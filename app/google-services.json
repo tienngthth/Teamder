@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "537858036303",
+    "project_id": "groupassigment-4b666",
+    "storage_bucket": "groupassigment-4b666.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:537858036303:android:c1a7c15b7fbb8907d3903a",
+        "android_client_info": {
+          "package_name": "com.example.teamder"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "537858036303-dmofjv7ds6thve03nelkbva0ip5e0p2p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBaLoaZYlRIdnWbQOUMWfGJWgdvTIXaBig"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "537858036303-dmofjv7ds6thve03nelkbva0ip5e0p2p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:537858036303:android:6d18af6bce630fd9d3903a",
+        "android_client_info": {
+          "package_name": "rmit.group20.groupassigment"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "537858036303-dmofjv7ds6thve03nelkbva0ip5e0p2p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBaLoaZYlRIdnWbQOUMWfGJWgdvTIXaBig"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "537858036303-dmofjv7ds6thve03nelkbva0ip5e0p2p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
