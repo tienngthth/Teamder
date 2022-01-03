@@ -1,53 +1,32 @@
 package com.example.teamder.model;
 
-import com.google.firebase.firestore.DocumentSnapshot;
+import java.util.ArrayList;
 
 public class User {
-
     private String name;
-    private String email;
+    private UserType type;
     private String uid;
-    private String id;
+    private ArrayList<String> coursesIDs;
+    private ArrayList<String> groupIDs;
+
+    public ArrayList<String> getCoursesIDs() {
+        return coursesIDs;
+    }
+
+    public void setCoursesIDs(ArrayList<String> coursesIDs) {
+        this.coursesIDs = coursesIDs;
+    }
+
+    public ArrayList<String> getGroupIDs() {
+        return groupIDs;
+    }
+
+    public void setGroupIDs(ArrayList<String> groupIDs) {
+        this.groupIDs = groupIDs;
+    }
 
     public User() {
-
-    }
-
-    public User(String name, String email, String uid) {
-        this.name = name;
-        this.email = email;
-        this.uid = uid;
-    }
-
-    public static User parseUser(DocumentSnapshot document) {
-        User volunteer = new User();
-        volunteer.setName(document.getString("name"));
-        volunteer.setEmail(document.getString("email"));
-        return volunteer;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
+        type = UserType.NORMAL;
     }
 
     public String getUid() {
@@ -58,4 +37,24 @@ public class User {
         this.uid = uid;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setType(Boolean isLeader, Boolean isSuperUser) {
+        if (isLeader) {
+            this.type = UserType.LEADER;
+        }
+        if (isSuperUser) {
+            this.type = UserType.SUPER_USER;
+        }
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public UserType getType() {
+        return type;
+    }
 }
