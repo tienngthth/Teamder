@@ -21,6 +21,8 @@
         <entry key="app/src/main/res/layout/dashboard_header.xml" value="0.375" />
         <entry key="app/src/main/res/layout/dashboard_row.xml" value="0.4244791666666667" />
         <entry key="app/src/main/res/layout/header.xml" value="0.40989583333333335" />
+        <entry key="app/src/main/res/layout/notification_row.xml" value="0.40989583333333335" />
+        <entry key="app/src/main/res/layout/request_course_row.xml" value="0.40989583333333335" />
       </map>
     </option>
   </component>

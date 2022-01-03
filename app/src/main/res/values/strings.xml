@@ -29,4 +29,12 @@
     <string name="name">Name</string>
     <string name="profile">Profile</string>
     <string name="explore">"Explore "</string>
+    <string name="request_message">Leave a message</string>
+    <string name="request_course">Course(s) request</string>
+    <string name="request_message_hint">Say hi...</string>
+    <string name="cancel">Cancel</string>
+    <string name="send">Send</string>
+    <string name="request_person">Name</string>
+    <string name="message">message</string>
+    <string name="timestamp">timestamp</string>
 </resources>
