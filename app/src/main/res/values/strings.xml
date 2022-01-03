@@ -37,4 +37,10 @@
     <string name="request_person">Name</string>
     <string name="message">message</string>
     <string name="timestamp">timestamp</string>
+    <string name="review_note">Notes from requester</string>
+    <string name="reject">Reject</string>
+    <string name="requester">Requester</string>
+    <string name="requests">All requests</string>
+    <string name="groups">Groups</string>
+    <string name="courses">Courses</string>
 </resources>

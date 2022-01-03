@@ -81,7 +81,7 @@
                     android:textColor="@color/blue_900_70" />
 
                 <LinearLayout
-                    android:id="@+id/sites_list"
+                    android:id="@+id/requests_list"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="30dp"
@@ -115,7 +115,7 @@
                             android:text="@string/cancel"
                             android:textAllCaps="false"
                             android:textColor="#546E7A"
-                            android:textSize="12sp"
+                            android:textSize="14sp"
                             tools:ignore="NestedWeights" />
 
                         <ImageButton
