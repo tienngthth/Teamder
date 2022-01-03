@@ -1,49 +1,32 @@
 package com.example.teamder.model;
 
-import static com.example.teamder.util.DateTimeUtil.getCurrentTime;
-
 public class Notification {
-
+    private String notiID;
+    private String userID;
     private String message;
-    private String timeStamp;
-    private String userId;
-    private String id;
-    private boolean hasPushed = false;
-    private boolean isSeen = false;
+    private boolean isSeen;
+    private boolean isPush;
 
-    public Notification() {
-    }
-
-    public Notification(String message, String userId) {
+    public Notification(String notiID, String userID, String message, boolean isSeen, boolean isPush) {
+        this.notiID = notiID;
+        this.userID = userID;
         this.message = message;
-        this.timeStamp = getCurrentTime();
-        this.userId = userId;
+        this.isSeen = isSeen;
+        this.isPush = isPush;
     }
 
-    public static void broadcastNotification(String message, String userId) {
-
+    public Notification(String userID, String message) {
+        this.userID = userID;
+        this.message = message;
+        this.isSeen = false;
     }
 
-    // parse from some type to notification
-    public static Notification parseNotification() {
-        Notification notification = new Notification();
-        return notification;
+    public String getUserID() {
+        return userID;
     }
 
-    public boolean isHasPushed() {
-        return hasPushed;
-    }
-
-    public void setHasPushed(boolean hasPushed) {
-        this.hasPushed = hasPushed;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
+    public void setUserID(String userID) {
+        this.userID = userID;
     }
 
     public String getMessage() {
@@ -62,19 +45,11 @@ public class Notification {
         isSeen = seen;
     }
 
-    public String getTimeStamp() {
-        return timeStamp;
+    public String getNotiID() {
+        return notiID;
     }
 
-    public void setTimeStamp(String timeStamp) {
-        this.timeStamp = timeStamp;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setNotiID(String notiID) {
+        this.notiID = notiID;
     }
 }

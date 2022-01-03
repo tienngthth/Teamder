@@ -43,4 +43,6 @@
     <string name="requests">All requests</string>
     <string name="groups">Groups</string>
     <string name="courses">Courses</string>
+    <string name="channel_name">notification_channel</string>
+    <string name="channel_description">notification_description</string>
 </resources>
