@@ -29,7 +29,6 @@ public class CurrentUser {
     public void updateUser(QueryDocumentSnapshot document) {
         User user = new User();
         user.setEmail(document.getString("email"));
-        user.setType(document.getString("type"));
         user.setName(document.getString("name"));
         user.setUid(document.getString("uid"));
         user.setId(document.getId());

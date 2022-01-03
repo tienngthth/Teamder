@@ -4,10 +4,13 @@ import java.util.ArrayList;
 
 public class User {
     private String name;
+
+    private String email;
     private UserType type;
     private String uid;
     private ArrayList<String> coursesIDs;
     private ArrayList<String> groupIDs;
+    private String id;
 
     public ArrayList<String> getCoursesIDs() {
         return coursesIDs;
@@ -23,6 +26,13 @@ public class User {
 
     public void setGroupIDs(ArrayList<String> groupIDs) {
         this.groupIDs = groupIDs;
+    }
+
+    public User(String name, String email, String uid) {
+        this.name = name;
+        this.email = email;
+        this.uid = uid;
+        type = UserType.NORMAL;
     }
 
     public User() {
@@ -56,5 +66,21 @@ public class User {
 
     public UserType getType() {
         return type;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }
