@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AlertDialogCustom">
+        <item name="fontFamily">@font/poppins_regular</item>
+        <item name="android:textColor">@color/blue_900</item>
+        <item name="android:textColorPrimary">@color/blue_grey_500</item>
+        <item name="android:layout_marginBottom">2dp</item>
+    </style>
+</resources>
+

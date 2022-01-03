@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">Teamder</string>
+    <string name="login_message">Login to your account</string>
+    <string name="email_input">Email</string>
+    <string name="password_input">Password</string>
+    <string name="social_distancing">social distancing</string>
+    <string name="login_button">login button</string>
+    <string name="password_title">Password</string>
+    <string name="register_account">Register</string>
+    <string name="register_message">Create your new account</string>
+    <string name="email_title">Email</string>
+    <string name="name_title">Your name</string>
+    <string name="confirm_password">Confirm password</string>
+    <string name="sign_up_button">Sign Up</string>
+    <string name="notification">Notification</string>
+    <string name="past_notifications">Past notifications</string>
+    <string name="new_notifications">New notifications</string>
+    <string name="no_notification">You don\'t have any notifications</string>
+    <string name="top_background">top background</string>
+    <string name="home_welcome">Hi</string>
+    <string name="home_username" />
+    <string name="logout_icon">logout icon</string>
+    <string name="notification_icon">notification icon</string>
+    <string name="new_notification">(+1)</string>
+    <string name="dashboard">Dashboard</string>
+    <string name="teamee">Teamee</string>
+    <string name="status">Status</string>
+    <string name="course">Course</string>
+    <string name="name">Name</string>
+    <string name="profile">Profile</string>
+    <string name="explore">"Explore "</string>
+</resources>
