@@ -31,7 +31,7 @@
     <string name="explore">"Explore "</string>
     <string name="request_message">Leave a message</string>
     <string name="request_course">Course(s) request</string>
-    <string name="request_message_hint">Say hi...</string>
+    <string name="request_message_hint">Say hi…</string>
     <string name="cancel">Cancel</string>
     <string name="send">Send</string>
     <string name="request_person">Name</string>
@@ -45,4 +45,12 @@
     <string name="courses">Courses</string>
     <string name="channel_name">notification_channel</string>
     <string name="channel_description">notification_description</string>
+    <string name="course_request">Course</string>
+    <string name="sID">sID</string>
+    <string name="gpa">GPA</string>
+    <string name="phone">Phone</string>
+    <string name="major">Major</string>
+    <string name="introduction">Introduction</string>
+    <string name="enrolling_courses">Enrolling courses</string>
+    <string name="comments">Comments</string>
 </resources>

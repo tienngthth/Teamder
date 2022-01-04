@@ -1,32 +1,54 @@
 package com.example.teamder.model;
 
+import static com.example.teamder.util.DateTimeUtil.getCurrentTime;
+
+import com.example.teamder.repository.NotificationRepository;
+import com.google.firebase.firestore.DocumentSnapshot;
+
 public class Notification {
-    private String notiID;
-    private String userID;
+
     private String message;
-    private boolean isSeen;
-    private boolean isPush;
+    private String timeStamp;
+    private String userId;
+    private String id;
+    private boolean hasPushed = false;
+    private boolean isSeen = false;
 
-    public Notification(String notiID, String userID, String message, boolean isSeen, boolean isPush) {
-        this.notiID = notiID;
-        this.userID = userID;
+    public Notification() {
+    }
+
+    public Notification(String message, String userId) {
         this.message = message;
-        this.isSeen = isSeen;
-        this.isPush = isPush;
+        this.timeStamp = getCurrentTime();
+        this.userId = userId;
     }
 
-    public Notification(String userID, String message) {
-        this.userID = userID;
-        this.message = message;
-        this.isSeen = false;
+    public static void broadcastNotification(String message, String userId) {
+        NotificationRepository.createNotification(new Notification(message, userId));
     }
 
-    public String getUserID() {
-        return userID;
+    public static Notification parseNotification(DocumentSnapshot document) {
+        Notification notification = new Notification();
+        notification.setMessage(document.getString("message"));
+        notification.setTimeStamp(document.getString("timeStamp"));
+        notification.setId(document.getId());
+        return notification;
     }
 
-    public void setUserID(String userID) {
-        this.userID = userID;
+    public boolean isHasPushed() {
+        return hasPushed;
+    }
+
+    public void setHasPushed(boolean hasPushed) {
+        this.hasPushed = hasPushed;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getMessage() {
@@ -45,11 +67,19 @@ public class Notification {
         isSeen = seen;
     }
 
-    public String getNotiID() {
-        return notiID;
+    public String getTimeStamp() {
+        return timeStamp;
     }
 
-    public void setNotiID(String notiID) {
-        this.notiID = notiID;
+    public void setTimeStamp(String timeStamp) {
+        this.timeStamp = timeStamp;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

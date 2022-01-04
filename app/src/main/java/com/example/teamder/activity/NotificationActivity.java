@@ -1,5 +1,8 @@
 package com.example.teamder.activity;
 
+import static com.example.teamder.model.Notification.parseNotification;
+import static com.example.teamder.repository.UtilRepository.updateFieldToDb;
+
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,10 +13,18 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.teamder.R;
+import com.example.teamder.model.CurrentUser;
 import com.example.teamder.model.Notification;
+import com.example.teamder.repository.NotificationRepository;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
 
 public class NotificationActivity extends AppCompatActivity {
 
+    private final ArrayList<String> newNotificationIDs = new ArrayList<>();
+    private final String currentUserID = CurrentUser.getInstance().getUser().getId();
     private LinearLayout pastNotificationList, newNotificationList, pastNotificationGroup, newNotificationGroup;
     private LayoutInflater inflater;
     private TextView noNotification;
@@ -35,27 +46,41 @@ public class NotificationActivity extends AppCompatActivity {
         noNotification = findViewById(R.id.no_notification);
     }
 
-    // get all pass notification
     private void getPastNotifications() {
-        // 1. get pass notification
-        // 2. call updateNotificationView
-        // 3. call getNewNotifications
+        NotificationRepository.getNotificationByUserIdAndSeenValue(
+                currentUserID,
+                true,
+                (querySnapshot) -> {
+                    updateNotificationView("PAST", querySnapshot);
+                    getNewNotifications();
+                }
+        );
     }
 
-    // get new notification
     private void getNewNotifications() {
-        // 1. get new notification
-        // 2. call updateNotificationView
+        NotificationRepository.getNotificationByUserIdAndSeenValue(
+                currentUserID,
+                false,
+                (querySnapshot) -> {
+                    updateNotificationView("NEW", querySnapshot);
+                    noNotificationFound();
+                }
+        );
     }
 
-    // update notification view, update parameters to pass in results type ()
-    private void updateNotificationView(String notificationGroup) {
+    private void updateNotificationView(String notificationGroup, QuerySnapshot documents) {
         if (notificationGroup.equals("PAST")) {
-            // 1. set pastNotificationGroup visibility based on notification lengths
-            // 2. call setupCustomItemView
+            pastNotificationGroup.setVisibility(documents.size() < 1 ? View.GONE : View.VISIBLE);
+            for (QueryDocumentSnapshot document : documents) {
+                setupCustomItemView(pastNotificationList, parseNotification(document));
+            }
         } else {
-            // 1. set newNotificationGroup visibility based on notification lengths
-            // 2. call setupCustomItemView
+            newNotificationGroup.setVisibility(documents.size() < 1 ? View.GONE : View.VISIBLE);
+            for (QueryDocumentSnapshot document : documents) {
+                Notification notification = parseNotification(document);
+                setupCustomItemView(newNotificationList, notification);
+                newNotificationIDs.add(notification.getId());
+            }
         }
     }
 
@@ -80,8 +105,9 @@ public class NotificationActivity extends AppCompatActivity {
         seenAllNotification();
     }
 
-    //  mark all notification to seen
     private void seenAllNotification() {
-
+        for (String notificationID : newNotificationIDs) {
+            updateFieldToDb("notifications", notificationID, "seen", true);
+        }
     }
 }

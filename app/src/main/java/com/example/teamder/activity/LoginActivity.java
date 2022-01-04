@@ -19,6 +19,7 @@ import com.example.teamder.R;
 import com.example.teamder.model.CurrentUser;
 import com.example.teamder.repository.AuthenticationRepository;
 import com.example.teamder.repository.UserRepository;
+import com.example.teamder.service.NotificationService;
 import com.example.teamder.util.ScreenUtil;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -88,10 +89,15 @@ public class LoginActivity extends AppCompatActivity {
                     toHome();
                 }
                 if (currentUser.getUser() != null) {
-                    // start notification service
+                    startNotificationService();
                 }
             }
         });
+    }
+
+    private void startNotificationService() {
+        Intent intent = new Intent(LoginActivity.this, NotificationService.class);
+        startService(intent);
     }
 
     public void login() {
