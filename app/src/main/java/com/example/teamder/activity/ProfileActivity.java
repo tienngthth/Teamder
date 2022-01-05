@@ -1,11 +1,14 @@
 package com.example.teamder.activity;
 
 import static com.example.teamder.model.Review.parseReview;
+import static com.example.teamder.model.User.parseUser;
 import static com.example.teamder.repository.ReviewRepository.getReviewByUserId;
+import static com.example.teamder.repository.UserRepository.getUserById;
 import static com.example.teamder.repository.UtilRepository.updateFieldToDb;
 import static com.example.teamder.util.ScreenUtil.clearFocus;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +24,7 @@ import com.example.teamder.R;
 import com.example.teamder.model.CurrentUser;
 import com.example.teamder.model.Review;
 import com.example.teamder.model.User;
+import com.example.teamder.repository.UserRepository;
 import com.example.teamder.util.ValidationUtil;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -28,19 +32,31 @@ import java.util.ArrayList;
 
 public class ProfileActivity extends AppCompatActivity {
 
-    private final User currentUser = CurrentUser.getInstance().getUser();
+    private User user = null;
+    private String userId = null;
     private EditText name, major, sID, GPA, introduction, phone;
+    private View phoneLine, nameLine, majorLine, sIDLine, GPALine, introductionLine;
     private ImageButton addCourseButton;
     private LayoutInflater inflater;
-    private LinearLayout reviewList, courseList, fullscreenConstraint;
+    private LinearLayout reviewList, courseList, fullscreenConstraint, actions;
+    private String action = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         initialiseVariables();
-        setUpListeners();
-        setUpScreen();
+        if (userId != null) {
+            getUserById(userId, (document) -> {
+                user = parseUser(document);
+                setUpListeners();
+                setUpScreen();
+            });
+        } else {
+            user = CurrentUser.getInstance().getUser();
+            setUpListeners();
+            setUpScreen();
+        }
     }
 
     private void initialiseVariables() {
@@ -54,7 +70,24 @@ public class ProfileActivity extends AppCompatActivity {
         courseList = findViewById(R.id.courses_list);
         reviewList = findViewById(R.id.reviews_list);
         fullscreenConstraint = findViewById(R.id.full_screen);
+        phoneLine = findViewById(R.id.phone_line);
+        nameLine = findViewById(R.id.name_line);
+        majorLine = findViewById(R.id.major_line);
+        sIDLine = findViewById(R.id.sID_line);
+        GPALine = findViewById(R.id.GPA_line);
+        introductionLine = findViewById(R.id.introduction_line);
+        actions = findViewById(R.id.actions);
         inflater = LayoutInflater.from(this);
+        checkIntent();
+    }
+
+    private void checkIntent() {
+        Intent intent = getIntent();
+        Bundle bundle = intent.getExtras();
+        if (bundle != null) {
+            action = bundle.get("action").toString();
+            userId = bundle.get("userId").toString();
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -74,20 +107,38 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void setUpScreen() {
-        name.setText(currentUser.getName());
-        major.setText(currentUser.getMajor());
-        sID.setText(currentUser.getsId());
-        phone.setText(currentUser.getPhone());
-        introduction.setText(currentUser.getIntroduction());
-        GPA.setText(String.valueOf(currentUser.getGPA()));
+        name.setText(user.getName());
+        major.setText(user.getMajor());
+        sID.setText(user.getsId());
+        phone.setText(user.getPhone());
+        introduction.setText(user.getIntroduction());
+        GPA.setText(String.valueOf(user.getGPA()));
         setUpCoursesList();
         setUpReviewsList();
+        setEditable();
+    }
+
+    private void setEditable() {
+        addCourseButton.setVisibility(action.equals("explore") ? View.GONE : View.VISIBLE);
+        actions.setVisibility(action.equals("explore") ? View.VISIBLE : View.GONE);
+        majorLine.setVisibility(action.equals("explore") ? View.GONE : View.VISIBLE);
+        nameLine.setVisibility(action.equals("explore") ? View.GONE : View.VISIBLE);
+        phoneLine.setVisibility(action.equals("explore") ? View.GONE : View.VISIBLE);
+        sIDLine.setVisibility(action.equals("explore") ? View.GONE : View.VISIBLE);
+        introductionLine.setVisibility(action.equals("explore") ? View.GONE : View.VISIBLE);
+        GPALine.setVisibility(action.equals("explore") ? View.GONE : View.VISIBLE);
+        name.setEnabled(!action.equals("explore"));
+        phone.setEnabled(!action.equals("explore"));
+        GPA.setEnabled(!action.equals("explore"));
+        major.setEnabled(!action.equals("explore"));
+        introduction.setEnabled(!action.equals("explore"));
+        sID.setEnabled(!action.equals("explore"));
     }
 
     @SuppressLint("SetTextI18n")
     private void setUpReviewsList() {
         reviewList.removeAllViews();
-        getReviewByUserId(currentUser.getId(), (querySnapshot) -> {
+        getReviewByUserId(user.getId(), (querySnapshot) -> {
             int size = querySnapshot.size();
             if (size > 0) {
                 findViewById(R.id.reviews).setVisibility(View.VISIBLE);
@@ -114,7 +165,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     private void setUpCoursesList() {
-        ArrayList<String> courses = currentUser.getCourses();
+        ArrayList<String> courses = user.getCourses();
         int size = courses.size();
         courseList.removeAllViews();
         if (size > 0) {
@@ -132,23 +183,50 @@ public class ProfileActivity extends AppCompatActivity {
     private void setupCustomCourseView(String name, int index) {
         View itemView = inflater.inflate(R.layout.enrolled_courses_row, null, false);
         ((TextView) itemView.findViewById(R.id.course)).setText(name);
-        ((ImageButton) itemView.findViewById(R.id.remove_course)).setOnClickListener((View view) -> {
-            currentUser.removeCourse(index);
-            updateFieldToDb("users", currentUser.getId(), "courses", currentUser.getCourses());
-            setUpCoursesList();
-        });
+        if (action.equals("explore")) {
+            itemView.findViewById(R.id.remove_course).setVisibility(View.GONE);
+        } else {
+            itemView.findViewById(R.id.remove_course).setVisibility(View.VISIBLE);
+            ((ImageButton) itemView.findViewById(R.id.remove_course)).setOnClickListener((View view) -> {
+                user.removeCourse(index);
+                updateFieldToDb("users", user.getId(), "courses", user.getCourses());
+                setUpCoursesList();
+            });
+        }
         courseList.addView(itemView);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        updateFieldToDb("users", currentUser.getId(), "name", name.getText().toString());
-        updateFieldToDb("users", currentUser.getId(), "major", major.getText().toString());
-        updateFieldToDb("users", currentUser.getId(), "sID", sID.getText().toString());
-        updateFieldToDb("users", currentUser.getId(), "GPA", GPA.getText().toString());
-        updateFieldToDb("users", currentUser.getId(), "introduction", introduction.getText().toString());
-        updateFieldToDb("users", currentUser.getId(), "phone", phone.getText().toString());
+        if (CurrentUser.getInstance().getUser().getId().equals(user.getId())) {
+            user.setName(name.getText().toString());
+            updateFieldToDb("users", user.getId(), "name", name.getText().toString(), (v) -> {
+                updateUser();
+            });
+            updateFieldToDb("users", user.getId(), "major", major.getText().toString(), (v) -> {
+                updateUser();
+            });
+            updateFieldToDb("users", user.getId(), "sID", sID.getText().toString(), (v) -> {
+                updateUser();
+            });
+            updateFieldToDb("users", user.getId(), "GPA", GPA.getText().toString(), (v) -> {
+                updateUser();
+            });
+            updateFieldToDb("users", user.getId(), "introduction", introduction.getText().toString(), (v) -> {
+                updateUser();
+            });
+            updateFieldToDb("users", user.getId(), "phone", phone.getText().toString(), (v) -> {
+                updateUser();
+            });
+        }
+        updateUser();
+    }
+
+    private void updateUser() {
+        UserRepository.getUserById(user.getId(), document -> {
+                CurrentUser.getInstance().updateUser(document);
+        });
     }
 
     @SuppressLint("SetTextI18n")
@@ -158,7 +236,8 @@ public class ProfileActivity extends AppCompatActivity {
         EditText editText = view.findViewById(R.id.course_name);
         builder.setView(view)
                 .setPositiveButton("Cancel", (dialog, which) -> dialog.dismiss())
-                .setNegativeButton("Confirm", (dialog, id) -> {});
+                .setNegativeButton("Confirm", (dialog, id) -> {
+                });
         AlertDialog dialog = builder.create();
         dialog.show();
         dialog.getButton(dialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.white));
@@ -167,10 +246,10 @@ public class ProfileActivity extends AppCompatActivity {
         dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(v -> {
             String name = ValidationUtil.validateNameInput(editText);
             if (name != null) {
-                currentUser.addCourse(name);
+                user.addCourse(name);
                 dialog.dismiss();
                 setUpCoursesList();
-                updateFieldToDb("users", currentUser.getId(), "courses", currentUser.getCourses());
+                updateFieldToDb("users", user.getId(), "courses", user.getCourses());
             }
         });
     }

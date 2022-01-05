@@ -29,7 +29,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private final User currentUser = CurrentUser.getInstance().getUser();
     private TextView userNameView, requestsTitle, coursesTitle;
-    private ImageButton logoutButton, notificationButton, profileButton;
+    private ImageButton logoutButton, notificationButton, profileButton, exploreButton;
     private LinearLayout requestListView, courseListView;
     private LayoutInflater inflater;
     private TextView newNotificationCount;
@@ -52,6 +52,7 @@ public class HomeActivity extends AppCompatActivity {
         courseListView = findViewById(R.id.courses_list);
         newNotificationCount = findViewById(R.id.new_notification_count);
         profileButton = findViewById(R.id.profile_button);
+        exploreButton = findViewById(R.id.explore_button);
         inflater = LayoutInflater.from(this);
     }
 
@@ -59,6 +60,7 @@ public class HomeActivity extends AppCompatActivity {
         logoutButton.setOnClickListener((View view) -> openConfirmationDialog());
         notificationButton.setOnClickListener((View view) -> navigateUser(NotificationActivity.class));
         profileButton.setOnClickListener((View view) -> navigateUser(ProfileActivity.class));
+        exploreButton.setOnClickListener((View view) -> explore());
     }
 
     private void openConfirmationDialog() {
@@ -204,6 +206,13 @@ public class HomeActivity extends AppCompatActivity {
 
     private void navigateUser(Class activity) {
         Intent intent = new Intent(HomeActivity.this, activity);
+        startActivity(intent);
+    }
+
+    private void explore() {
+        Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
+        intent.putExtra("action", "explore");
+        intent.putExtra("userId", "eCWYH9PXaCCfYVnPRij5");
         startActivity(intent);
     }
 

@@ -14,6 +14,10 @@ public class CallbackInterfaces {
         void onCallBack();
     }
 
+    public interface VoidCallBack {
+        void onCallBack(Void v);
+    }
+
     public interface DocRefCallBack {
         void onCallBack(DocumentReference documentReference);
     }
