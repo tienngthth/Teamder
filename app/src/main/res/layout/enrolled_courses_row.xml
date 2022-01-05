@@ -10,10 +10,11 @@
         android:layout_marginBottom="10dp"
         android:orientation="horizontal"
         android:layout_gravity="center_vertical"
-        android:padding="10dp"
+        android:paddingTop="10dp"
         tools:ignore="UselessParent">
 
         <TextView
+            android:id="@+id/course"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -26,7 +27,8 @@
             tools:ignore="RtlSymmetry" />
 
         <ImageButton
-            android:layout_width="wrap_content"
+            android:id="@+id/remove_course"
+            android:layout_width="50dp"
             android:layout_height="match_parent"
             android:background="@android:color/transparent"
             android:src="@drawable/ic_x_circle"

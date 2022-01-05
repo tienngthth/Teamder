@@ -16,7 +16,7 @@
         tools:ignore="SpeakableTextPresentCheck">
 
         <LinearLayout
-            android:id="@+id/activity_site_detail"
+            android:id="@+id/full_screen"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -45,7 +45,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="30dp"
                 android:fontFamily="@font/poppins_semibold"
-                android:gravity="bottom"
+                android:gravity="center_vertical"
                 android:importantForAutofill="no"
                 android:inputType="textPersonName"
                 android:minHeight="48dp"
@@ -63,14 +63,14 @@
                 android:textSize="12sp" />
 
             <EditText
-                android:id="@+id/leader_name"
+                android:id="@+id/introduction"
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:layout_marginTop="20dp"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="30dp"
                 android:fontFamily="@font/poppins_bold"
+                android:gravity="top|start"
                 android:importantForAutofill="no"
-                android:inputType="textLongMessage"
+                android:inputType="textMultiLine"
                 android:paddingBottom="20dp"
                 android:textColor="@color/blue_900"
                 android:textSize="16sp"
@@ -90,7 +90,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="30dp"
                 android:fontFamily="@font/poppins_bold"
-                android:gravity="bottom"
+                android:gravity="center_vertical"
                 android:importantForAutofill="no"
                 android:inputType="text"
                 android:minHeight="48dp"
@@ -113,16 +113,15 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="30dp"
                 android:fontFamily="@font/poppins_bold"
-                android:gravity="bottom"
+                android:gravity="center_vertical"
                 android:importantForAutofill="no"
-                android:inputType="text"
+                android:inputType="number"
                 android:minHeight="48dp"
                 android:textColor="@color/blue_900"
                 android:textSize="16sp"
                 tools:ignore="LabelFor,SpeakableTextPresentCheck" />
 
             <TextView
-                android:id="@+id/start_date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/poppins_light"
@@ -136,7 +135,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="30dp"
                 android:fontFamily="@font/poppins_bold"
-                android:gravity="bottom"
+                android:gravity="center_vertical"
                 android:importantForAutofill="no"
                 android:inputType="phone"
                 android:minHeight="48dp"
@@ -159,7 +158,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="30dp"
                 android:fontFamily="@font/poppins_bold"
-                android:gravity="bottom"
+                android:gravity="center_vertical"
                 android:importantForAutofill="no"
                 android:inputType="text"
                 android:minHeight="48dp"
@@ -173,18 +172,37 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:fontFamily="@font/poppins_light"
-                    android:text="@string/enrolling_courses"
-                    android:textColor="@color/blue_900"
-                    android:textSize="12sp"
-                    tools:ignore="DuplicateIds" />
+                    android:gravity="left"
+                    android:orientation="horizontal"
+                    tools:ignore="RtlHardcoded">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/poppins_light"
+                        android:text="@string/enrolling_courses"
+                        android:textColor="@color/blue_900"
+                        android:textSize="12sp"
+                        tools:ignore="DuplicateIds" />
+
+                    <TextView
+                        android:id="@+id/enrolling_courses_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/poppins_light"
+                        android:text="@string/new_notification"
+                        android:textColor="@color/blue_900"
+                        android:visibility="gone"
+                        android:textSize="12sp" />
+                </LinearLayout>
 
                 <ImageButton
-                    android:layout_width="wrap_content"
+                    android:id="@+id/add_course"
+                    android:layout_width="50dp"
                     android:layout_height="wrap_content"
                     android:backgroundTint="@android:color/transparent"
                     android:src="@drawable/ic_plus_circle"
@@ -196,28 +214,45 @@
                 android:id="@+id/courses_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
                 android:layout_marginBottom="30dp"
-                android:orientation="vertical"
-                android:padding="15dp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/poppins_light"
-                android:text="@string/comments"
-                android:textColor="@color/blue_900"
-                android:textSize="12sp"
-                tools:ignore="DuplicateIds" />
+                android:orientation="vertical" />
 
             <LinearLayout
-                android:id="@+id/comments_list"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:orientation="horizontal"
+                tools:ignore="RtlHardcoded">
+
+                <TextView
+                    android:id="@+id/reviews"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins_light"
+                    android:text="@string/reviews"
+                    android:textColor="@color/blue_900"
+                    android:textSize="12sp"
+                    tools:ignore="DuplicateIds" />
+
+                <TextView
+                    android:id="@+id/reviews_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins_light"
+                    android:text="@string/new_notification"
+                    android:textColor="@color/blue_900"
+                    android:visibility="gone"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/reviews_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="30dp"
-                android:orientation="vertical"
-                android:padding="15dp" />
+                android:orientation="vertical" />
 
         </LinearLayout>
 

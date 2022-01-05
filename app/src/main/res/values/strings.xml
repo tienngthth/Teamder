@@ -21,7 +21,7 @@
     <string name="home_username" />
     <string name="logout_icon">logout icon</string>
     <string name="notification_icon">notification icon</string>
-    <string name="new_notification">(+1)</string>
+    <string name="new_notification"> (+1)</string>
     <string name="dashboard">Dashboard</string>
     <string name="teamee">Teamee</string>
     <string name="status">Status</string>
@@ -53,4 +53,6 @@
     <string name="introduction">Introduction</string>
     <string name="enrolling_courses">Enrolling courses</string>
     <string name="comments">Comments</string>
+    <string name="course_name">Enter course name:</string>
+    <string name="reviews">Reviews</string>
 </resources>

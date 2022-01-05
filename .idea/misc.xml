@@ -19,10 +19,11 @@
         <entry key="app/src/main/res/layout/activity_home.xml" value="0.40989583333333335" />
         <entry key="app/src/main/res/layout/activity_login.xml" value="0.41041666666666665" />
         <entry key="app/src/main/res/layout/activity_notification.xml" value="0.40989583333333335" />
-        <entry key="app/src/main/res/layout/activity_profile.xml" value="0.25" />
+        <entry key="app/src/main/res/layout/activity_profile.xml" value="0.335" />
         <entry key="app/src/main/res/layout/activity_request.xml" value="0.40989583333333335" />
         <entry key="app/src/main/res/layout/activity_review.xml" value="0.234375" />
         <entry key="app/src/main/res/layout/activity_sign_up.xml" value="0.375" />
+        <entry key="app/src/main/res/layout/course_input_form.xml" value="0.234375" />
         <entry key="app/src/main/res/layout/courses_header.xml" value="0.40989583333333335" />
         <entry key="app/src/main/res/layout/courses_row.xml" value="0.40989583333333335" />
         <entry key="app/src/main/res/layout/dashboard_header.xml" value="0.375" />

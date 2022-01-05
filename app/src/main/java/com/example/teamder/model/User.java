@@ -3,21 +3,32 @@ package com.example.teamder.model;
 import java.util.ArrayList;
 
 public class User {
-    private String name;
 
-    private String email;
-    private UserType type;
-    private String uid;
-    private ArrayList<String> coursesIDs;
-    private ArrayList<String> groupIDs;
     private String id;
+    private String name;
+    private String uid;
+    private double GPA = 4;
+    private String major = "";
+    private String sId = "";
+    private String phone = "";
+    private String introduction = "";
+    private ArrayList<String> courses = new ArrayList<>();
+    private ArrayList<String> groupIDs = new ArrayList<>();
 
-    public ArrayList<String> getCoursesIDs() {
-        return coursesIDs;
+    public void addCourse(String course) {
+        courses.add(course);
     }
 
-    public void setCoursesIDs(ArrayList<String> coursesIDs) {
-        this.coursesIDs = coursesIDs;
+    public void removeCourse(int index) {
+        courses.remove(index);
+    }
+
+    public ArrayList<String> getCourses() {
+        return courses;
+    }
+
+    public void setCourses(ArrayList<String> coursesIDs) {
+        this.courses = coursesIDs;
     }
 
     public ArrayList<String> getGroupIDs() {
@@ -30,14 +41,10 @@ public class User {
 
     public User(String name, String email, String uid) {
         this.name = name;
-        this.email = email;
         this.uid = uid;
-        type = UserType.NORMAL;
     }
 
-    public User() {
-        type = UserType.NORMAL;
-    }
+    public User() {}
 
     public String getUid() {
         return uid;
@@ -51,29 +58,48 @@ public class User {
         this.name = name;
     }
 
-    public void setType(Boolean isLeader, Boolean isSuperUser) {
-        if (isLeader) {
-            this.type = UserType.LEADER;
-        }
-        if (isSuperUser) {
-            this.type = UserType.SUPER_USER;
-        }
-    }
-
     public String getName() {
         return name;
     }
 
-    public UserType getType() {
-        return type;
+    public double getGPA() {
+        return GPA;
     }
 
-    public String getEmail() {
-        return email;
+    public void setGPA(double GPA) {
+        this.GPA = GPA;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public String getMajor() {
+        return major;
+    }
+
+    public void setMajor(String major) {
+        this.major = major;
+    }
+
+    public String getsId() {
+        return sId;
+    }
+
+    public void setsId(String sId) {
+        this.sId = sId;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getIntroduction() {
+        return introduction;
+    }
+
+    public void setIntroduction(String introduction) {
+        this.introduction = introduction;
     }
 
     public String getId() {

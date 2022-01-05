@@ -1,10 +1,12 @@
 package com.example.teamder.model;
 
+import com.google.firebase.firestore.DocumentSnapshot;
+
 public class Review {
     private String uid;
     private String userID;
-    private int rating;
     private String comment;
+    private String timeStamp;
 
     public String getUid() {
         return uid;
@@ -22,19 +24,26 @@ public class Review {
         this.userID = userID;
     }
 
-    public int getRating() {
-        return rating;
-    }
-
-    public void setRating(int rating) {
-        this.rating = rating;
-    }
-
     public String getComment() {
         return comment;
     }
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public String getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(String timeStamp) {
+        this.timeStamp = timeStamp;
+    }
+
+    public static Review parseReview(DocumentSnapshot document) {
+        Review review = new Review();
+        review.setComment(document.getString("comment"));
+        review.setTimeStamp(document.getString("timeStamp"));
+        return review;
     }
 }

@@ -29,7 +29,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private final User currentUser = CurrentUser.getInstance().getUser();
     private TextView userNameView, requestsTitle, coursesTitle;
-    private ImageButton logoutButton, notificationButton;
+    private ImageButton logoutButton, notificationButton, profileButton;
     private LinearLayout requestListView, courseListView;
     private LayoutInflater inflater;
     private TextView newNotificationCount;
@@ -40,7 +40,6 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
         initialiseVariables();
         setupListener();
-        setupScreen();
     }
 
     private void initialiseVariables() {
@@ -52,12 +51,14 @@ public class HomeActivity extends AppCompatActivity {
         coursesTitle = findViewById(R.id.all_courses);
         courseListView = findViewById(R.id.courses_list);
         newNotificationCount = findViewById(R.id.new_notification_count);
+        profileButton = findViewById(R.id.profile_button);
         inflater = LayoutInflater.from(this);
     }
 
     private void setupListener() {
         logoutButton.setOnClickListener((View view) -> openConfirmationDialog());
-        notificationButton.setOnClickListener((View view) -> toNotification());
+        notificationButton.setOnClickListener((View view) -> navigateUser(NotificationActivity.class));
+        profileButton.setOnClickListener((View view) -> navigateUser(ProfileActivity.class));
     }
 
     private void openConfirmationDialog() {
@@ -77,7 +78,7 @@ public class HomeActivity extends AppCompatActivity {
         CurrentUser.getInstance().setUser(null);
         AuthenticationRepository.signOut();
         NotificationService.listenerRegistration.remove();
-        toLogin();
+        navigateUser(LoginActivity.class);
         finish();
     }
 
@@ -104,6 +105,7 @@ public class HomeActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         updateList();
+        setupScreen();
     }
 
     private void updateList() {
@@ -200,13 +202,8 @@ public class HomeActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void toNotification() {
-        Intent intent = new Intent(HomeActivity.this, NotificationActivity.class);
-        startActivity(intent);
-    }
-
-    private void toLogin() {
-        Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
+    private void navigateUser(Class activity) {
+        Intent intent = new Intent(HomeActivity.this, activity);
         startActivity(intent);
     }
 

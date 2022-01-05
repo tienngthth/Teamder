@@ -127,7 +127,6 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-
     private boolean clearInputFieldsFocus(View view) {
         clearFocus(view, emailInput, this);
         clearFocus(view, passwordInput, this);

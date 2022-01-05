@@ -11,7 +11,9 @@
         android:theme="@style/Theme.Teamder">
         <activity
             android:name=".activity.ProfileActivity"
-            android:exported="true" />
+            android:exported="true" >
+
+        </activity>
         <activity
             android:name=".activity.CourseActivity"
             android:exported="true" />
@@ -39,6 +41,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service android:name=".service.NotificationService" />
     </application>
 
 </manifest>

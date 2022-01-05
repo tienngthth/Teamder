@@ -94,7 +94,7 @@
                 >
 
                 <ImageButton
-                    android:id="@+id/create_site_button"
+                    android:id="@+id/explore_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -132,7 +132,7 @@
                 </LinearLayout>
 
                 <ImageButton
-                    android:id="@+id/logout_button"
+                    android:id="@+id/profile_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
