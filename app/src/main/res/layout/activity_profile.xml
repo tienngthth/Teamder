@@ -67,6 +67,7 @@
                     android:id="@+id/name_line"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
+                    android:visibility="gone"
                     android:background="@color/blue_700"
                     tools:ignore="MissingConstraints" />
 
@@ -105,6 +106,7 @@
                 <View
                     android:id="@+id/introduction_line"
                     android:layout_width="match_parent"
+                    android:visibility="gone"
                     android:layout_height="1dp"
                     android:background="@color/blue_700"
                     tools:ignore="MissingConstraints" />
@@ -143,6 +145,7 @@
                     android:id="@+id/sID_line"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
+                    android:visibility="gone"
                     android:background="@color/blue_700"
                     tools:ignore="MissingConstraints" />
 
@@ -182,6 +185,7 @@
                     android:id="@+id/GPA_line"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
+                    android:visibility="gone"
                     android:background="@color/blue_700"
                     tools:ignore="MissingConstraints" />
 
@@ -220,6 +224,7 @@
                     android:id="@+id/phone_line"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
+                    android:visibility="gone"
                     android:background="@color/blue_700"
                     tools:ignore="MissingConstraints" />
 
@@ -259,6 +264,7 @@
                     android:id="@+id/major_line"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
+                    android:visibility="gone"
                     android:background="@color/blue_700"
                     tools:ignore="MissingConstraints" />
 
@@ -266,7 +272,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="50dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -368,7 +374,7 @@
                     tools:ignore="NestedWeights">
 
                     <Button
-                        android:id="@+id/cancel_button"
+                        android:id="@+id/pass_button"
                         android:layout_width="0dp"
                         android:layout_height="50dp"
                         android:layout_weight="1"

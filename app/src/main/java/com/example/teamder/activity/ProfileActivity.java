@@ -12,10 +12,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,6 +25,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.teamder.R;
 import com.example.teamder.model.CurrentUser;
 import com.example.teamder.model.Review;
+import com.example.teamder.model.ToVisitUserList;
 import com.example.teamder.model.User;
 import com.example.teamder.repository.UserRepository;
 import com.example.teamder.util.ValidationUtil;
@@ -32,11 +35,14 @@ import java.util.ArrayList;
 
 public class ProfileActivity extends AppCompatActivity {
 
+    private final ToVisitUserList toVisitUserList = ToVisitUserList.getInstance();
+    private final User currentUser = CurrentUser.getInstance().getUser();
     private User user = null;
     private String userId = null;
     private EditText name, major, sID, GPA, introduction, phone;
     private View phoneLine, nameLine, majorLine, sIDLine, GPALine, introductionLine;
-    private ImageButton addCourseButton;
+    private ImageButton addCourseButton, requestButton;
+    private Button passButton;
     private LayoutInflater inflater;
     private LinearLayout reviewList, courseList, fullscreenConstraint, actions;
     private String action = "";
@@ -77,6 +83,8 @@ public class ProfileActivity extends AppCompatActivity {
         GPALine = findViewById(R.id.GPA_line);
         introductionLine = findViewById(R.id.introduction_line);
         actions = findViewById(R.id.actions);
+        passButton = findViewById(R.id.pass_button);
+        requestButton = findViewById(R.id.request_button);
         inflater = LayoutInflater.from(this);
         checkIntent();
     }
@@ -86,7 +94,7 @@ public class ProfileActivity extends AppCompatActivity {
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
             action = bundle.get("action").toString();
-            userId = bundle.get("userId").toString();
+            userId = toVisitUserList.getUserID();
         }
     }
 
@@ -94,6 +102,32 @@ public class ProfileActivity extends AppCompatActivity {
     private void setUpListeners() {
         fullscreenConstraint.setOnTouchListener((view, event) -> clearInputFieldsFocus(view));
         addCourseButton.setOnClickListener((View view) -> openCourseInputForm());
+        passButton.setOnClickListener((View view) -> nextUser());
+        requestButton.setOnClickListener((View view) -> toRequest());
+    }
+
+    private void toRequest() {
+        Intent intent = new Intent(ProfileActivity.this, RequestActivity.class);
+        intent.putExtra("requester", user.getId());
+        startActivity(intent);
+
+    }
+
+    private void nextUser() {
+        toVisitUserList.removeUserID();
+        currentUser.addVisitedTeameeIDs(userId);
+        updateFieldToDb("users", CurrentUser.getInstance().getUser().getId(), "visitedTeameeIDs", currentUser.getVisitedTeameeIDs());
+        if (toVisitUserList.getUserIDs().size() > 0) {
+            finish();
+            Intent intent = new Intent(ProfileActivity.this, ProfileActivity.class);
+            intent.putExtra("action", "explore");
+            startActivity(intent);
+        } else {
+            currentUser.setVisitedTeameeIDs(new ArrayList<String>());
+            updateFieldToDb("users", currentUser.getId(), "visitedTeameeIDs", currentUser.getVisitedTeameeIDs());
+            Toast.makeText(this, "No more potential teammate found", Toast.LENGTH_LONG).show();
+            finish();
+        }
     }
 
     private boolean clearInputFieldsFocus(View view) {
@@ -146,11 +180,10 @@ public class ProfileActivity extends AppCompatActivity {
                     setUpCustomReviewView(snapshot);
                 }
                 ((TextView) findViewById(R.id.reviews_count)).setText("(" + size + ")");
-                ((TextView) findViewById(R.id.reviews_count)).setVisibility(View.VISIBLE);
             } else {
                 findViewById(R.id.reviews).setVisibility(View.GONE);
-                ((TextView) findViewById(R.id.reviews_count)).setVisibility(View.GONE);
             }
+            findViewById(R.id.reviews_count).setVisibility(size > 0 ? View.VISIBLE : View.GONE);
         });
     }
 
@@ -173,10 +206,8 @@ public class ProfileActivity extends AppCompatActivity {
                 setupCustomCourseView(courses.get(index), index);
             }
             ((TextView) findViewById(R.id.enrolling_courses_count)).setText("(" + size + ")");
-            ((TextView) findViewById(R.id.enrolling_courses_count)).setVisibility(View.VISIBLE);
-        } else {
-            ((TextView) findViewById(R.id.enrolling_courses_count)).setVisibility(View.GONE);
         }
+        findViewById(R.id.enrolling_courses_count).setVisibility(size > 0 ? View.VISIBLE : View.GONE);
     }
 
     @SuppressLint({"SetTextI18n", "InflateParams"})
@@ -219,8 +250,8 @@ public class ProfileActivity extends AppCompatActivity {
             updateFieldToDb("users", user.getId(), "phone", phone.getText().toString(), (v) -> {
                 updateUser();
             });
+            updateUser();
         }
-        updateUser();
     }
 
     private void updateUser() {
@@ -252,6 +283,11 @@ public class ProfileActivity extends AppCompatActivity {
                 updateFieldToDb("users", user.getId(), "courses", user.getCourses());
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
     }
 
 }

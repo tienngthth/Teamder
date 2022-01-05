@@ -18,6 +18,7 @@ public class User {
     private String introduction = "";
     private ArrayList<String> courses = new ArrayList<>();
     private ArrayList<String> groupIDs = new ArrayList<>();
+    private ArrayList<String> visitedTeameeIDs = new ArrayList<>();
 
     public void addCourse(String course) {
         courses.add(course);
@@ -114,6 +115,18 @@ public class User {
         this.id = id;
     }
 
+    public ArrayList<String> getVisitedTeameeIDs() {
+        return visitedTeameeIDs;
+    }
+
+    public void addVisitedTeameeIDs(String userID) {
+        visitedTeameeIDs.add(userID);
+    }
+
+    public void setVisitedTeameeIDs(ArrayList<String> visitedTeameeIDs) {
+        this.visitedTeameeIDs = visitedTeameeIDs;
+    }
+
     public static User parseUser(QueryDocumentSnapshot document) {
         User user = new User();
         user.setName(document.getString("name"));
@@ -126,6 +139,8 @@ public class User {
         user.setId(document.getId());
         ArrayList<String> courses = (ArrayList<String>) document.getData().get("courses");
         user.setCourses(courses == null ? new ArrayList<>() : courses);
+        ArrayList<String> visitedTeameeIDs = (ArrayList<String>) document.getData().get("visitedTeameeIDs");
+        user.setVisitedTeameeIDs(visitedTeameeIDs == null ? new ArrayList<>() : visitedTeameeIDs);
         return user;
     }
 
@@ -141,6 +156,8 @@ public class User {
         user.setId(document.getId());
         ArrayList<String> courses = (ArrayList<String>) document.getData().get("courses");
         user.setCourses(courses == null ? new ArrayList<>() : courses);
+        ArrayList<String> visitedTeameeIDs = (ArrayList<String>) document.getData().get("visitedTeameeIDs");
+        user.setVisitedTeameeIDs(visitedTeameeIDs == null ? new ArrayList<>() : visitedTeameeIDs);
         return user;
     }
 }

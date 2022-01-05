@@ -5,6 +5,7 @@ import android.util.Log;
 import com.example.teamder.model.User;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 
@@ -37,6 +38,18 @@ public class UserRepository {
                 .add(user)
                 .addOnSuccessListener(docRefCallBack::onCallBack)
                 .addOnFailureListener(e -> emptyCallBack.onCallBack());
+    }
+
+    public static void getUsersByCourse(ArrayList<String> courses, String uid, CallbackInterfaces.QuerySnapShotCallBack querySnapShotCallBack) {
+        FirebaseFirestore.getInstance().collection("users")
+//                .whereNotEqualTo("uid", uid)
+                .whereArrayContainsAny("courses", courses)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        querySnapShotCallBack.onCallBack(Objects.requireNonNull(task.getResult()));
+                    }
+                });
     }
 
 }

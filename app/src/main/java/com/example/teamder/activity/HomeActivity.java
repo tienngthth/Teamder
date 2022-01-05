@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,16 +18,20 @@ import com.example.teamder.R;
 import com.example.teamder.model.Course;
 import com.example.teamder.model.CurrentUser;
 import com.example.teamder.model.Request;
+import com.example.teamder.model.ToVisitUserList;
 import com.example.teamder.model.User;
 import com.example.teamder.repository.AuthenticationRepository;
 import com.example.teamder.repository.NotificationRepository;
+import com.example.teamder.repository.UserRepository;
 import com.example.teamder.service.NotificationService;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.ArrayList;
 
 
 public class HomeActivity extends AppCompatActivity {
 
+    private final ToVisitUserList toVisitUserList = ToVisitUserList.getInstance();
     private final User currentUser = CurrentUser.getInstance().getUser();
     private TextView userNameView, requestsTitle, coursesTitle;
     private ImageButton logoutButton, notificationButton, profileButton, exploreButton;
@@ -210,10 +215,24 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void explore() {
-        Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
-        intent.putExtra("action", "explore");
-        intent.putExtra("userId", "eCWYH9PXaCCfYVnPRij5");
-        startActivity(intent);
+        UserRepository.getUsersByCourse(currentUser.getCourses(),
+                currentUser.getUid(),
+                (QuerySnapshot) -> {
+                    for (DocumentSnapshot document: QuerySnapshot.getDocuments()) {
+                        String userID = document.getId();
+                        if(!toVisitUserList.getUserIDs().contains(userID) && !userID.equals(currentUser.getId()) && !currentUser.getVisitedTeameeIDs().contains(userID)){
+                            toVisitUserList.addUserID(userID);
+                        }
+                    }
+                    if (toVisitUserList.getUserIDs().size() > 0) {
+                        Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
+                        intent.putExtra("action", "explore");
+                        startActivity(intent);
+                    } else {
+                        Toast.makeText(this, "No potential teammate found", Toast.LENGTH_LONG).show();
+                    }
+
+                });
     }
 
     @Override
