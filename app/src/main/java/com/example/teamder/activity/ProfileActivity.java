@@ -19,6 +19,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -37,6 +39,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private final ToVisitUserList toVisitUserList = ToVisitUserList.getInstance();
     private final User currentUser = CurrentUser.getInstance().getUser();
+    private ActivityResultLauncher<Intent> activityResultLauncher = null;
     private User user = null;
     private String userId = null;
     private EditText name, major, sID, GPA, introduction, phone;
@@ -86,6 +89,15 @@ public class ProfileActivity extends AppCompatActivity {
         passButton = findViewById(R.id.pass_button);
         requestButton = findViewById(R.id.request_button);
         inflater = LayoutInflater.from(this);
+        activityResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK) {
+                        assert result.getData() != null;
+                        nextUser();
+                    } else assert result.getResultCode() != RESULT_CANCELED || result.getData() != null;
+                }
+        );
         checkIntent();
     }
 
@@ -108,9 +120,9 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void toRequest() {
         Intent intent = new Intent(ProfileActivity.this, RequestActivity.class);
-        intent.putExtra("requester", user.getId());
-        startActivity(intent);
-
+        intent.putExtra("userName", user.getName());
+        intent.putExtra("userID", user.getName());
+        activityResultLauncher.launch(intent);
     }
 
     private void nextUser() {
