@@ -1,5 +1,10 @@
 package com.example.teamder.activity;
 
+import static com.example.teamder.model.Request.parseRequest;
+import static com.example.teamder.model.User.parseUser;
+import static com.example.teamder.repository.RequestRepository.getPendingRequestByFieldValue;
+import static com.example.teamder.repository.UserRepository.getUserById;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,7 +20,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.teamder.R;
-import com.example.teamder.model.Course;
 import com.example.teamder.model.CurrentUser;
 import com.example.teamder.model.Request;
 import com.example.teamder.model.ToVisitUserList;
@@ -33,9 +37,9 @@ public class HomeActivity extends AppCompatActivity {
 
     private final ToVisitUserList toVisitUserList = ToVisitUserList.getInstance();
     private final User currentUser = CurrentUser.getInstance().getUser();
-    private TextView userNameView, requestsTitle, coursesTitle;
+    private TextView userNameView, coursesTitle;
     private ImageButton logoutButton, notificationButton, profileButton, exploreButton;
-    private LinearLayout requestListView, courseListView;
+    private LinearLayout receivedRequestListView, courseListView, sentRequestListView, receivedRequests, sentRequests;
     private LayoutInflater inflater;
     private TextView newNotificationCount;
 
@@ -51,8 +55,10 @@ public class HomeActivity extends AppCompatActivity {
         userNameView = findViewById(R.id.name);
         logoutButton = findViewById(R.id.logout_btn);
         notificationButton = findViewById(R.id.notification_button);
-        requestsTitle = findViewById(R.id.all_requests);
-        requestListView = findViewById(R.id.requests_list);
+        receivedRequests = findViewById(R.id.all_received_requests);
+        sentRequests = findViewById(R.id.all_sent_requests);
+        receivedRequestListView = findViewById(R.id.requests_list);
+        sentRequestListView = findViewById(R.id.sent_requests_list);
         coursesTitle = findViewById(R.id.all_courses);
         courseListView = findViewById(R.id.courses_list);
         newNotificationCount = findViewById(R.id.new_notification_count);
@@ -116,29 +122,95 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void updateList() {
-        // 1. get all requests, courses
-        generateRequestsListView();
+        generateReceivedRequestsListView();
+        generateSentRequestsListView();
         generateCoursesListView();
     }
 
     @SuppressLint("SetTextI18n")
-    private void generateRequestsListView() {
-        ArrayList<Request> requests = new ArrayList<>();
-        int total = requests.size();
-        if (total == 0) {
-            requestsTitle.setVisibility(View.GONE);
-            requestListView.setVisibility(View.GONE);
-        } else {
-            prepareRequestListView();
-            for (int index = 0; index < total; ++index) {
-                setupCustomRequestView(requests.get(index), index);
+    private void generateReceivedRequestsListView() {
+        getPendingRequestByFieldValue("requesteeID", currentUser.getId(), (snapshot) -> {
+            int size = snapshot.getDocuments().size();
+            receivedRequests.setVisibility(size == 0 ? View.GONE : View.VISIBLE);
+            prepareReceivedRequestListView();
+            for (int index = 0; index < size; ++index) {
+                Request request = parseRequest(snapshot.getDocuments().get(index));
+                setupCustomReceivedRequestView(request, index);
             }
-        }
+        });
+    }
+
+    @SuppressLint("SetTextI18n, InflateParams")
+    private void prepareReceivedRequestListView() {
+        View itemView = inflater.inflate(R.layout.requests_header, null, false);
+        ((TextView) itemView.findViewById(R.id.position)).setText("From");
+        receivedRequestListView.setVisibility(View.VISIBLE);
+        receivedRequestListView.removeAllViews();
+        receivedRequestListView.addView(itemView);
+    }
+
+    @SuppressLint("SetTextI18n, InflateParams")
+    private void setupCustomReceivedRequestView(Request request, int index) {
+        getUserById(request.getRequesterID(), (documentSnapshot -> {
+            User user = parseUser(documentSnapshot);
+            View itemView = inflater.inflate(R.layout.requests_row, null, false);
+            ImageButton nextBtn = itemView.findViewById(R.id.next_button);
+            ((TextView) itemView.findViewById(R.id.name)).setText(user.getName());
+            ((TextView) itemView.findViewById(R.id.time)).setText(request.getCreatedTime());
+            ((TextView) itemView.findViewById(R.id.course)).setText(request.getCourseName());
+            if (index % 2 == 0) {
+                itemView.findViewById(R.id.row_linear).setBackgroundColor(getResources().getColor(R.color.blue_grey_050));
+            }
+            receivedRequestListView.addView(itemView);
+            itemView.setOnClickListener((View view) -> toReviewRequest(request, "received"));
+            nextBtn.setOnClickListener((View view) -> toReviewRequest(request, "received"));
+        }));
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void generateSentRequestsListView() {
+        getPendingRequestByFieldValue("requesterID", currentUser.getId(), (snapshot) -> {
+            int size = snapshot.getDocuments().size();
+            sentRequests.setVisibility(size == 0 ? View.GONE : View.VISIBLE);
+            prepareSentRequestListView();
+            for (int index = 0; index < size; ++index) {
+                Request request = parseRequest(snapshot.getDocuments().get(index));
+                setupCustomSentRequestView(request, index);
+            }
+        });
+    }
+
+
+    @SuppressLint("SetTextI18n, InflateParams")
+    private void prepareSentRequestListView() {
+        View itemView = inflater.inflate(R.layout.requests_header, null, false);
+        ((TextView) itemView.findViewById(R.id.position)).setText("To");
+        sentRequestListView.setVisibility(View.VISIBLE);
+        sentRequestListView.removeAllViews();
+        sentRequestListView.addView(itemView);
+    }
+
+    @SuppressLint("SetTextI18n, InflateParams")
+    private void setupCustomSentRequestView(Request request, int index) {
+        getUserById(request.getRequesteeID(), (documentSnapshot -> {
+            User user = parseUser(documentSnapshot);
+            View itemView = inflater.inflate(R.layout.requests_row, null, false);
+            ImageButton nextBtn = itemView.findViewById(R.id.next_button);
+            ((TextView) itemView.findViewById(R.id.name)).setText(user.getName());
+            ((TextView) itemView.findViewById(R.id.time)).setText(request.getCreatedTime());
+            ((TextView) itemView.findViewById(R.id.course)).setText(request.getCourseName());
+            if (index % 2 == 0) {
+                itemView.findViewById(R.id.row_linear).setBackgroundColor(getResources().getColor(R.color.blue_grey_050));
+            }
+            sentRequestListView.addView(itemView);
+            itemView.setOnClickListener((View view) -> toReviewRequest(request, "sent"));
+            nextBtn.setOnClickListener((View view) -> toReviewRequest(request, "sent"));
+        }));
     }
 
     @SuppressLint("SetTextI18n")
     private void generateCoursesListView() {
-        ArrayList<Course> courses = new ArrayList<>();
+        ArrayList<String> courses = currentUser.getCourses();
         int total = courses.size();
         if (total == 0) {
             coursesTitle.setText("No courses found");
@@ -152,15 +224,6 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     @SuppressLint("SetTextI18n, InflateParams")
-    private void prepareRequestListView() {
-        View itemView = inflater.inflate(R.layout.requests_header, null, false);
-        requestListView.setVisibility(View.VISIBLE);
-        requestListView.removeAllViews();
-        requestListView.addView(itemView);
-        requestsTitle.setText("All requests");
-    }
-
-    @SuppressLint("SetTextI18n, InflateParams")
     private void prepareCourseListView() {
         View itemView = inflater.inflate(R.layout.courses_header, null, false);
         courseListView.setVisibility(View.VISIBLE);
@@ -170,42 +233,32 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     @SuppressLint("SetTextI18n, InflateParams")
-    private void setupCustomRequestView(Request request, int index) {
-        View itemView = inflater.inflate(R.layout.requests_row, null, false);
-        ImageButton nextBtn = itemView.findViewById(R.id.next_button);
-        ((TextView) itemView.findViewById(R.id.name)).setText(request.getName());
-        ((TextView) itemView.findViewById(R.id.time)).setText(request.getCreatedTime());
-        ((TextView) itemView.findViewById(R.id.course)).setText(request.getCourse());
-        if (index % 2 == 0) {
-            itemView.findViewById(R.id.row_linear).setBackgroundColor(getResources().getColor(R.color.blue_grey_050));
-        }
-        requestListView.addView(itemView);
-        itemView.setOnClickListener((View view) -> toReviewRequest(index));
-        nextBtn.setOnClickListener((View view) -> toReviewRequest(index));
-    }
-
-    @SuppressLint("SetTextI18n, InflateParams")
-    private void setupCustomCourseItemView(Course course, int index) {
+    private void setupCustomCourseItemView(String course, int index) {
         View itemView = inflater.inflate(R.layout.courses_row, null, false);
         ImageButton nextBtn = itemView.findViewById(R.id.next_button);
-        ((TextView) itemView.findViewById(R.id.name)).setText(course.getName());
+        ((TextView) itemView.findViewById(R.id.course)).setText(course);
         if (index % 2 == 0) {
             itemView.findViewById(R.id.row_linear).setBackgroundColor(getResources().getColor(R.color.blue_grey_050));
         }
         courseListView.addView(itemView);
-        itemView.setOnClickListener((View view) -> toCourse(index));
-        nextBtn.setOnClickListener((View view) -> toCourse(index));
+        itemView.setOnClickListener((View view) -> toCourse(course));
+        nextBtn.setOnClickListener((View view) -> toCourse(course));
     }
 
-    private void toReviewRequest(int index) {
+    private void toReviewRequest(Request request, String source) {
         Intent intent = new Intent(HomeActivity.this, ReviewActivity.class);
-        intent.putExtra("index", index);
+        intent.putExtra("id", request.getId());
+        intent.putExtra("message", request.getMessage());
+        intent.putExtra("course", request.getCourseName());
+        intent.putExtra("source", source);
+        intent.putExtra("requesteeID", request.getRequesteeID());
+        intent.putExtra("requesterID", request.getRequesterID());
         startActivity(intent);
     }
 
-    private void toCourse(int index) {
+    private void toCourse(String course) {
         Intent intent = new Intent(HomeActivity.this, CourseActivity.class);
-        intent.putExtra("index", index);
+        intent.putExtra("course", course);
         startActivity(intent);
     }
 
@@ -218,9 +271,9 @@ public class HomeActivity extends AppCompatActivity {
         UserRepository.getUsersByCourse(currentUser.getCourses(),
                 currentUser.getUid(),
                 (QuerySnapshot) -> {
-                    for (DocumentSnapshot document: QuerySnapshot.getDocuments()) {
+                    for (DocumentSnapshot document : QuerySnapshot.getDocuments()) {
                         String userID = document.getId();
-                        if(!toVisitUserList.getUserIDs().contains(userID) && !userID.equals(currentUser.getId()) && !currentUser.getVisitedTeameeIDs().contains(userID)){
+                        if (!toVisitUserList.getUserIDs().contains(userID) && !userID.equals(currentUser.getId()) && !currentUser.getVisitedTeameeIDs().contains(userID)) {
                             toVisitUserList.addUserID(userID);
                         }
                     }
@@ -231,7 +284,6 @@ public class HomeActivity extends AppCompatActivity {
                     } else {
                         Toast.makeText(this, "No potential teammate found", Toast.LENGTH_LONG).show();
                     }
-
                 });
     }
 

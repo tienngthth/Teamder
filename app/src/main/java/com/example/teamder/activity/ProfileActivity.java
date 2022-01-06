@@ -2,6 +2,7 @@ package com.example.teamder.activity;
 
 import static com.example.teamder.model.Review.parseReview;
 import static com.example.teamder.model.User.parseUser;
+import static com.example.teamder.repository.RequestRepository.getPendingRequestByParties;
 import static com.example.teamder.repository.ReviewRepository.getReviewByUserId;
 import static com.example.teamder.repository.UserRepository.getUserById;
 import static com.example.teamder.repository.UtilRepository.updateFieldToDb;
@@ -49,18 +50,37 @@ public class ProfileActivity extends AppCompatActivity {
     private Button passButton;
     private LayoutInflater inflater;
     private LinearLayout reviewList, courseList, fullscreenConstraint, actions;
-    private String action = "";
+    private String action = "profile";
+    private boolean slideAnimation = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         initialiseVariables();
-        if (userId != null) {
+        if (userId != null && !action.equals("profile")) {
             getUserById(userId, (document) -> {
                 user = parseUser(document);
-                setUpListeners();
-                setUpScreen();
+                if (action.equals("explore")) {
+                    ArrayList<String> intersectCourses = new ArrayList<>(user.getCourses());
+                    intersectCourses.retainAll(currentUser.getCourses());
+                    ArrayList<String> parties = new ArrayList<>();
+                    parties.add(user.getId());
+                    parties.add(currentUser.getId());
+                    getPendingRequestByParties(parties, (snapshot) -> {
+                        int requestNo = snapshot.getDocuments().size();
+                        if ((intersectCourses.size() - requestNo) > 0) {
+                            setUpListeners();
+                            setUpScreen();
+                        } else {
+                            slideAnimation = false;
+                            nextUser();
+                        }
+                    });
+                } else {
+                    setUpListeners();
+                    setUpScreen();
+                }
             });
         } else {
             user = CurrentUser.getInstance().getUser();
@@ -94,9 +114,8 @@ public class ProfileActivity extends AppCompatActivity {
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == RESULT_OK) {
-                        assert result.getData() != null;
                         nextUser();
-                    } else assert result.getResultCode() != RESULT_CANCELED || result.getData() != null;
+                    }
                 }
         );
         checkIntent();
@@ -107,7 +126,11 @@ public class ProfileActivity extends AppCompatActivity {
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
             action = bundle.get("action").toString();
-            userId = toVisitUserList.getUserID();
+            if (action.equals("explore")) {
+                userId = toVisitUserList.getUserID();
+            } else {
+                userId = bundle.get("userID").toString();
+            }
         }
     }
 
@@ -122,7 +145,7 @@ public class ProfileActivity extends AppCompatActivity {
     private void toRequest() {
         Intent intent = new Intent(ProfileActivity.this, RequestActivity.class);
         intent.putExtra("userName", user.getName());
-        intent.putExtra("userID", user.getName());
+        intent.putExtra("userID", user.getId());
         activityResultLauncher.launch(intent);
     }
 
@@ -135,6 +158,10 @@ public class ProfileActivity extends AppCompatActivity {
             Intent intent = new Intent(ProfileActivity.this, ProfileActivity.class);
             intent.putExtra("action", "explore");
             startActivity(intent);
+            if (slideAnimation) {
+                overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+            }
+            slideAnimation = true;
         } else {
             currentUser.setVisitedTeameeIDs(new ArrayList<String>());
             updateFieldToDb("users", currentUser.getId(), "visitedTeameeIDs", currentUser.getVisitedTeameeIDs());
@@ -163,22 +190,23 @@ public class ProfileActivity extends AppCompatActivity {
         setUpCoursesList();
         setUpReviewsList();
         setEditable();
+        fullscreenConstraint.setVisibility(View.VISIBLE);
     }
 
     private void setEditable() {
-        addCourseButton.setVisibility(action.equals("explore") ? View.GONE : View.VISIBLE);
+        addCourseButton.setVisibility(action.equals("profile") ? View.VISIBLE : View.GONE);
+        majorLine.setVisibility(action.equals("profile") ? View.VISIBLE : View.GONE);
+        nameLine.setVisibility(action.equals("profile") ? View.VISIBLE : View.GONE);
+        phoneLine.setVisibility(action.equals("profile") ? View.VISIBLE : View.GONE);
+        sIDLine.setVisibility(action.equals("profile") ? View.VISIBLE : View.GONE);
+        introductionLine.setVisibility(action.equals("profile") ? View.VISIBLE : View.GONE);
+        GPALine.setVisibility(action.equals("profile") ? View.VISIBLE : View.GONE);
+        name.setEnabled(action.equals("profile"));
+        phone.setEnabled(action.equals("profile"));
+        GPA.setEnabled(action.equals("profile"));
+        major.setEnabled(action.equals("profile"));
+        introduction.setEnabled(action.equals("profile"));
         actions.setVisibility(action.equals("explore") ? View.VISIBLE : View.GONE);
-        majorLine.setVisibility(action.equals("explore") ? View.GONE : View.VISIBLE);
-        nameLine.setVisibility(action.equals("explore") ? View.GONE : View.VISIBLE);
-        phoneLine.setVisibility(action.equals("explore") ? View.GONE : View.VISIBLE);
-        sIDLine.setVisibility(action.equals("explore") ? View.GONE : View.VISIBLE);
-        introductionLine.setVisibility(action.equals("explore") ? View.GONE : View.VISIBLE);
-        GPALine.setVisibility(action.equals("explore") ? View.GONE : View.VISIBLE);
-        name.setEnabled(!action.equals("explore"));
-        phone.setEnabled(!action.equals("explore"));
-        GPA.setEnabled(!action.equals("explore"));
-        major.setEnabled(!action.equals("explore"));
-        introduction.setEnabled(!action.equals("explore"));
         name.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         phone.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         GPA.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -231,10 +259,8 @@ public class ProfileActivity extends AppCompatActivity {
     private void setupCustomCourseView(String name, int index) {
         View itemView = inflater.inflate(R.layout.enrolled_courses_row, null, false);
         ((TextView) itemView.findViewById(R.id.course)).setText(name);
-        if (action.equals("explore")) {
-            itemView.findViewById(R.id.remove_course).setVisibility(View.GONE);
-        } else {
-            itemView.findViewById(R.id.remove_course).setVisibility(View.VISIBLE);
+        itemView.findViewById(R.id.remove_course).setVisibility(action.equals("profile") ? View.VISIBLE : View.GONE);
+        if (action.equals("profile")) {
             ((ImageButton) itemView.findViewById(R.id.remove_course)).setOnClickListener((View view) -> {
                 user.removeCourse(index);
                 updateFieldToDb("users", user.getId(), "courses", user.getCourses());

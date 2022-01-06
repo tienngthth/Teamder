@@ -16,12 +16,12 @@
         >
 
         <TextView
-            android:layout_width="wrap_content"
+            android:id="@+id/position"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:fontFamily="@font/poppins_bold"
             android:text="@string/requester"
-            android:gravity="center"
+            android:layout_gravity="left"
             android:textColor="@color/blue_grey_800"
             android:textSize="14sp" />
 
@@ -29,11 +29,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="center"
             android:fontFamily="@font/poppins_bold"
             android:text="@string/course"
+            android:layout_gravity="left"
             android:textColor="@color/blue_grey_800"
             android:textSize="14sp" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:src="@drawable/ic_next"
+            android:id="@+id/next_button"
+            android:visibility="invisible"
+            android:backgroundTint="@android:color/transparent"
+            />
 
     </LinearLayout>
 

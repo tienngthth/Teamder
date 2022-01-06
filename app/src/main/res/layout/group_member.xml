@@ -1,4 +1,5 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_vertical">
@@ -7,26 +8,25 @@
         android:id="@+id/row_linear"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center_horizontal"
         android:orientation="horizontal"
-        android:layout_marginBottom="10dp">
+        android:gravity="bottom"
+        android:padding="10dp">
 
-        <CheckBox
-            android:id="@+id/checkbox"
+        <ImageView
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:src="@drawable/ic_small_avatar"/>
 
         <TextView
             android:id="@+id/name"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:text="Name"
             android:fontFamily="@font/poppins_regular"
-            android:text="@string/name"
-            android:background="@drawable/blue_round_item"
-            android:textColor="@color/blue_900"
-            android:padding="10dp"
-            android:paddingStart="20dp"
-            android:textSize="14sp" />
+            android:textColor="@color/blue_grey_800"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:ignore="ContentDescription" />
+
     </LinearLayout>
 
 </FrameLayout>

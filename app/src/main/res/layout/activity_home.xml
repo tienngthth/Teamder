@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background_img"
     tools:context=".activity.HomeActivity">
 
     <ScrollView
@@ -90,7 +89,8 @@
                 android:layout_height="match_parent"
                 android:gravity="bottom"
                 android:orientation="horizontal"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
                 >
 
                 <ImageButton
@@ -147,19 +147,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
+                android:id="@+id/all_received_requests"
                 android:paddingStart="20dp"
                 android:paddingEnd="20dp"
                 >
 
                 <TextView
-                    android:id="@+id/all_requests"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins_light"
-                    android:text="@string/requests"
+                    android:text="@string/received_requests"
                     android:textColor="@color/blue_700"
                     android:textSize="14sp"
-                    android:layout_marginTop="22dp"
                     tools:ignore="TextContrastCheck" />
 
                 <LinearLayout
@@ -167,7 +166,37 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:layout_marginBottom="50dp"
+                    android:layout_marginBottom="30dp"
+                    android:background="@drawable/white_list"
+                    android:orientation="vertical"
+                    android:padding="15dp">
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:paddingStart="20dp"
+                android:id="@+id/all_sent_requests"
+                android:paddingEnd="20dp"
+                >
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins_light"
+                    android:text="@string/sent_requests"
+                    android:textColor="@color/blue_700"
+                    android:textSize="14sp"
+                    tools:ignore="TextContrastCheck" />
+
+                <LinearLayout
+                    android:id="@+id/sent_requests_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="30dp"
                     android:background="@drawable/white_list"
                     android:orientation="vertical"
                     android:padding="15dp">
@@ -190,7 +219,6 @@
                     android:text="@string/courses"
                     android:textColor="@color/blue_700"
                     android:textSize="14sp"
-                    android:layout_marginTop="22dp"
                     tools:ignore="TextContrastCheck" />
 
                 <LinearLayout

@@ -17,9 +17,8 @@
         android:paddingBottom="10dp">
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:gravity="center_vertical"
             android:orientation="vertical">
 
@@ -27,9 +26,9 @@
                 android:id="@+id/name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/poppins_regular"
+                android:fontFamily="@font/poppins_light"
                 android:text="@string/name"
-                android:textColor="@color/blue_grey_900"
+                android:textColor="@color/blue_900"
                 android:textSize="14sp" />
 
             <TextView
@@ -38,20 +37,20 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/poppins_light"
                 android:text="@string/timestamp"
-                android:textColor="@color/blue_grey_800"
+                android:textColor="@color/blue_grey_500"
                 android:textSize="12sp" />
 
         </LinearLayout>
 
         <TextView
             android:id="@+id/course"
-            android:layout_weight="1"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:gravity="center_vertical"
+            android:layout_weight="1"
             android:fontFamily="@font/poppins_light"
+            android:gravity="center_vertical"
             android:text="@string/course"
-            android:textColor="@color/blue_grey_800"
+            android:textColor="@color/blue_900"
             android:textSize="12sp" />
 
         <ImageButton
@@ -59,7 +58,7 @@
             android:layout_height="match_parent"
             android:src="@drawable/ic_next"
             android:id="@+id/next_button"
-            android:backgroundTint="@color/white"
+            android:backgroundTint="@android:color/transparent"
             />
 
     </LinearLayout>

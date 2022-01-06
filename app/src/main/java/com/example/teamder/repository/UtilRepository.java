@@ -23,6 +23,14 @@ public class UtilRepository {
                 .addOnSuccessListener(voidCallBack::onCallBack);
     }
 
+    public static void updateFieldToDb(String collection, String id, String field, String value) {
+        FirebaseFirestore
+                .getInstance()
+                .collection(collection)
+                .document(id)
+                .update(field, value);
+    }
+
     public static void updateFieldToDb(String collection, String id, String field, Long value) {
         FirebaseFirestore.getInstance().collection(collection).document(id).update(field, value);
     }

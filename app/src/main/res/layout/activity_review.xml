@@ -19,6 +19,7 @@
             android:orientation="horizontal">
 
             <LinearLayout
+                android:id="@+id/requester_avatar"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:gravity="center"
@@ -33,6 +34,7 @@
                     tools:ignore="ContentDescription" />
 
                 <TextView
+                    android:id="@+id/requester"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins_bold"
@@ -51,6 +53,7 @@
                 tools:ignore="ContentDescription" />
 
             <LinearLayout
+                android:id="@+id/requestee_avatar"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:gravity="center"
@@ -65,6 +68,7 @@
                     tools:ignore="ContentDescription" />
 
                 <TextView
+                    android:id="@+id/requestee"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins_bold"
@@ -91,6 +95,7 @@
                 android:textColor="@color/blue_900_70" />
 
             <TextView
+                android:id="@+id/course"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="30dp"
@@ -108,6 +113,7 @@
                 android:textColor="@color/blue_900_70" />
 
             <TextView
+                android:id="@+id/message"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="30dp"
@@ -122,7 +128,19 @@
 
         </LinearLayout>
 
+        <Button
+            android:id="@+id/cancel_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Cancel Request"
+            android:textAllCaps="false"
+            android:layout_marginBottom="10dp"
+            android:visibility="gone"
+            android:background="@drawable/blue_round_item"
+            tools:ignore="HardcodedText" />
+
         <LinearLayout
+            android:id="@+id/actions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="bottom|center"
@@ -131,7 +149,7 @@
             tools:ignore="NestedWeights">
 
             <Button
-                android:id="@+id/cancel_button"
+                android:id="@+id/reject_button"
                 android:layout_width="0dp"
                 android:layout_height="50dp"
                 android:layout_weight="1"
@@ -146,7 +164,7 @@
                 tools:ignore="NestedWeights" />
 
             <ImageButton
-                android:id="@+id/complete_button"
+                android:id="@+id/approve_button"
                 android:layout_width="0dp"
                 android:layout_height="50dp"
                 android:layout_weight="1"

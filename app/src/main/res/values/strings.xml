@@ -40,7 +40,8 @@
     <string name="review_note">Notes from requester</string>
     <string name="reject">Reject</string>
     <string name="requester">Requester</string>
-    <string name="requests">All requests</string>
+    <string name="received_requests">Requests received</string>
+    <string name="sent_requests">Requests sent</string>
     <string name="groups">Groups</string>
     <string name="courses">Courses</string>
     <string name="channel_name">notification_channel</string>
