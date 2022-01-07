@@ -8,7 +8,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 public class Notification {
 
     private String message;
-    private String timeStamp;
+    private String timeStamp = getCurrentTime();
     private String userId;
     private String id;
     private boolean hasPushed = false;
@@ -19,7 +19,6 @@ public class Notification {
 
     public Notification(String message, String userId) {
         this.message = message;
-        this.timeStamp = getCurrentTime();
         this.userId = userId;
     }
 
