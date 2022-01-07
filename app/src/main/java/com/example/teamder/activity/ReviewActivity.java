@@ -3,6 +3,7 @@ package com.example.teamder.activity;
 import static com.example.teamder.model.User.parseUser;
 import static com.example.teamder.repository.UserRepository.getUserById;
 import static com.example.teamder.repository.UtilRepository.updateFieldToDb;
+import static com.example.teamder.repository.NotificationRepository.createNotification;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.teamder.R;
+import com.example.teamder.model.Notification;
 import com.example.teamder.model.User;
 
 public class ReviewActivity extends AppCompatActivity {
@@ -106,6 +108,8 @@ public class ReviewActivity extends AppCompatActivity {
         if (action.equals("approve")) {
             toCourse();
         }
+        Notification notification = new Notification("Your request has been " + action + "ed", requesterID);
+        createNotification(notification);
         finish();
     }
 

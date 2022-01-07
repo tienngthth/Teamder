@@ -45,7 +45,7 @@ public class ValidationUtil {
 
     public static String validateNameInput(EditText nameInput) {
         String name = nameInput.getText().toString().trim();
-        String regex = "[A-Za-z]{1,10}";
+        String regex = "[A-Za-z0-9\\s]{1,10}";
         if (isValidRegex(name, regex)) {
             return name;
         } else {

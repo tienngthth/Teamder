@@ -26,6 +26,19 @@ public class RequestRepository {
                 });
     }
 
+    public static void getApprovedRequestByParties(ArrayList<String> parties, CallbackInterfaces.QuerySnapShotCallBack querySnapShotCallBack) {
+        FirebaseFirestore.getInstance()
+                .collection("requests")
+                .whereEqualTo("status", "approved")
+                .whereIn("parties", Arrays.asList(parties, new ArrayList<String>(){{ add(parties.get(1));  add(parties.get(0)); }}))
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        querySnapShotCallBack.onCallBack(Objects.requireNonNull(task.getResult()));
+                    }
+                });
+    }
+
     public static void getPendingRequestOfCourseByParties(ArrayList<String> parties, String course, CallbackInterfaces.QuerySnapShotCallBack querySnapShotCallBack) {
         FirebaseFirestore.getInstance()
                 .collection("requests")

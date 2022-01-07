@@ -2,6 +2,8 @@ package com.example.teamder.activity;
 
 import static com.example.teamder.model.Review.parseReview;
 import static com.example.teamder.model.User.parseUser;
+import static com.example.teamder.repository.RequestRepository.getApproveRequestByCourseName;
+import static com.example.teamder.repository.RequestRepository.getApprovedRequestByParties;
 import static com.example.teamder.repository.RequestRepository.getPendingRequestByParties;
 import static com.example.teamder.repository.ReviewRepository.getReviewByUserId;
 import static com.example.teamder.repository.UserRepository.getUserById;
@@ -52,6 +54,7 @@ public class ProfileActivity extends AppCompatActivity {
     private LinearLayout reviewList, courseList, fullscreenConstraint, actions;
     private String action = "profile";
     private boolean slideAnimation = true;
+    private boolean suggested = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,9 +70,17 @@ public class ProfileActivity extends AppCompatActivity {
                     ArrayList<String> parties = new ArrayList<>();
                     parties.add(user.getId());
                     parties.add(currentUser.getId());
+
+                    getApprovedRequestByParties(parties, (snapshot) -> {
+                        int requestNo = snapshot.getDocuments().size();
+                        if (requestNo > 0) {
+                            suggested = false;
+                        }
+                    });
+
                     getPendingRequestByParties(parties, (snapshot) -> {
                         int requestNo = snapshot.getDocuments().size();
-                        if ((intersectCourses.size() - requestNo) > 0) {
+                        if ((intersectCourses.size() - requestNo) > 0 && suggested) {
                             setUpListeners();
                             setUpScreen();
                         } else {
