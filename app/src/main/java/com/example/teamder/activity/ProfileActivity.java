@@ -2,7 +2,6 @@ package com.example.teamder.activity;
 
 import static com.example.teamder.model.Review.parseReview;
 import static com.example.teamder.model.User.parseUser;
-import static com.example.teamder.repository.RequestRepository.getApproveRequestByCourseName;
 import static com.example.teamder.repository.RequestRepository.getApprovedRequestByParties;
 import static com.example.teamder.repository.RequestRepository.getPendingRequestByParties;
 import static com.example.teamder.repository.ReviewRepository.getReviewByUserId;
@@ -54,7 +53,7 @@ public class ProfileActivity extends AppCompatActivity {
     private LinearLayout reviewList, courseList, fullscreenConstraint, actions;
     private String action = "profile";
     private boolean slideAnimation = true;
-    private boolean suggested = true;
+    private boolean showDetails = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,13 +73,14 @@ public class ProfileActivity extends AppCompatActivity {
                     getApprovedRequestByParties(parties, (snapshot) -> {
                         int requestNo = snapshot.getDocuments().size();
                         if (requestNo > 0) {
-                            suggested = false;
+                            slideAnimation = false;
+                            nextUser();
                         }
                     });
 
                     getPendingRequestByParties(parties, (snapshot) -> {
                         int requestNo = snapshot.getDocuments().size();
-                        if ((intersectCourses.size() - requestNo) > 0 && suggested) {
+                        if ((intersectCourses.size() - requestNo) > 0) {
                             setUpListeners();
                             setUpScreen();
                         } else {
@@ -139,7 +139,12 @@ public class ProfileActivity extends AppCompatActivity {
             action = bundle.get("action").toString();
             if (action.equals("explore")) {
                 userId = toVisitUserList.getUserID();
-            } else {
+            }
+            else if (action.equals("inspect")){
+                userId = bundle.get("teammateID").toString();
+                showDetails = true;
+            }
+            else {
                 userId = bundle.get("userID").toString();
             }
         }
@@ -198,6 +203,14 @@ public class ProfileActivity extends AppCompatActivity {
         phone.setText(user.getPhone());
         introduction.setText(user.getIntroduction());
         GPA.setText(String.valueOf(user.getGPA()));
+
+        sID.setVisibility(showDetails ? View.VISIBLE : View.GONE);
+        phone.setVisibility(showDetails ? View.VISIBLE : View.GONE);
+        GPA.setVisibility(showDetails ? View.VISIBLE : View.GONE);
+        findViewById(R.id.sIDText).setVisibility(showDetails ? View.VISIBLE : View.GONE);
+        findViewById(R.id.phoneText).setVisibility(showDetails ? View.VISIBLE : View.GONE);
+        findViewById(R.id.gpaText).setVisibility(showDetails ? View.VISIBLE : View.GONE);
+
         setUpCoursesList();
         setUpReviewsList();
         setEditable();

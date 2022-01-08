@@ -84,7 +84,17 @@ public class CourseActivity extends AppCompatActivity {
         getUserById(id, (documentSnapshot) -> {
             User user = parseUser(documentSnapshot);
             View itemView = inflater.inflate(R.layout.group_member, null, false);
-            ((TextView) itemView.findViewById(R.id.name)).setText(user.getName());
+            TextView nameView = itemView.findViewById(R.id.name);
+            nameView.setText(user.getName());
+            nameView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(CourseActivity.this, ProfileActivity.class);
+                    intent.putExtra("action", "inspect");
+                    intent.putExtra("teammateID", user.getId());
+                    startActivity(intent);
+                }
+            });
             teameeList.addView(itemView);
         });
     }

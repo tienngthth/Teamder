@@ -120,6 +120,7 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/sIDText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins_light"
@@ -159,6 +160,7 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/gpaText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins_light"
@@ -199,6 +201,7 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/phoneText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins_light"
