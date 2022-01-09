@@ -4,7 +4,9 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/PC/OneDrive - RMIT University/Desktop/Android/Asm 3/Teamder/app/src/main/res/layout/activity_course.xml" value="0.264" />
-        <entry key="..\:/Users/PC/OneDrive - RMIT University/Desktop/Android/Asm 3/Teamder/app/src/main/res/layout/activity_profile.xml" value="0.12360688956433637" />
+        <entry key="..\:/Users/PC/OneDrive - RMIT University/Desktop/Android/Asm 3/Teamder/app/src/main/res/layout/activity_feedback.xml" value="0.27546296296296297" />
+        <entry key="..\:/Users/PC/OneDrive - RMIT University/Desktop/Android/Asm 3/Teamder/app/src/main/res/layout/activity_profile.xml" value="0.136" />
+        <entry key="..\:/Users/PC/OneDrive - RMIT University/Desktop/Android/Asm 3/Teamder/app/src/main/res/layout/activity_request.xml" value="0.11018518518518519" />
         <entry key="..\:/Users/PC/OneDrive - RMIT University/Desktop/Android/Asm 3/Teamder/app/src/main/res/layout/course_input_form.xml" value="0.12360688956433637" />
         <entry key="..\:/Users/PC/OneDrive - RMIT University/Desktop/Android/Asm 3/Teamder/app/src/main/res/layout/group_member.xml" value="0.72" />
         <entry key="app/src/main/res/drawable/background_img.xml" value="0.42604166666666665" />
