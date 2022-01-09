@@ -18,11 +18,13 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.teamder.R;
+import com.example.teamder.model.CurrentUser;
 import com.example.teamder.model.Notification;
 import com.example.teamder.model.User;
 
 public class ReviewActivity extends AppCompatActivity {
 
+    private final User currentUser = CurrentUser.getInstance().getUser();
     private TextView requester, requestee, message, course;
     private Button rejectButton, cancelButton;
     private ImageButton approveButton;
@@ -108,7 +110,16 @@ public class ReviewActivity extends AppCompatActivity {
         if (action.equals("approve")) {
             toCourse();
         }
-        Notification notification = new Notification("Your request has been " + action + "ed", requesterID);
+        String receiverID, senderName;
+        if (source.equals("sent")) {
+            receiverID = requesteeID;
+            senderName = currentUser.getName() + "'s";
+        }
+        else {
+            receiverID = requesterID;
+            senderName = "Your";
+        }
+        Notification notification = new Notification(senderName + " request has been " + action + "ed", receiverID);
         createNotification(notification);
         finish();
     }

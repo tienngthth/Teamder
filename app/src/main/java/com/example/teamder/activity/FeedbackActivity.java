@@ -1,6 +1,8 @@
 package com.example.teamder.activity;
 
 import static com.example.teamder.model.User.parseUser;
+import static com.example.teamder.repository.NotificationRepository.createNotification;
+import static com.example.teamder.repository.RequestRepository.createRequest;
 import static com.example.teamder.repository.ReviewRepository.createReview;
 import static com.example.teamder.repository.UserRepository.getUserById;
 import static com.example.teamder.util.DateTimeUtil.getToday;
@@ -15,11 +17,14 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.teamder.R;
+import com.example.teamder.model.CurrentUser;
+import com.example.teamder.model.Notification;
 import com.example.teamder.model.Review;
 import com.example.teamder.model.User;
 
 public class FeedbackActivity extends AppCompatActivity {
 
+    private final User currentUser = CurrentUser.getInstance().getUser();
     private User user = null;
     private TextView name, feedback;
     private String userName = null;
@@ -76,6 +81,8 @@ public class FeedbackActivity extends AppCompatActivity {
     private void sendFeedback() {
         String messageText = feedback.getText().toString();
         Review review = new Review(userID, messageText, getToday());
+        Notification notification = new Notification(currentUser.getName() + " sends you a feedback", user.getId());
+        createNotification(notification);
         createReview(review);
         Intent intent;
         if (action.equals("explore")) {
