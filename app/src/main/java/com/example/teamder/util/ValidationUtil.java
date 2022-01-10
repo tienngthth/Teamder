@@ -45,11 +45,11 @@ public class ValidationUtil {
 
     public static String validateNameInput(EditText nameInput) {
         String name = nameInput.getText().toString().trim();
-        String regex = "[A-Za-z]{1,10}";
+        String regex = "[A-Za-z0-9\\s]{1,10}";
         if (isValidRegex(name, regex)) {
             return name;
         } else {
-            nameInput.setError("Name can not be empty and contains less than 10 alphabetical characters only");
+            nameInput.setError("Name can not be empty and contains less than 10 alphanumerical characters or spaces only");
             return null;
         }
     }

@@ -2,6 +2,7 @@ package com.example.teamder.activity;
 
 import static com.example.teamder.model.Review.parseReview;
 import static com.example.teamder.model.User.parseUser;
+import static com.example.teamder.repository.RequestRepository.getApprovedRequestByParties;
 import static com.example.teamder.repository.RequestRepository.getPendingRequestByParties;
 import static com.example.teamder.repository.ReviewRepository.getReviewByUserId;
 import static com.example.teamder.repository.UserRepository.getUserById;
@@ -46,12 +47,13 @@ public class ProfileActivity extends AppCompatActivity {
     private String userId = null;
     private EditText name, major, sID, GPA, introduction, phone;
     private View phoneLine, nameLine, majorLine, sIDLine, GPALine, introductionLine;
-    private ImageButton addCourseButton, requestButton;
+    private ImageButton addCourseButton, requestButton, feedbackButton;
     private Button passButton;
     private LayoutInflater inflater;
     private LinearLayout reviewList, courseList, fullscreenConstraint, actions;
     private String action = "profile";
     private boolean slideAnimation = true;
+    private boolean showDetails = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +69,15 @@ public class ProfileActivity extends AppCompatActivity {
                     ArrayList<String> parties = new ArrayList<>();
                     parties.add(user.getId());
                     parties.add(currentUser.getId());
+
+                    getApprovedRequestByParties(parties, (snapshot) -> {
+                        int requestNo = snapshot.getDocuments().size();
+                        if (requestNo > 0) {
+                            slideAnimation = false;
+                            nextUser();
+                        }
+                    });
+
                     getPendingRequestByParties(parties, (snapshot) -> {
                         int requestNo = snapshot.getDocuments().size();
                         if ((intersectCourses.size() - requestNo) > 0) {
@@ -109,6 +120,7 @@ public class ProfileActivity extends AppCompatActivity {
         actions = findViewById(R.id.actions);
         passButton = findViewById(R.id.pass_button);
         requestButton = findViewById(R.id.request_button);
+        feedbackButton = findViewById(R.id.feedback_button);
         inflater = LayoutInflater.from(this);
         activityResultLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -128,7 +140,12 @@ public class ProfileActivity extends AppCompatActivity {
             action = bundle.get("action").toString();
             if (action.equals("explore")) {
                 userId = toVisitUserList.getUserID();
-            } else {
+                showDetails = false;
+            }
+            else if (action.equals("inspect")){
+                userId = bundle.get("teammateID").toString();
+            }
+            else {
                 userId = bundle.get("userID").toString();
             }
         }
@@ -140,6 +157,7 @@ public class ProfileActivity extends AppCompatActivity {
         addCourseButton.setOnClickListener((View view) -> openCourseInputForm());
         passButton.setOnClickListener((View view) -> nextUser());
         requestButton.setOnClickListener((View view) -> toRequest());
+        feedbackButton.setOnClickListener((View view) -> toFeedback());
     }
 
     private void toRequest() {
@@ -147,6 +165,17 @@ public class ProfileActivity extends AppCompatActivity {
         intent.putExtra("userName", user.getName());
         intent.putExtra("userID", user.getId());
         activityResultLauncher.launch(intent);
+    }
+
+    private void toFeedback() {
+        Intent intent = new Intent(ProfileActivity.this, FeedbackActivity.class);
+        intent.putExtra("userName", user.getName());
+        intent.putExtra("userID", user.getId());
+        intent.putExtra("action", action);
+        activityResultLauncher.launch(intent);
+        if (action.equals("inspect")) {
+            finish();
+        }
     }
 
     private void nextUser() {
@@ -187,6 +216,14 @@ public class ProfileActivity extends AppCompatActivity {
         phone.setText(user.getPhone());
         introduction.setText(user.getIntroduction());
         GPA.setText(String.valueOf(user.getGPA()));
+
+        sID.setVisibility(showDetails ? View.VISIBLE : View.GONE);
+        phone.setVisibility(showDetails ? View.VISIBLE : View.GONE);
+        GPA.setVisibility(showDetails ? View.VISIBLE : View.GONE);
+        findViewById(R.id.sIDText).setVisibility(showDetails ? View.VISIBLE : View.GONE);
+        findViewById(R.id.phoneText).setVisibility(showDetails ? View.VISIBLE : View.GONE);
+        findViewById(R.id.gpaText).setVisibility(showDetails ? View.VISIBLE : View.GONE);
+
         setUpCoursesList();
         setUpReviewsList();
         setEditable();
@@ -207,6 +244,7 @@ public class ProfileActivity extends AppCompatActivity {
         major.setEnabled(action.equals("profile"));
         introduction.setEnabled(action.equals("profile"));
         actions.setVisibility(action.equals("explore") ? View.VISIBLE : View.GONE);
+        feedbackButton.setVisibility(!action.equals("profile") && !userId.equals(currentUser.getId()) ? View.VISIBLE : View.GONE);
         name.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         phone.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         GPA.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -290,6 +328,7 @@ public class ProfileActivity extends AppCompatActivity {
             updateFieldToDb("users", user.getId(), "introduction", introduction.getText().toString(), (v) -> {
                 updateUser();
             });
+            // TO DO: field listener for phone
             updateFieldToDb("users", user.getId(), "phone", phone.getText().toString(), (v) -> {
                 updateUser();
             });

@@ -120,6 +120,7 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/sIDText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins_light"
@@ -159,6 +160,7 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/gpaText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins_light"
@@ -199,6 +201,7 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/phoneText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins_light"
@@ -398,16 +401,17 @@
                         android:src="@drawable/ic_request"
                         tools:ignore="ContentDescription,SpeakableTextPresentCheck" />
                 </LinearLayout>
-
-                <ImageButton
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="@color/blue_grey_050"
-                    android:contentDescription="@string/login_button"
-                    android:minHeight="48dp"
-                    app:srcCompat="@drawable/ic_comment_link"
-                    tools:ignore="SpeakableTextPresentCheck,RedundantDescriptionCheck,ImageContrastCheck" />
             </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/feedback_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/blue_grey_050"
+                android:gravity="bottom|center"
+                android:minHeight="48dp"
+                app:srcCompat="@drawable/ic_comment_link"
+                tools:ignore="SpeakableTextPresentCheck,RedundantDescriptionCheck,ImageContrastCheck" />
 
         </LinearLayout>
 

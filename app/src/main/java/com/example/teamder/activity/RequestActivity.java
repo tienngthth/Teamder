@@ -4,6 +4,7 @@ import static com.example.teamder.model.User.parseUser;
 import static com.example.teamder.repository.RequestRepository.createRequest;
 import static com.example.teamder.repository.RequestRepository.getPendingRequestOfCourseByParties;
 import static com.example.teamder.repository.UserRepository.getUserById;
+import static com.example.teamder.repository.NotificationRepository.createNotification;
 import static com.example.teamder.util.DateTimeUtil.getToday;
 
 import android.content.Intent;
@@ -21,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.teamder.R;
 import com.example.teamder.model.CurrentUser;
+import com.example.teamder.model.Notification;
 import com.example.teamder.model.Request;
 import com.example.teamder.model.User;
 
@@ -119,7 +121,9 @@ public class RequestActivity extends AppCompatActivity {
         if (courseNames.size() > 0) {
             for (String course : courseNames) {
                 Request request = new Request(course, getToday(), currentUser.getId(), messageText, user.getId());
+                Notification notification = new Notification(currentUser.getName() + " sends a request", user.getId());
                 createRequest(request);
+                createNotification(notification);
             }
             Intent intent = new Intent(RequestActivity.this, ProfileActivity.class);
             setResult(RESULT_OK, intent);

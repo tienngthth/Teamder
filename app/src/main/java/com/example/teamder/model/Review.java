@@ -8,6 +8,15 @@ public class Review {
     private String comment;
     private String timeStamp;
 
+    public Review(String userID, String comment, String timeStamp) {
+        this.userID = userID;
+        this.comment = comment;
+        this.timeStamp = timeStamp;
+    }
+
+    public Review() {
+    }
+
     public String getUid() {
         return uid;
     }

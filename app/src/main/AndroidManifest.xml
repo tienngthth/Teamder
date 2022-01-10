@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.teamder">
 
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.READ_CALL_LOG"/>
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -11,18 +13,19 @@
         android:theme="@style/Theme.Teamder">
         <activity
             android:name=".activity.ProfileActivity"
-            android:exported="true" >
-
-        </activity>
+            android:exported="true"></activity>
+        <activity
+            android:name=".activity.FeedbackActivity"
+            android:exported="true" />
         <activity
             android:name=".activity.CourseActivity"
             android:exported="true" />
         <activity
             android:name=".activity.ReviewActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".activity.RequestActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".activity.HomeActivity"
             android:exported="true" />
