@@ -16,7 +16,6 @@
         tools:ignore="SpeakableTextPresentCheck">
 
         <LinearLayout
-            android:visibility="gone"
             android:id="@+id/full_screen"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -86,6 +85,7 @@
                     android:fontFamily="@font/poppins_light"
                     android:text="@string/introduction"
                     android:textColor="@color/blue_900"
+                    android:layout_marginBottom="10dp"
                     android:textSize="12sp" />
 
                 <EditText
@@ -120,47 +120,7 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/sIDText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/poppins_light"
-                    android:text="@string/sID"
-                    android:textColor="@color/blue_900"
-                    android:textSize="12sp" />
-
-                <EditText
-                    android:id="@+id/sID"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="@android:color/transparent"
-                    android:fontFamily="@font/poppins_bold"
-                    android:gravity="bottom"
-                    android:importantForAutofill="no"
-                    android:inputType="text"
-                    android:minHeight="40dp"
-                    android:padding="0dp"
-                    android:textColor="@color/blue_900"
-                    android:textSize="16sp"
-                    tools:ignore="LabelFor,SpeakableTextPresentCheck" />
-
-                <View
-                    android:id="@+id/sID_line"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:visibility="gone"
-                    android:background="@color/blue_700"
-                    tools:ignore="MissingConstraints" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="30dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/gpaText"
+                    android:id="@+id/gpa_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins_light"
@@ -186,46 +146,6 @@
 
                 <View
                     android:id="@+id/GPA_line"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:visibility="gone"
-                    android:background="@color/blue_700"
-                    tools:ignore="MissingConstraints" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="30dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/phoneText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/poppins_light"
-                    android:text="@string/phone"
-                    android:textColor="@color/blue_900"
-                    android:textSize="12sp" />
-
-                <EditText
-                    android:id="@+id/phone"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:backgroundTint="@android:color/transparent"
-                    android:fontFamily="@font/poppins_bold"
-                    android:gravity="bottom"
-                    android:importantForAutofill="no"
-                    android:inputType="phone"
-                    android:minHeight="40dp"
-                    android:padding="0dp"
-                    android:textColor="@color/blue_900"
-                    android:textSize="16sp"
-                    tools:ignore="LabelFor,SpeakableTextPresentCheck,TextViewEdits" />
-
-                <View
-                    android:id="@+id/phone_line"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:visibility="gone"
@@ -275,8 +195,128 @@
             </LinearLayout>
 
             <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/sID_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="30dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/sID_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins_light"
+                    android:text="@string/sID"
+                    android:textColor="@color/blue_900"
+                    android:textSize="12sp" />
+
+                <EditText
+                    android:id="@+id/sID"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@android:color/transparent"
+                    android:fontFamily="@font/poppins_bold"
+                    android:gravity="bottom"
+                    android:importantForAutofill="no"
+                    android:inputType="text"
+                    android:minHeight="40dp"
+                    android:padding="0dp"
+                    android:textColor="@color/blue_900"
+                    android:textSize="16sp"
+                    tools:ignore="LabelFor,SpeakableTextPresentCheck" />
+
+                <View
+                    android:id="@+id/sID_line"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:visibility="gone"
+                    android:background="@color/blue_700"
+                    tools:ignore="MissingConstraints" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/phone_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="30dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/phone_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins_light"
+                    android:text="@string/phone"
+                    android:textColor="@color/blue_900"
+                    android:textSize="12sp" />
+
+                <EditText
+                    android:id="@+id/phone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@android:color/transparent"
+                    android:fontFamily="@font/poppins_bold"
+                    android:gravity="bottom"
+                    android:importantForAutofill="no"
+                    android:inputType="phone"
+                    android:minHeight="40dp"
+                    android:padding="0dp"
+                    android:textColor="@color/blue_900"
+                    android:textSize="16sp"
+                    tools:ignore="LabelFor,SpeakableTextPresentCheck,TextViewEdits" />
+
+                <View
+                    android:id="@+id/phone_line"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:visibility="gone"
+                    android:background="@color/blue_700"
+                    tools:ignore="MissingConstraints" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/email_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="30dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/email_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins_light"
+                    android:text="@string/email_title"
+                    android:textColor="@color/blue_900"
+                    android:textSize="12sp" />
+
+                <EditText
+                    android:id="@+id/email"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@android:color/transparent"
+                    android:fontFamily="@font/poppins_bold"
+                    android:gravity="bottom"
+                    android:importantForAutofill="no"
+                    android:inputType="textEmailAddress"
+                    android:minHeight="40dp"
+                    android:padding="0dp"
+                    android:enabled="false"
+                    android:textColor="@color/blue_900"
+                    android:textSize="16sp"
+                    tools:ignore="LabelFor,SpeakableTextPresentCheck" />
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -312,6 +352,7 @@
                     android:id="@+id/add_course"
                     android:layout_width="50dp"
                     android:layout_height="wrap_content"
+                    android:padding="0dp"
                     android:backgroundTint="@android:color/transparent"
                     android:src="@drawable/ic_plus_circle"
                     tools:ignore="ContentDescription,TouchTargetSizeCheck,SpeakableTextPresentCheck" />
@@ -367,7 +408,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="bottom|center"
-                android:layout_marginTop="20dp"
                 android:orientation="vertical">
 
                 <LinearLayout
@@ -405,7 +445,7 @@
 
             <ImageButton
                 android:id="@+id/feedback_button"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/blue_grey_050"
                 android:gravity="bottom|center"

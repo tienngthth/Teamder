@@ -37,7 +37,7 @@ public class Receiver extends BroadcastReceiver {
                     if (querySnapshot.getDocuments().size() == 0) {
                         getUserByFieldValue("phone", phoneNumber, (documentSnapshots) -> {
                             if (documentSnapshots.getDocuments().size() > 0) {
-                                createNotification(new Notification(message, currentUser.getId()));
+                                createNotification(new Notification(message, currentUser.getId(), "suggestion"));
                             }
                         });
                     }

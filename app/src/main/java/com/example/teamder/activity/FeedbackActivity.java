@@ -2,12 +2,9 @@ package com.example.teamder.activity;
 
 import static com.example.teamder.model.User.parseUser;
 import static com.example.teamder.repository.NotificationRepository.createNotification;
-import static com.example.teamder.repository.RequestRepository.createRequest;
 import static com.example.teamder.repository.ReviewRepository.createReview;
 import static com.example.teamder.repository.UserRepository.getUserById;
 import static com.example.teamder.util.DateTimeUtil.getToday;
-
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,6 +12,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.teamder.R;
 import com.example.teamder.model.CurrentUser;
@@ -80,18 +80,18 @@ public class FeedbackActivity extends AppCompatActivity {
 
     private void sendFeedback() {
         String messageText = feedback.getText().toString();
-        Review review = new Review(userID, messageText, getToday());
-        Notification notification = new Notification(currentUser.getName() + " sends you a feedback", user.getId());
-        createNotification(notification);
-        createReview(review);
-        Intent intent;
-        if (action.equals("explore")) {
-            intent = new Intent(FeedbackActivity.this, ProfileActivity.class);
+        if (messageText.trim().equals("")) {
+            Toast.makeText(this, "Message can not be empty.", Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(this, "Thank you for your review!", Toast.LENGTH_LONG).show();
+            createNotification(new Notification(" You have a new feedback from your friend.", user.getId(), "feedback"));
+            createReview(new Review(userID, messageText, getToday()));
+            if (!action.equals("")) {
+                Intent intent = new Intent(FeedbackActivity.this, CourseActivity.class);
+                setResult(RESULT_OK, intent);
+            }
+            finish();
         }
-        else {
-            intent = new Intent(FeedbackActivity.this, CourseActivity.class);
-        }
-        setResult(RESULT_OK, intent);
-        finish();
     }
+
 }

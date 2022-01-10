@@ -1,9 +1,11 @@
 package com.example.teamder.activity;
 
+import static com.example.teamder.activity.ProfileActivity.Action.Profile;
+import static com.example.teamder.activity.ProfileActivity.Action.Review;
 import static com.example.teamder.model.User.parseUser;
+import static com.example.teamder.repository.NotificationRepository.createNotification;
 import static com.example.teamder.repository.UserRepository.getUserById;
 import static com.example.teamder.repository.UtilRepository.updateFieldToDb;
-import static com.example.teamder.repository.NotificationRepository.createNotification;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -107,21 +109,16 @@ public class ReviewActivity extends AppCompatActivity {
 
     private void updateRequestStatus(String action) {
         updateFieldToDb("requests", id, "status", action.equals("approve") ? "approved" : (action + "ed"));
+        String message = (action.equals("cancel") ? "Request from " : "Your request to ")
+                + currentUser.getName() + " for course " + courseName + " has been "
+                + (action.equals("approved") ? "approved" : (action + "ed")) + ".";
         if (action.equals("approve")) {
             toCourse();
+        } else {
+            finish();
         }
-        String receiverID, senderName;
-        if (source.equals("sent")) {
-            receiverID = requesteeID;
-            senderName = currentUser.getName() + "'s";
-        }
-        else {
-            receiverID = requesterID;
-            senderName = "Your";
-        }
-        Notification notification = new Notification(senderName + " request has been " + action + "ed", receiverID);
+        Notification notification = new Notification(message, requesteeID.equals(currentUser.getId()) ? requesterID : requesteeID, "Update request");
         createNotification(notification);
-        finish();
     }
 
     private void toCourse() {
@@ -133,7 +130,7 @@ public class ReviewActivity extends AppCompatActivity {
 
     private void toReviewProfile(String position) {
         Intent intent = new Intent(ReviewActivity.this, ProfileActivity.class);
-        intent.putExtra("action", isToProfile(position) ? "profile" : "review");
+        intent.putExtra("action", isToProfile(position) ? Profile : Review);
         intent.putExtra("userID", position.equals("requestee") ? requesteeID : requesterID);
         startActivity(intent);
     }

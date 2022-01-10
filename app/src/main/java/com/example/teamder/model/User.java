@@ -4,14 +4,14 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class User {
 
     private String id;
     private String name;
     private String uid;
-    private double GPA = 4;
+    private String email;
+    private String gpa = "4";
     private String major = "";
     private String sId = "";
     private String phone = "";
@@ -47,9 +47,18 @@ public class User {
     public User(String name, String email, String uid) {
         this.name = name;
         this.uid = uid;
+        this.email = email;
     }
 
     public User() {}
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
     public String getUid() {
         return uid;
@@ -67,12 +76,12 @@ public class User {
         return name;
     }
 
-    public double getGPA() {
-        return GPA;
+    public String getGpa() {
+        return gpa;
     }
 
-    public void setGPA(double GPA) {
-        this.GPA = GPA;
+    public void setGpa(String gpa) {
+        this.gpa = gpa;
     }
 
     public String getMajor() {
@@ -131,11 +140,12 @@ public class User {
         User user = new User();
         user.setName(document.getString("name"));
         user.setMajor(document.getString("major"));
-        user.setGPA(Double.parseDouble(Objects.requireNonNull(document.getString("GPA"))));
+        user.setGpa(document.getString("gpa"));
         user.setIntroduction(document.getString("introduction"));
         user.setPhone(document.getString("phone"));
-        user.setsId(document.getString("sID"));
+        user.setsId(document.getString("sId"));
         user.setUid(document.getString("uid"));
+        user.setEmail(document.getString("email"));
         user.setId(document.getId());
         ArrayList<String> courses = (ArrayList<String>) document.getData().get("courses");
         user.setCourses(courses == null ? new ArrayList<>() : courses);
@@ -148,11 +158,12 @@ public class User {
         User user = new User();
         user.setName(document.getString("name"));
         user.setMajor(document.getString("major"));
-        user.setGPA(Double.parseDouble(Objects.requireNonNull(document.getString("GPA"))));
+        user.setGpa(document.getString("gpa"));
         user.setIntroduction(document.getString("introduction"));
         user.setPhone(document.getString("phone"));
-        user.setsId(document.getString("sID"));
+        user.setsId(document.getString("sId"));
         user.setUid(document.getString("uid"));
+        user.setEmail(document.getString("email"));
         user.setId(document.getId());
         ArrayList<String> courses = (ArrayList<String>) document.getData().get("courses");
         user.setCourses(courses == null ? new ArrayList<>() : courses);

@@ -4,6 +4,7 @@ import static com.example.teamder.model.Notification.parseNotification;
 import static com.example.teamder.repository.UtilRepository.updateFieldToDb;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +24,12 @@ import java.util.ArrayList;
 
 public class NotificationActivity extends AppCompatActivity {
 
+    public enum Type {
+        Feedback,
+        Suggestion,
+        Review,
+        Inspect,
+    }
     private final ArrayList<String> newNotificationIDs = new ArrayList<>();
     private final String currentUserID = CurrentUser.getInstance().getUser().getId();
     private LinearLayout pastNotificationList, newNotificationList, pastNotificationGroup, newNotificationGroup;
@@ -97,6 +104,14 @@ public class NotificationActivity extends AppCompatActivity {
         ((TextView) itemView.findViewById(R.id.message)).setText(notification.getMessage());
         ((TextView) itemView.findViewById(R.id.timestamp)).setText(notification.getTimeStamp());
         list.addView(itemView);
+        itemView.setOnClickListener((view -> navigateUser(notification)));
+    }
+
+    private void navigateUser(Notification notification) {
+        if (notification.getType().equals("feedback")) {
+            Intent intent = new Intent(NotificationActivity.this, ProfileActivity.class);
+            startActivity(intent);
+        }
     }
 
     @Override

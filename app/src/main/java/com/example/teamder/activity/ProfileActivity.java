@@ -1,10 +1,12 @@
 package com.example.teamder.activity;
 
+import static com.example.teamder.activity.ProfileActivity.Action.Explore;
 import static com.example.teamder.model.Review.parseReview;
 import static com.example.teamder.model.User.parseUser;
 import static com.example.teamder.repository.RequestRepository.getApprovedRequestByParties;
 import static com.example.teamder.repository.RequestRepository.getPendingRequestByParties;
 import static com.example.teamder.repository.ReviewRepository.getReviewByUserId;
+import static com.example.teamder.repository.UserRepository.getOtherUserByFieldValue;
 import static com.example.teamder.repository.UserRepository.getUserById;
 import static com.example.teamder.repository.UtilRepository.updateFieldToDb;
 import static com.example.teamder.util.ScreenUtil.clearFocus;
@@ -37,20 +39,25 @@ import com.example.teamder.util.ValidationUtil;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
-
 public class ProfileActivity extends AppCompatActivity {
 
+    public enum Action {
+        Explore,
+        Profile,
+        Review,
+        Inspect,
+    }
     private final ToVisitUserList toVisitUserList = ToVisitUserList.getInstance();
     private final User currentUser = CurrentUser.getInstance().getUser();
     private ActivityResultLauncher<Intent> activityResultLauncher = null;
     private User user = null;
     private String userId = null;
-    private EditText name, major, sID, GPA, introduction, phone;
+    private EditText name, major, sID, GPA, introduction, phone, email;
     private View phoneLine, nameLine, majorLine, sIDLine, GPALine, introductionLine;
     private ImageButton addCourseButton, requestButton, feedbackButton;
     private Button passButton;
     private LayoutInflater inflater;
-    private LinearLayout reviewList, courseList, fullscreenConstraint, actions;
+    private LinearLayout reviewList, courseList, fullscreenConstraint, actions, emailGroup, sIdGroup, phoneGroup;
     private String action = "profile";
     private boolean slideAnimation = true;
     private boolean showDetails = true;
@@ -107,6 +114,7 @@ public class ProfileActivity extends AppCompatActivity {
         GPA = findViewById(R.id.GPA);
         introduction = findViewById(R.id.introduction);
         phone = findViewById(R.id.phone);
+        email = findViewById(R.id.email);
         addCourseButton = findViewById(R.id.add_course);
         courseList = findViewById(R.id.courses_list);
         reviewList = findViewById(R.id.reviews_list);
@@ -121,6 +129,9 @@ public class ProfileActivity extends AppCompatActivity {
         passButton = findViewById(R.id.pass_button);
         requestButton = findViewById(R.id.request_button);
         feedbackButton = findViewById(R.id.feedback_button);
+        emailGroup = findViewById(R.id.email_group);
+        phoneGroup = findViewById(R.id.phone_group);
+        sIdGroup = findViewById(R.id.sID_group);
         inflater = LayoutInflater.from(this);
         activityResultLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -141,11 +152,9 @@ public class ProfileActivity extends AppCompatActivity {
             if (action.equals("explore")) {
                 userId = toVisitUserList.getUserID();
                 showDetails = false;
-            }
-            else if (action.equals("inspect")){
+            } else if (action.equals("inspect")){
                 userId = bundle.get("teammateID").toString();
-            }
-            else {
+            } else {
                 userId = bundle.get("userID").toString();
             }
         }
@@ -172,7 +181,8 @@ public class ProfileActivity extends AppCompatActivity {
         intent.putExtra("userName", user.getName());
         intent.putExtra("userID", user.getId());
         intent.putExtra("action", action);
-        activityResultLauncher.launch(intent);
+        startActivity(intent);
+//        activityResultLauncher.launch(intent);
         if (action.equals("inspect")) {
             finish();
         }
@@ -185,7 +195,7 @@ public class ProfileActivity extends AppCompatActivity {
         if (toVisitUserList.getUserIDs().size() > 0) {
             finish();
             Intent intent = new Intent(ProfileActivity.this, ProfileActivity.class);
-            intent.putExtra("action", "explore");
+            intent.putExtra("action", Explore);
             startActivity(intent);
             if (slideAnimation) {
                 overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
@@ -206,6 +216,7 @@ public class ProfileActivity extends AppCompatActivity {
         clearFocus(view, phone, this);
         clearFocus(view, introduction, this);
         clearFocus(view, sID, this);
+        clearFocus(view, email, this);
         return true;
     }
 
@@ -214,16 +225,12 @@ public class ProfileActivity extends AppCompatActivity {
         major.setText(user.getMajor());
         sID.setText(user.getsId());
         phone.setText(user.getPhone());
+        email.setText(user.getEmail());
         introduction.setText(user.getIntroduction());
-        GPA.setText(String.valueOf(user.getGPA()));
-
-        sID.setVisibility(showDetails ? View.VISIBLE : View.GONE);
-        phone.setVisibility(showDetails ? View.VISIBLE : View.GONE);
-        GPA.setVisibility(showDetails ? View.VISIBLE : View.GONE);
-        findViewById(R.id.sIDText).setVisibility(showDetails ? View.VISIBLE : View.GONE);
-        findViewById(R.id.phoneText).setVisibility(showDetails ? View.VISIBLE : View.GONE);
-        findViewById(R.id.gpaText).setVisibility(showDetails ? View.VISIBLE : View.GONE);
-
+        GPA.setText(String.valueOf(user.getGpa()));
+        sIdGroup.setVisibility(showDetails ? View.VISIBLE : View.GONE);
+        phoneGroup.setVisibility(showDetails ? View.VISIBLE : View.GONE);
+        emailGroup.setVisibility(showDetails ? View.VISIBLE : View.GONE);
         setUpCoursesList();
         setUpReviewsList();
         setEditable();
@@ -249,6 +256,7 @@ public class ProfileActivity extends AppCompatActivity {
         phone.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         GPA.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         major.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        email.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         introduction.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
     }
 
@@ -319,18 +327,38 @@ public class ProfileActivity extends AppCompatActivity {
             updateFieldToDb("users", user.getId(), "major", major.getText().toString(), (v) -> {
                 updateUser();
             });
-            updateFieldToDb("users", user.getId(), "sID", sID.getText().toString(), (v) -> {
-                updateUser();
-            });
-            updateFieldToDb("users", user.getId(), "GPA", GPA.getText().toString(), (v) -> {
+            updateFieldToDb("users", user.getId(), "gpa", GPA.getText().toString(), (v) -> {
                 updateUser();
             });
             updateFieldToDb("users", user.getId(), "introduction", introduction.getText().toString(), (v) -> {
                 updateUser();
             });
-            // TO DO: field listener for phone
-            updateFieldToDb("users", user.getId(), "phone", phone.getText().toString(), (v) -> {
-                updateUser();
+            getOtherUserByFieldValue("sId", sID.getText().toString(), (querySnapshot) -> {
+                if (querySnapshot.getDocuments().size() > 0) {
+                    Toast.makeText(this, "Can not update sID. This sID already exists.", Toast.LENGTH_LONG).show();
+                } else {
+                    updateFieldToDb("users", user.getId(), "sId", sID.getText().toString(), (v) -> {
+                        updateUser();
+                    });
+                }
+            });
+            getOtherUserByFieldValue("email", email.getText().toString(), (querySnapshot) -> {
+                if (querySnapshot.getDocuments().size() > 0) {
+                    Toast.makeText(this, "Can not update email. This email already exists.", Toast.LENGTH_LONG).show();
+                } else {
+                    updateFieldToDb("users", user.getId(), "email", email.getText().toString(), (v) -> {
+                        updateUser();
+                    });
+                }
+            });
+            getOtherUserByFieldValue("phone", phone.getText().toString(), (querySnapshot) -> {
+                if (querySnapshot.getDocuments().size() > 0) {
+                    Toast.makeText(this, "Can not update phone number. This phone number already exists.", Toast.LENGTH_LONG).show();
+                } else {
+                    updateFieldToDb("users", user.getId(), "phone", phone.getText().toString(), (v) -> {
+                        updateUser();
+                    });
+                }
             });
             updateUser();
         }

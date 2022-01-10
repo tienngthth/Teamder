@@ -2,6 +2,7 @@ package com.example.teamder.repository;
 
 import android.util.Log;
 
+import com.example.teamder.model.CurrentUser;
 import com.example.teamder.model.User;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -16,6 +17,21 @@ public class UserRepository {
     public static void getUserByFieldValue(String field, String value, CallbackInterfaces.QuerySnapShotCallBack querySnapShotCallBack) {
         FirebaseFirestore.getInstance().collection("users")
                 .whereEqualTo(field, value)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        querySnapShotCallBack.onCallBack(Objects.requireNonNull(task.getResult()));
+                    } else {
+                        Log.w(TAG, "Error getting user with id " + value, task.getException());
+                    }
+                });
+    }
+
+    public static void getOtherUserByFieldValue(String field, String value, CallbackInterfaces.QuerySnapShotCallBack querySnapShotCallBack) {
+        String currentUserId = CurrentUser.getInstance().getUser().getId();
+        FirebaseFirestore.getInstance().collection("users")
+                .whereEqualTo(field, value)
+                .whereNotEqualTo("id", currentUserId)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {

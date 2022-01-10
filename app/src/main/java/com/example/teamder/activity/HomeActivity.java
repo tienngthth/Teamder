@@ -1,5 +1,6 @@
 package com.example.teamder.activity;
 
+import static com.example.teamder.activity.ProfileActivity.Action.Explore;
 import static com.example.teamder.model.Request.parseRequest;
 import static com.example.teamder.model.User.parseUser;
 import static com.example.teamder.repository.RequestRepository.getPendingRequestByFieldValue;
@@ -286,23 +287,28 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void explore() {
-        UserRepository.getUsersByCourse(currentUser.getCourses(),
-                currentUser.getUid(),
-                (QuerySnapshot) -> {
-                    for (DocumentSnapshot document : QuerySnapshot.getDocuments()) {
-                        String userID = document.getId();
-                        if (!toVisitUserList.getUserIDs().contains(userID) && !userID.equals(currentUser.getId()) && !currentUser.getVisitedTeameeIDs().contains(userID)) {
-                            toVisitUserList.addUserID(userID);
+        if (currentUser.getCourses().size() > 0) {
+            UserRepository.getUsersByCourse(currentUser.getCourses(),
+                    currentUser.getUid(),
+                    (QuerySnapshot) -> {
+                        for (DocumentSnapshot document : QuerySnapshot.getDocuments()) {
+                            String userID = document.getId();
+                            if (!toVisitUserList.getUserIDs().contains(userID) && !userID.equals(currentUser.getId()) && !currentUser.getVisitedTeameeIDs().contains(userID)) {
+                                toVisitUserList.addUserID(userID);
+                            }
                         }
-                    }
-                    if (toVisitUserList.getUserIDs().size() > 0) {
-                        Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
-                        intent.putExtra("action", "explore");
-                        startActivity(intent);
-                    } else {
-                        Toast.makeText(this, "No potential teammate found", Toast.LENGTH_LONG).show();
-                    }
-                });
+                        if (toVisitUserList.getUserIDs().size() > 0) {
+                            Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
+                            intent.putExtra("action", Explore);
+                            startActivity(intent);
+                        } else {
+                            Toast.makeText(this, "No potential teammate found", Toast.LENGTH_LONG).show();
+                        }
+                    });
+        } else {
+            Toast.makeText(this, "Let's update your profile and courses first", Toast.LENGTH_LONG).show();
+        }
+
     }
 
     @Override

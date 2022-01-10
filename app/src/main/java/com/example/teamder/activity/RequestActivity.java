@@ -121,7 +121,7 @@ public class RequestActivity extends AppCompatActivity {
         if (courseNames.size() > 0) {
             for (String course : courseNames) {
                 Request request = new Request(course, getToday(), currentUser.getId(), messageText, user.getId());
-                Notification notification = new Notification(currentUser.getName() + " sends a request", user.getId());
+                Notification notification = new Notification(currentUser.getName() + " sends you a request for course " + course + ".", user.getId(), "New request");
                 createRequest(request);
                 createNotification(notification);
             }

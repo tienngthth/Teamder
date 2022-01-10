@@ -2,7 +2,6 @@ package com.example.teamder.model;
 
 import static com.example.teamder.util.DateTimeUtil.getCurrentTime;
 
-import com.example.teamder.repository.NotificationRepository;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 public class Notification {
@@ -11,27 +10,34 @@ public class Notification {
     private String timeStamp = getCurrentTime();
     private String userId;
     private String id;
+    private String type;
     private boolean hasPushed = false;
     private boolean isSeen = false;
 
     public Notification() {
     }
 
-    public Notification(String message, String userId) {
+    public Notification(String message, String userId, String type) {
         this.message = message;
         this.userId = userId;
-    }
-
-    public static void broadcastNotification(String message, String userId) {
-        NotificationRepository.createNotification(new Notification(message, userId));
+        this.type = type;
     }
 
     public static Notification parseNotification(DocumentSnapshot document) {
         Notification notification = new Notification();
         notification.setMessage(document.getString("message"));
         notification.setTimeStamp(document.getString("timeStamp"));
+        notification.setType(document.getString("type"));
         notification.setId(document.getId());
         return notification;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public boolean isHasPushed() {
