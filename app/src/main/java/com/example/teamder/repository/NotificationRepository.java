@@ -21,6 +21,19 @@ public class NotificationRepository {
                 });
     }
 
+    public static void getNotificationByUserIdAndMessage(String userId, String message, CallbackInterfaces.QuerySnapShotCallBack querySnapShotCallBack) {
+        FirebaseFirestore.getInstance()
+                .collection("notifications")
+                .whereEqualTo("userId", userId)
+                .whereEqualTo("message", message)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        querySnapShotCallBack.onCallBack(Objects.requireNonNull(task.getResult()));
+                    }
+                });
+    }
+
     public static ListenerRegistration addSnapshotListenerForNotificationByUserIdAndHasPushedValue(String userId, boolean hashPushed, CallbackInterfaces.ListDocumentChangeCallBack listDocumentChangeCallBack) {
         return FirebaseFirestore.getInstance()
                 .collection("notifications")

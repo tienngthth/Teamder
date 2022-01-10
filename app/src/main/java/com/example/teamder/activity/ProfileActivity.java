@@ -328,6 +328,7 @@ public class ProfileActivity extends AppCompatActivity {
             updateFieldToDb("users", user.getId(), "introduction", introduction.getText().toString(), (v) -> {
                 updateUser();
             });
+            // TO DO: field listener for phone
             updateFieldToDb("users", user.getId(), "phone", phone.getText().toString(), (v) -> {
                 updateUser();
             });

@@ -1,6 +1,7 @@
 package com.example.teamder.activity;
 
 import static com.example.teamder.util.ScreenUtil.clearFocus;
+import static com.example.teamder.util.ScreenUtil.setViewAndChildrenEnabled;
 import static com.example.teamder.util.ValidationUtil.validateEmailInput;
 import static com.example.teamder.util.ValidationUtil.validatePasswordInput;
 
@@ -20,7 +21,6 @@ import com.example.teamder.model.CurrentUser;
 import com.example.teamder.repository.AuthenticationRepository;
 import com.example.teamder.repository.UserRepository;
 import com.example.teamder.service.NotificationService;
-import com.example.teamder.util.ScreenUtil;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -36,6 +36,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         initialiseVariables();
+        setViewAndChildrenEnabled(fullscreenConstraint, false);
         setupListener();
         setupScreen(getIntent());
     }
@@ -74,14 +75,14 @@ public class LoginActivity extends AppCompatActivity {
         if (user != null) {
             navigateUser(user.getUid());
         } else {
-            fullscreenConstraint.setVisibility(View.VISIBLE);
+            setViewAndChildrenEnabled(fullscreenConstraint, true);
         }
     }
 
     private void navigateUser(String uid) {
         UserRepository.getUserByFieldValue("uid", uid, querySnapshot -> {
             if (querySnapshot.size() != 1) {
-                ScreenUtil.setViewAndChildrenEnabled(fullscreenConstraint, true);
+                setViewAndChildrenEnabled(fullscreenConstraint, true);
                 Toast.makeText(this, "Account is not valid", Toast.LENGTH_SHORT).show();
             } else {
                 for (QueryDocumentSnapshot document : querySnapshot) {
@@ -104,13 +105,13 @@ public class LoginActivity extends AppCompatActivity {
         String email = validateEmailInput(emailInput);
         String password = validatePasswordInput(passwordInput);
         if (email != null && password != null) {
-            ScreenUtil.setViewAndChildrenEnabled(fullscreenConstraint, false);
+            setViewAndChildrenEnabled(fullscreenConstraint, false);
             AuthenticationRepository.signInWithEmailAndPassword(
                     email,
                     password,
                     this::verifyUserType,
                     () -> {
-                        ScreenUtil.setViewAndChildrenEnabled(fullscreenConstraint, true);
+                        setViewAndChildrenEnabled(fullscreenConstraint, true);
                         Toast.makeText(LoginActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                     });
         }
