@@ -5,8 +5,10 @@ import static com.example.teamder.model.User.parseUser;
 import static com.example.teamder.repository.RequestRepository.getPendingRequestByFieldValue;
 import static com.example.teamder.repository.UserRepository.getUserById;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
@@ -18,8 +20,10 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import com.example.teamder.R;
+import com.example.teamder.broadcast.Receiver;
 import com.example.teamder.model.CurrentUser;
 import com.example.teamder.model.Request;
 import com.example.teamder.model.ToVisitUserList;
@@ -35,6 +39,7 @@ import java.util.ArrayList;
 
 public class HomeActivity extends AppCompatActivity {
 
+    private static final int MY_PERMISSIONS_REQUEST = 99;
     private final ToVisitUserList toVisitUserList = ToVisitUserList.getInstance();
     private final User currentUser = CurrentUser.getInstance().getUser();
     private TextView userNameView, coursesTitle;
@@ -42,6 +47,8 @@ public class HomeActivity extends AppCompatActivity {
     private LinearLayout receivedRequestListView, courseListView, sentRequestListView, receivedRequests, sentRequests;
     private LayoutInflater inflater;
     private TextView newNotificationCount;
+    protected Receiver myReceiver;
+    protected IntentFilter intentFilter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +56,17 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
         initialiseVariables();
         setupListener();
+        registerService();
+    }
+
+    private void registerService(){
+        myReceiver = new Receiver();
+        intentFilter = new IntentFilter();
+        intentFilter.addAction("android.intent.action.PHONE_STATE");
+        intentFilter.addAction("android.provider.Telephony.SMS_RECEIVED");
+        registerReceiver(myReceiver, intentFilter);
+        ActivityCompat.requestPermissions(HomeActivity.this, new String[]{
+                Manifest.permission.READ_PHONE_STATE, Manifest.permission.READ_CALL_LOG}, MY_PERMISSIONS_REQUEST);
     }
 
     private void initialiseVariables() {
