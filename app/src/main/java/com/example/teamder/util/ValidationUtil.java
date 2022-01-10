@@ -49,7 +49,7 @@ public class ValidationUtil {
         if (isValidRegex(name, regex)) {
             return name;
         } else {
-            nameInput.setError("Name can not be empty and contains less than 10 alphabetical characters only");
+            nameInput.setError("Name can not be empty and contains less than 10 alphanumerical characters or spaces only");
             return null;
         }
     }
