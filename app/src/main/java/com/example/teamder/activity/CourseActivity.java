@@ -1,5 +1,6 @@
 package com.example.teamder.activity;
 
+import static com.example.teamder.activity.NotificationActivity.Type.DoneGroup;
 import static com.example.teamder.activity.ProfileActivity.Action.Inspect;
 import static com.example.teamder.model.Request.parseRequest;
 import static com.example.teamder.model.User.parseUser;
@@ -117,7 +118,7 @@ public class CourseActivity extends AppCompatActivity {
                 for (int index = 0; index < snapshot.getDocuments().size(); ++index) {
                     Request request = parseRequest(snapshot.getDocuments().get(index));
                     updateFieldToDb("requests", request.getId(), "status", "cancelled");
-                    Notification notification = new Notification("Group " + courseName + " has been removed", request.getRequesteeID(), "Done group");
+                    Notification notification = new Notification("Group " + courseName + " has been removed", request.getRequesteeID(), DoneGroup);
                     createNotification(notification);
                 }
                 Toast.makeText(CourseActivity.this, "Group has been removed", Toast.LENGTH_SHORT).show();

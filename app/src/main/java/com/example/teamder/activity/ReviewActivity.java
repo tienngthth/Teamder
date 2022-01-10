@@ -1,5 +1,8 @@
 package com.example.teamder.activity;
 
+import static com.example.teamder.activity.NotificationActivity.Type.ApproveRequest;
+import static com.example.teamder.activity.NotificationActivity.Type.CancelRequest;
+import static com.example.teamder.activity.NotificationActivity.Type.RejectRequest;
 import static com.example.teamder.activity.ProfileActivity.Action.Profile;
 import static com.example.teamder.activity.ProfileActivity.Action.Review;
 import static com.example.teamder.model.User.parseUser;
@@ -117,7 +120,10 @@ public class ReviewActivity extends AppCompatActivity {
         } else {
             finish();
         }
-        Notification notification = new Notification(message, requesteeID.equals(currentUser.getId()) ? requesterID : requesteeID, "Update request");
+        Notification notification = new Notification(
+                message,
+                requesteeID.equals(currentUser.getId()) ? requesterID : requesteeID,
+                action.equals("approve") ? ApproveRequest : action.equals("reject") ? RejectRequest : CancelRequest);
         createNotification(notification);
     }
 

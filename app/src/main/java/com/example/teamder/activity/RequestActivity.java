@@ -1,5 +1,6 @@
 package com.example.teamder.activity;
 
+import static com.example.teamder.activity.NotificationActivity.Type.NewRequest;
 import static com.example.teamder.model.User.parseUser;
 import static com.example.teamder.repository.RequestRepository.createRequest;
 import static com.example.teamder.repository.RequestRepository.getPendingRequestOfCourseByParties;
@@ -121,7 +122,7 @@ public class RequestActivity extends AppCompatActivity {
         if (courseNames.size() > 0) {
             for (String course : courseNames) {
                 Request request = new Request(course, getToday(), currentUser.getId(), messageText, user.getId());
-                Notification notification = new Notification(currentUser.getName() + " sends you a request for course " + course + ".", user.getId(), "New request");
+                Notification notification = new Notification(currentUser.getName() + " sends you a request for course " + course + ".", user.getId(), NewRequest);
                 createRequest(request);
                 createNotification(notification);
             }

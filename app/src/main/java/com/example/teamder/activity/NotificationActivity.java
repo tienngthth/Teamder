@@ -1,5 +1,6 @@
 package com.example.teamder.activity;
 
+import static com.example.teamder.activity.NotificationActivity.Type.Feedback;
 import static com.example.teamder.model.Notification.parseNotification;
 import static com.example.teamder.repository.UtilRepository.updateFieldToDb;
 
@@ -27,8 +28,12 @@ public class NotificationActivity extends AppCompatActivity {
     public enum Type {
         Feedback,
         Suggestion,
-        Review,
-        Inspect,
+        Message,
+        DoneGroup,
+        ApproveRequest,
+        RejectRequest,
+        CancelRequest,
+        NewRequest,
     }
     private final ArrayList<String> newNotificationIDs = new ArrayList<>();
     private final String currentUserID = CurrentUser.getInstance().getUser().getId();
@@ -108,7 +113,7 @@ public class NotificationActivity extends AppCompatActivity {
     }
 
     private void navigateUser(Notification notification) {
-        if (notification.getType().equals("feedback")) {
+        if (notification.getType().equals(Feedback)) {
             Intent intent = new Intent(NotificationActivity.this, ProfileActivity.class);
             startActivity(intent);
         }

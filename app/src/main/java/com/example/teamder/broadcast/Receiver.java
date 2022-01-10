@@ -1,6 +1,7 @@
 package com.example.teamder.broadcast;
 
 import static android.telephony.TelephonyManager.EXTRA_STATE_IDLE;
+import static com.example.teamder.activity.NotificationActivity.Type.Suggestion;
 import static com.example.teamder.repository.NotificationRepository.createNotification;
 import static com.example.teamder.repository.NotificationRepository.getNotificationByUserIdAndMessage;
 import static com.example.teamder.repository.UserRepository.getUserByFieldValue;
@@ -37,7 +38,7 @@ public class Receiver extends BroadcastReceiver {
                     if (querySnapshot.getDocuments().size() == 0) {
                         getUserByFieldValue("phone", phoneNumber, (documentSnapshots) -> {
                             if (documentSnapshots.getDocuments().size() > 0) {
-                                createNotification(new Notification(message, currentUser.getId(), "suggestion"));
+                                createNotification(new Notification(message, currentUser.getId(), Suggestion));
                             }
                         });
                     }

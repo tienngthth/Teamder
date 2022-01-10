@@ -1,6 +1,8 @@
 package com.example.teamder.activity;
 
 import static com.example.teamder.activity.ProfileActivity.Action.Explore;
+import static com.example.teamder.activity.ProfileActivity.Action.Inspect;
+import static com.example.teamder.activity.ProfileActivity.Action.Profile;
 import static com.example.teamder.model.Review.parseReview;
 import static com.example.teamder.model.User.parseUser;
 import static com.example.teamder.repository.RequestRepository.getApprovedRequestByParties;
@@ -58,7 +60,7 @@ public class ProfileActivity extends AppCompatActivity {
     private Button passButton;
     private LayoutInflater inflater;
     private LinearLayout reviewList, courseList, fullscreenConstraint, actions, emailGroup, sIdGroup, phoneGroup;
-    private String action = "profile";
+    private Action action = Profile;
     private boolean slideAnimation = true;
     private boolean showDetails = true;
 
@@ -67,10 +69,10 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         initialiseVariables();
-        if (userId != null && !action.equals("profile")) {
+        if (userId != null && !action.equals(Profile)) {
             getUserById(userId, (document) -> {
                 user = parseUser(document);
-                if (action.equals("explore")) {
+                if (action.equals(Explore)) {
                     ArrayList<String> intersectCourses = new ArrayList<>(user.getCourses());
                     intersectCourses.retainAll(currentUser.getCourses());
                     ArrayList<String> parties = new ArrayList<>();
@@ -148,11 +150,11 @@ public class ProfileActivity extends AppCompatActivity {
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
-            action = bundle.get("action").toString();
-            if (action.equals("explore")) {
+            action = Action.valueOf(bundle.get("action").toString());
+            if (action.equals(Explore)) {
                 userId = toVisitUserList.getUserID();
                 showDetails = false;
-            } else if (action.equals("inspect")){
+            } else if (action.equals(Inspect)){
                 userId = bundle.get("teammateID").toString();
             } else {
                 userId = bundle.get("userID").toString();
@@ -183,7 +185,7 @@ public class ProfileActivity extends AppCompatActivity {
         intent.putExtra("action", action);
         startActivity(intent);
 //        activityResultLauncher.launch(intent);
-        if (action.equals("inspect")) {
+        if (action.equals(Inspect)) {
             finish();
         }
     }
@@ -238,20 +240,20 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void setEditable() {
-        addCourseButton.setVisibility(action.equals("profile") ? View.VISIBLE : View.GONE);
-        majorLine.setVisibility(action.equals("profile") ? View.VISIBLE : View.GONE);
-        nameLine.setVisibility(action.equals("profile") ? View.VISIBLE : View.GONE);
-        phoneLine.setVisibility(action.equals("profile") ? View.VISIBLE : View.GONE);
-        sIDLine.setVisibility(action.equals("profile") ? View.VISIBLE : View.GONE);
-        introductionLine.setVisibility(action.equals("profile") ? View.VISIBLE : View.GONE);
-        GPALine.setVisibility(action.equals("profile") ? View.VISIBLE : View.GONE);
-        name.setEnabled(action.equals("profile"));
-        phone.setEnabled(action.equals("profile"));
-        GPA.setEnabled(action.equals("profile"));
-        major.setEnabled(action.equals("profile"));
-        introduction.setEnabled(action.equals("profile"));
-        actions.setVisibility(action.equals("explore") ? View.VISIBLE : View.GONE);
-        feedbackButton.setVisibility(!action.equals("profile") && !userId.equals(currentUser.getId()) ? View.VISIBLE : View.GONE);
+        addCourseButton.setVisibility(action.equals(Profile) ? View.VISIBLE : View.GONE);
+        majorLine.setVisibility(action.equals(Profile) ? View.VISIBLE : View.GONE);
+        nameLine.setVisibility(action.equals(Profile) ? View.VISIBLE : View.GONE);
+        phoneLine.setVisibility(action.equals(Profile) ? View.VISIBLE : View.GONE);
+        sIDLine.setVisibility(action.equals(Profile) ? View.VISIBLE : View.GONE);
+        introductionLine.setVisibility(action.equals(Profile) ? View.VISIBLE : View.GONE);
+        GPALine.setVisibility(action.equals(Profile) ? View.VISIBLE : View.GONE);
+        name.setEnabled(action.equals(Profile));
+        phone.setEnabled(action.equals(Profile));
+        GPA.setEnabled(action.equals(Profile));
+        major.setEnabled(action.equals(Profile));
+        introduction.setEnabled(action.equals(Profile));
+        actions.setVisibility(action.equals(Explore) ? View.VISIBLE : View.GONE);
+        feedbackButton.setVisibility(!action.equals(Profile) && !userId.equals(currentUser.getId()) ? View.VISIBLE : View.GONE);
         name.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         phone.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         GPA.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -305,8 +307,8 @@ public class ProfileActivity extends AppCompatActivity {
     private void setupCustomCourseView(String name, int index) {
         View itemView = inflater.inflate(R.layout.enrolled_courses_row, null, false);
         ((TextView) itemView.findViewById(R.id.course)).setText(name);
-        itemView.findViewById(R.id.remove_course).setVisibility(action.equals("profile") ? View.VISIBLE : View.GONE);
-        if (action.equals("profile")) {
+        itemView.findViewById(R.id.remove_course).setVisibility(action.equals(Profile) ? View.VISIBLE : View.GONE);
+        if (action.equals(Profile)) {
             ((ImageButton) itemView.findViewById(R.id.remove_course)).setOnClickListener((View view) -> {
                 user.removeCourse(index);
                 updateFieldToDb("users", user.getId(), "courses", user.getCourses());
