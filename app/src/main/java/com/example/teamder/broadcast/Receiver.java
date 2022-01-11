@@ -8,7 +8,7 @@ import static com.example.teamder.model.User.parseUser;
 import static com.example.teamder.repository.NotificationRepository.createNotification;
 import static com.example.teamder.repository.NotificationRepository.getNotificationByUserIdAndMessage;
 import static com.example.teamder.repository.RequestRepository.getRequestsByPartiesAndStatus;
-import static com.example.teamder.repository.UserRepository.getUserByFieldValue;
+import static com.example.teamder.repository.UserRepository.getOtherUserByFieldValue;
 import static com.example.teamder.repository.UserRepository.getUserById;
 
 import android.content.BroadcastReceiver;
@@ -47,7 +47,7 @@ public class Receiver extends BroadcastReceiver {
                 getNotificationByUserIdAndMessage(currentUser.getId(), message, (querySnapshot) ->  {
                     int size = querySnapshot.getDocuments().size();
                     if (size == 0) {
-                        getUserByFieldValue("phone", phoneNumber, (documentSnapshots) -> {
+                        getOtherUserByFieldValue("phone", phoneNumber, (documentSnapshots) -> {
                             List<DocumentSnapshot> documents = documentSnapshots.getDocuments();
                             if (documents.size() > 0) {
                                 checkIntersectCourses(message, documents.get(0).getString("id"));

@@ -17,6 +17,8 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.teamder.R;
@@ -35,6 +37,7 @@ public class LoginActivity extends AppCompatActivity {
     private ImageButton signUpLink;
     private Button loginButton;
     private LinearLayout fullscreenConstraint;
+    private ActivityResultLauncher<Intent> activityResultLauncher = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +61,12 @@ public class LoginActivity extends AppCompatActivity {
         loginButton = findViewById(R.id.login_button);
         signUpLink = findViewById(R.id.sign_up_link);
         fullscreenConstraint = findViewById(R.id.activity_login);
+        activityResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    setupScreen(result.getData());
+                }
+        );
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -68,10 +77,12 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void setupScreen(Intent intent) {
-        Bundle bundle = intent.getExtras();
-        if (bundle != null) {
-            emailInput.setText(bundle.get(Email.toString()).toString());
-            passwordInput.setText(bundle.get(Password.toString()).toString());
+        if (intent != null) {
+            Bundle bundle = intent.getExtras();
+            if (bundle != null) {
+                emailInput.setText(bundle.get(Email.toString()).toString());
+                passwordInput.setText(bundle.get(Password.toString()).toString());
+            }
         }
     }
 
@@ -132,7 +143,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void toSignUp() {
         Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
-        startActivity(intent);
+        activityResultLauncher.launch(intent);
     }
 
     private boolean clearInputFieldsFocus(View view) {

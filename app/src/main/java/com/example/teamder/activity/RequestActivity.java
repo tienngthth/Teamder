@@ -149,7 +149,8 @@ public class RequestActivity extends AppCompatActivity {
                 for (String course : courseNames) {
                     createRequestAndNotificationInDb(course, messageText);
                 }
-                navigateUser();
+                Toast.makeText(this, "Request(s) sent.", Toast.LENGTH_LONG).show();
+                toProfile();
             } else {
                 Toast.makeText(this, "Please select some courses.", Toast.LENGTH_LONG).show();
             }
@@ -169,7 +170,7 @@ public class RequestActivity extends AppCompatActivity {
         });
     }
 
-    private void navigateUser() {
+    private void toProfile() {
         Intent intent = new Intent(RequestActivity.this, ProfileActivity.class);
         setResult(RESULT_OK, intent);
         finish();

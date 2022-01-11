@@ -197,7 +197,6 @@ public class HomeActivity extends AppCompatActivity {
             int size = snapshot.getDocuments().size();
             sentRequests.setVisibility(size == 0 ? View.GONE : View.VISIBLE);
             prepareSentRequestListView();
-            sentRequestListView.removeAllViews();
             for (int index = 0; index < size; ++index) {
                 Request request = parseRequest(snapshot.getDocuments().get(index));
                 setupCustomSentRequestView(request, index);
@@ -242,7 +241,11 @@ public class HomeActivity extends AppCompatActivity {
                     }
                     int total = groups.size();
                     if (total == 0) {
-                        groupsTitle.setText("No group found");
+                        groupsTitle.setText(
+                                (currentUser.getCourses().size() == 0)
+                                        ? "Let's add some courses to your Profile."
+                                        : "No group found. Let's explore and review requests."
+                        );
                         groupListView.setVisibility(View.GONE);
                     } else {
                         prepareCourseListView();
@@ -304,7 +307,7 @@ public class HomeActivity extends AppCompatActivity {
                 Toast.makeText(this, "No potential teammate found", Toast.LENGTH_LONG).show();
             }
         } else {
-            Toast.makeText(this, "Let's update your profile and courses first", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Let's update your profile and enrolling courses first", Toast.LENGTH_LONG).show();
         }
     }
 

@@ -56,6 +56,7 @@ public class ProfileActivity extends AppCompatActivity {
         Review,
         Inspect,
     }
+
     private final ToVisitUserList toVisitUserList = ToVisitUserList.getInstance();
     private final User currentUser = CurrentUser.getInstance().getUser();
     private ActivityResultLauncher<Intent> activityResultLauncher = null;
@@ -77,56 +78,6 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
         initialiseVariables();
         checkActionType();
-    }
-
-    private void checkActionType() {
-        if (userId != null && !action.equals(Profile)) {
-            getUserById(userId, (document) -> {
-                user = parseUser(document);
-                if (action.equals(Explore)) {
-                    checkIntersectCourses();
-                } else {
-                    setUpListeners();
-                    setUpScreen();
-                }
-            });
-        } else {
-            setUpCurrentUserScreen();
-        }
-    }
-
-    private void checkIntersectCourses() {
-        getUserById(user.getId(), (documentSnapshot -> {
-            User user = parseUser(documentSnapshot);
-            ArrayList<String> parties = new ArrayList<>(Arrays.asList(user.getId(), currentUser.getId()));
-            getRequestsByPartiesAndStatus(pending.toString(), parties, (snapshot) -> {
-                        final int[] requestNo = {snapshot.getDocuments().size()};
-                        getRequestsByPartiesAndStatus(approved.toString(), parties, (documentSnapshots) -> {
-                            requestNo[0] += documentSnapshots.getDocuments().size();
-                            int courseAvailable = (countIntersectCourses(user) - requestNo[0]);
-                            if (courseAvailable > 0) {
-                                setUpListeners();
-                                setUpScreen();
-                            } else {
-                                slideAnimation = false;
-                                nextUser();
-                            }
-                        });
-                    }
-            );
-        }));
-    }
-
-    public int countIntersectCourses(User user) {
-        ArrayList<String> intersectCourses = new ArrayList<>(user.getCourses());
-        intersectCourses.retainAll(currentUser.getCourses());
-        return intersectCourses.size();
-    }
-
-    private void setUpCurrentUserScreen() {
-        user = CurrentUser.getInstance().getUser();
-        setUpListeners();
-        setUpScreen();
     }
 
     private void initialiseVariables() {
@@ -181,7 +132,7 @@ public class ProfileActivity extends AppCompatActivity {
                 if (action.equals(Explore)) {
                     userId = toVisitUserList.getUserID();
                     showDetails = false;
-                } else if (action.equals(Inspect)){
+                } else if (action.equals(Inspect)) {
                     userId = bundle.get(TeammateId.toString()).toString();
                 } else {
                     userId = bundle.get(UserId.toString()).toString();
@@ -189,6 +140,57 @@ public class ProfileActivity extends AppCompatActivity {
             }
         }
     }
+
+    private void checkActionType() {
+        if (userId != null && !action.equals(Profile)) {
+            getUserById(userId, (document) -> {
+                user = parseUser(document);
+                if (action.equals(Explore)) {
+                    checkIntersectCourses();
+                } else {
+                    setUpListeners();
+                    setUpScreen();
+                }
+            });
+        } else {
+            setUpCurrentUserScreen();
+        }
+    }
+
+    private void checkIntersectCourses() {
+        getUserById(user.getId(), (documentSnapshot -> {
+            User user = parseUser(documentSnapshot);
+            ArrayList<String> parties = new ArrayList<>(Arrays.asList(user.getId(), currentUser.getId()));
+            getRequestsByPartiesAndStatus(pending.toString(), parties, (snapshot) -> {
+                        final int[] requestNo = {snapshot.getDocuments().size()};
+                        getRequestsByPartiesAndStatus(approved.toString(), parties, (documentSnapshots) -> {
+                            requestNo[0] += documentSnapshots.getDocuments().size();
+                            int courseAvailable = (countIntersectCourses(user) - requestNo[0]);
+                            if (courseAvailable > 0) {
+                                setUpListeners();
+                                setUpScreen();
+                            } else {
+                                slideAnimation = false;
+                                nextUser();
+                            }
+                        });
+                    }
+            );
+        }));
+    }
+
+    public int countIntersectCourses(User user) {
+        ArrayList<String> intersectCourses = new ArrayList<>(user.getCourses());
+        intersectCourses.retainAll(currentUser.getCourses());
+        return intersectCourses.size();
+    }
+
+    private void setUpCurrentUserScreen() {
+        user = CurrentUser.getInstance().getUser();
+        setUpListeners();
+        setUpScreen();
+    }
+
 
     @SuppressLint("ClickableViewAccessibility")
     private void setUpListeners() {
@@ -354,38 +356,20 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        if (CurrentUser.getInstance().getUser().getId().equals(user.getId())) {
-            user.setName(name.getText().toString());
-            updateFieldToDb("users", user.getId(), "name", name.getText().toString(), (v) -> {
-                updateUser();
-            });
-            updateFieldToDb("users", user.getId(), "major", major.getText().toString(), (v) -> {
-                updateUser();
-            });
-            updateFieldToDb("users", user.getId(), "gpa", GPA.getText().toString(), (v) -> {
-                updateUser();
-            });
-            updateFieldToDb("users", user.getId(), "introduction", introduction.getText().toString(), (v) -> {
-                updateUser();
-            });
-            getOtherUserByFieldValue("sId", sID.getText().toString(), (querySnapshot) -> {
-                if (querySnapshot.getDocuments().size() > 0) {
-                    Toast.makeText(this, "Can not update sID. This sID already exists.", Toast.LENGTH_LONG).show();
-                } else {
-                    updateFieldToDb("users", user.getId(), "sId", sID.getText().toString(), (v) -> {
-                        updateUser();
-                    });
-                }
-            });
-            getOtherUserByFieldValue("email", email.getText().toString(), (querySnapshot) -> {
-                if (querySnapshot.getDocuments().size() > 0) {
-                    Toast.makeText(this, "Can not update email. This email already exists.", Toast.LENGTH_LONG).show();
-                } else {
-                    updateFieldToDb("users", user.getId(), "email", email.getText().toString(), (v) -> {
-                        updateUser();
-                    });
-                }
-            });
+        if (currentUser.getId().equals(user.getId())) {
+            updateUserInformation();
+        }
+    }
+
+    private void updateUserInformation() {
+        user.setName(name.getText().toString());
+        checkChangesAndUpdate(name, user.getName(), "name");
+        checkChangesAndUpdate(major, user.getMajor(), "major");
+        checkChangesAndUpdate(GPA, user.getGpa(), "gpa");
+        checkChangesAndUpdate(introduction, user.getIntroduction(), "introduction");
+        checkDuplicateAndUpdate(sID, user.getsId(), "sId");
+        checkDuplicateAndUpdate(phone, user.getPhone(), "phone");
+        if (!phone.getText().toString().equals(user.getPhone())) {
             getOtherUserByFieldValue("phone", phone.getText().toString(), (querySnapshot) -> {
                 if (querySnapshot.getDocuments().size() > 0) {
                     Toast.makeText(this, "Can not update phone number. This phone number already exists.", Toast.LENGTH_LONG).show();
@@ -395,13 +379,37 @@ public class ProfileActivity extends AppCompatActivity {
                     });
                 }
             });
-            updateUser();
+        }
+        updateUser();
+    }
+
+    private void checkChangesAndUpdate(EditText editText, String currentValue, String field) {
+        String newValue = editText.getText().toString();
+        if (!newValue.equals(currentValue)) {
+            updateFieldToDb("users", user.getId(), field, newValue, (v) -> {
+                updateUser();
+            });
+        }
+    }
+
+    private void checkDuplicateAndUpdate(EditText editText, String currentValue, String field) {
+        String newValue = editText.getText().toString();
+        if (!newValue.equals(currentValue)) {
+            getOtherUserByFieldValue(field, newValue, (querySnapshot) -> {
+                if (querySnapshot.getDocuments().size() > 0) {
+                    Toast.makeText(this, "Can not update " + field + ". This " + field + " already exists.", Toast.LENGTH_LONG).show();
+                } else {
+                    updateFieldToDb("users", user.getId(), field, newValue, (v) -> {
+                        updateUser();
+                    });
+                }
+            });
         }
     }
 
     private void updateUser() {
         UserRepository.getUserById(user.getId(), document -> {
-                CurrentUser.getInstance().updateUser(document);
+            CurrentUser.getInstance().updateUser(document);
         });
     }
 
@@ -428,11 +436,6 @@ public class ProfileActivity extends AppCompatActivity {
                 updateFieldToDb("users", user.getId(), "courses", user.getCourses());
             }
         });
-    }
-
-    @Override
-    public void onBackPressed() {
-        finish();
     }
 
 }

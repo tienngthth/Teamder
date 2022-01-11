@@ -25,6 +25,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -189,6 +190,7 @@ public class ReviewActivity extends AppCompatActivity {
         updateFieldToDb("requests", request.getId(), "status", getPastTense(action), (v) -> {
             createNotificationInDb(action, groupId);
         });
+        Toast.makeText(this, "Request " + getPastTense(action) + ".", Toast.LENGTH_LONG).show();
         if (!action.equals("approve")) {
             finish();
         }
