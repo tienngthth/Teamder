@@ -10,9 +10,10 @@ import static com.example.teamder.repository.NotificationRepository.createNotifi
 import static com.example.teamder.repository.RequestRepository.createRequest;
 import static com.example.teamder.repository.RequestRepository.getRequestOfCourseByParties;
 import static com.example.teamder.repository.UserRepository.getUserById;
-import static com.example.teamder.util.DateTimeUtil.getToday;
+import static com.example.teamder.util.ScreenUtil.clearFocus;
 import static com.example.teamder.util.ValidationUtil.validateMessage;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -51,7 +52,7 @@ public class RequestActivity extends AppCompatActivity {
     private String userName = null;
     private String userID = null;
     private Button cancelButton, sendButton;
-    private LinearLayout coursesList;
+    private LinearLayout coursesList, fullScreen;
     private LayoutInflater inflater;
 
     @Override
@@ -73,6 +74,7 @@ public class RequestActivity extends AppCompatActivity {
         sendButton = findViewById(R.id.send_button);
         coursesList = findViewById(R.id.courses_list);
         message = findViewById(R.id.message);
+        fullScreen = findViewById(R.id.full_screen);
         inflater = LayoutInflater.from(this);
     }
 
@@ -122,9 +124,16 @@ public class RequestActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void setUpListeners() {
         cancelButton.setOnClickListener((View view) -> cancel());
         sendButton.setOnClickListener((View view) -> sendRequest());
+        fullScreen.setOnTouchListener((view, event) -> clearInputFieldsFocus(view));
+    }
+
+    private boolean clearInputFieldsFocus(View view) {
+        clearFocus(view, message, this);
+        return true;
     }
 
     private void cancel() {
@@ -148,7 +157,7 @@ public class RequestActivity extends AppCompatActivity {
     }
 
     private void createRequestAndNotificationInDb(String course, String messageText) {
-        Request request = new Request(course, getToday(), currentUser.getId(), messageText, user.getId());
+        Request request = new Request(course, currentUser.getId(), messageText, user.getId());
         createRequest(request, (documentReference) -> {
             Notification notification = new Notification(
                     currentUser.getName() + " sends you a request for course " + course + ".",

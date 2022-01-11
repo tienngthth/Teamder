@@ -1,6 +1,7 @@
 package com.example.teamder.model;
 
 import static com.example.teamder.activity.RequestActivity.Status.pending;
+import static com.example.teamder.util.DateTimeUtil.getCurrentTime;
 
 import com.google.firebase.firestore.DocumentSnapshot;
 
@@ -12,14 +13,13 @@ public class Request {
     private String requesterID;
     private String requesteeID;
     private String courseName;
-    private String createdTime;
+    private String timeStamp = getCurrentTime();
     private String message = "";
     private String id;
     private String status = pending.toString();
 
-    public Request(String courseName, String createdTime, String requesterID, String message, String requesteeID) {
+    public Request(String courseName, String requesterID, String message, String requesteeID) {
         this.courseName = courseName;
-        this.createdTime = createdTime;
         this.requesterID = requesterID;
         this.message = message;
         this.requesteeID = requesteeID;
@@ -85,12 +85,12 @@ public class Request {
         this.courseName = courseName;
     }
 
-    public String getCreatedTime() {
-        return createdTime;
+    public String getTimeStamp() {
+        return timeStamp;
     }
 
-    public void setCreatedTime(String createdTime) {
-        this.createdTime = createdTime;
+    public void setTimeStamp(String timeStamp) {
+        this.timeStamp = timeStamp;
     }
 
     public static Request parseRequest(DocumentSnapshot document) {
@@ -98,7 +98,7 @@ public class Request {
         request.setRequesteeID(document.getString("requesteeID"));
         request.setRequesterID(document.getString("requesterID"));
         request.setMessage(document.getString("message"));
-        request.setCreatedTime(document.getString("createdTime"));
+        request.setTimeStamp(document.getString("timeStamp"));
         request.setStatus(document.getString("status"));
         request.setCourseName(document.getString("courseName"));
         request.setId(document.getId());

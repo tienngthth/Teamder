@@ -9,6 +9,7 @@ import static com.example.teamder.repository.GroupRepository.getGroupById;
 import static com.example.teamder.repository.NotificationRepository.createNotification;
 import static com.example.teamder.repository.ReviewRepository.createReview;
 import static com.example.teamder.repository.UserRepository.getUserById;
+import static com.example.teamder.util.ScreenUtil.clearFocus;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -58,11 +59,19 @@ public class FeedbackActivity extends AppCompatActivity {
         inflater = LayoutInflater.from(this);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void setUpListeners() {
         sendButton.setOnClickListener((View view) -> sendFeedback());
         cancelButton.setOnClickListener((View view) -> finish());
+        fullConstraint.setOnTouchListener((view, event) -> clearInputFieldsFocus(view));
     }
 
+    private boolean clearInputFieldsFocus(View view) {
+        for(String userId: userIds) {
+            clearFocus(view, feedbackMessages.get(userId), this);
+        }
+        return true;
+    }
 
     private void checkIntent() {
         Intent intent = getIntent();

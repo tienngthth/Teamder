@@ -169,7 +169,6 @@ public class HomeActivity extends AppCompatActivity {
     private void prepareReceivedRequestListView() {
         View itemView = inflater.inflate(R.layout.requests_header, null, false);
         ((TextView) itemView.findViewById(R.id.position)).setText("From");
-        receivedRequestListView.setVisibility(View.VISIBLE);
         receivedRequestListView.removeAllViews();
         receivedRequestListView.addView(itemView);
     }
@@ -178,7 +177,7 @@ public class HomeActivity extends AppCompatActivity {
     private void setupCustomReceivedRequestView(Request request, int index) {
         View itemView = inflater.inflate(R.layout.requests_row, null, false);
         ImageButton nextBtn = itemView.findViewById(R.id.next_button);
-        ((TextView) itemView.findViewById(R.id.time)).setText(request.getCreatedTime());
+        ((TextView) itemView.findViewById(R.id.time)).setText(request.getTimeStamp());
         ((TextView) itemView.findViewById(R.id.course)).setText(request.getCourseName());
         if (index % 2 == 0) {
             itemView.findViewById(R.id.row_linear).setBackgroundColor(getResources().getColor(R.color.blue_grey_050));
@@ -211,7 +210,6 @@ public class HomeActivity extends AppCompatActivity {
     private void prepareSentRequestListView() {
         View itemView = inflater.inflate(R.layout.requests_header, null, false);
         ((TextView) itemView.findViewById(R.id.position)).setText("To");
-        sentRequestListView.setVisibility(View.VISIBLE);
         sentRequestListView.removeAllViews();
         sentRequestListView.addView(itemView);
     }
@@ -220,7 +218,7 @@ public class HomeActivity extends AppCompatActivity {
     private void setupCustomSentRequestView(Request request, int index) {
         View itemView = inflater.inflate(R.layout.requests_row, null, false);
         ImageButton nextBtn = itemView.findViewById(R.id.next_button);
-        ((TextView) itemView.findViewById(R.id.time)).setText(request.getCreatedTime());
+        ((TextView) itemView.findViewById(R.id.time)).setText(request.getTimeStamp());
         ((TextView) itemView.findViewById(R.id.course)).setText(request.getCourseName());
         if (index % 2 == 0) {
             itemView.findViewById(R.id.row_linear).setBackgroundColor(getResources().getColor(R.color.blue_grey_050));
