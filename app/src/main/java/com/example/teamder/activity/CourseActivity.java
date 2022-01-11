@@ -23,13 +23,16 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.teamder.R;
 import com.example.teamder.model.CurrentUser;
+import com.example.teamder.model.Group;
 import com.example.teamder.model.Notification;
 import com.example.teamder.model.Request;
 import com.example.teamder.model.User;
+import com.example.teamder.repository.GroupRepository;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class CourseActivity extends AppCompatActivity {
 
@@ -38,6 +41,7 @@ public class CourseActivity extends AppCompatActivity {
     private Button doneButton;
     private LinearLayout teameeList;
     private LayoutInflater inflater;
+    private String groupId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,25 +64,12 @@ public class CourseActivity extends AppCompatActivity {
         if (bundle != null) {
             String courseName = bundle.getString("course");
             course.setText(courseName);
-            getApproveRequestByCourseName(courseName, (querySnapshot) -> {
-                generateTeameeListView(getTeameeIDs(querySnapshot));
+            GroupRepository.getGroup(courseName, Arrays.asList(currentUser.getId()), (querySnapshot) -> {
+                groupId = Group.parseGroup(querySnapshot.getDocuments().get(0)).getUid();
+                generateTeameeListView(Group.parseGroup(querySnapshot.getDocuments().get(0)).getUserIds());
             });
-            doneButton.setOnClickListener((View view) -> removeGroup(courseName));
+            doneButton.setOnClickListener((View view) -> deactivateGroup());
         }
-    }
-
-    private ArrayList<String> getTeameeIDs(QuerySnapshot querySnapshot) {
-        ArrayList<String> teameesIDs = new ArrayList<>();
-        teameesIDs.add(currentUser.getId());
-        for (DocumentSnapshot documentSnapshot : querySnapshot.getDocuments()) {
-            ArrayList<String> parties = parseRequest(documentSnapshot).getParties();
-            for (String id : parties) {
-                if (!teameesIDs.contains(id)) {
-                    teameesIDs.add(id);
-                }
-            }
-        }
-        return teameesIDs;
     }
 
     @SuppressLint("SetTextI18n")
@@ -112,21 +103,8 @@ public class CourseActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void removeGroup(String courseName) {
-        getApproveRequestByCourseName(courseName, (snapshot) -> {
-            if (currentUser.getId().equals(snapshot.getDocuments().get(0).get("requesterID"))) {
-                for (int index = 0; index < snapshot.getDocuments().size(); ++index) {
-                    Request request = parseRequest(snapshot.getDocuments().get(index));
-                    updateFieldToDb("requests", request.getId(), "status", "cancelled");
-                    Notification notification = new Notification("Group " + courseName + " has been removed", request.getRequesteeID(), DoneGroup);
-                    createNotification(notification);
-                }
-                Toast.makeText(CourseActivity.this, "Group has been removed", Toast.LENGTH_SHORT).show();
-            }
-            else {
-                Toast.makeText(CourseActivity.this, "Only group leader can remove the group", Toast.LENGTH_SHORT).show();
-            }
-        });
+    private void deactivateGroup() {
+        GroupRepository.deactivateGroup(groupId);
         finish();
     }
 }

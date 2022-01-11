@@ -21,7 +21,7 @@
             android:layout_height="wrap_content"
             android:gravity="left"
             android:fontFamily="@font/poppins_bold"
-            android:text="@string/course"
+            android:text="@string/group"
             android:textColor="@color/blue_grey_800"
             android:textSize="14sp" />
 

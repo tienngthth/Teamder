@@ -1,11 +1,13 @@
 package com.example.teamder.model;
 
+import com.google.firebase.firestore.DocumentSnapshot;
+
 import java.util.ArrayList;
 
 public class Group {
     private String uid;
-    private ArrayList<String> userIDs;
-    private String leaderIDs;
+    private ArrayList<String> userIds;
+    private String courseId;
 
     public String getUid() {
         return uid;
@@ -15,19 +17,27 @@ public class Group {
         this.uid = uid;
     }
 
-    public ArrayList<String> getUserIDs() {
-        return userIDs;
+    public ArrayList<String> getUserIds() {
+        return userIds;
     }
 
-    public void setUserIDs(ArrayList<String> userIDs) {
-        this.userIDs = userIDs;
+    public void setUserIds(ArrayList<String> userIds) {
+        this.userIds = userIds;
     }
 
-    public String getLeaderIDs() {
-        return leaderIDs;
+    public String getCourseIDs() {
+        return courseId;
     }
 
-    public void setLeaderIDs(String leaderIDs) {
-        this.leaderIDs = leaderIDs;
+    public void setCourseIDs(String courseIDs) {
+        this.courseId = courseIDs;
+    }
+
+    public static Group parseGroup(DocumentSnapshot document) {
+        Group group = new Group();
+        group.setUid(document.getId());
+        group.setUserIds((ArrayList<String>) document.get("userIds"));
+        group.setCourseIDs(document.getString("courseIDs"));
+        return group;
     }
 }

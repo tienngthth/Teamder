@@ -23,7 +23,7 @@
             android:layout_height="match_parent"
             android:gravity="center_vertical"
             android:fontFamily="@font/poppins_light"
-            android:text="@string/course"
+            android:text="@string/group"
             android:textColor="@color/blue_grey_800"
             android:textSize="12sp" />
 

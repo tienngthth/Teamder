@@ -18,14 +18,20 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.teamder.R;
 import com.example.teamder.model.CurrentUser;
+import com.example.teamder.model.Group;
 import com.example.teamder.model.Notification;
 import com.example.teamder.model.User;
+import com.example.teamder.repository.GroupRepository;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ReviewActivity extends AppCompatActivity {
 
@@ -102,12 +108,51 @@ public class ReviewActivity extends AppCompatActivity {
                 .setTitle("Confirmation")
                 .setMessage("Are you sure you want to " + action + " this request?")
                 .setPositiveButton("No", (dialog, which) -> dialog.dismiss())
-                .setNegativeButton("Yes", (dialog, which) -> updateRequestStatus(action));
+                .setNegativeButton("Yes", (dialog, which) -> {joinGroup(); updateRequestStatus(action); });
         AlertDialog dialog = builder.create();
         dialog.show();
         dialog.getButton(dialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.white));
         dialog.getButton(dialog.BUTTON_NEGATIVE).setBackgroundColor(getResources().getColor(R.color.red_300));
         dialog.getButton(dialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.blue_grey_500));
+    }
+
+    private void joinGroup() {
+        GroupRepository.getGroup(courseName, Arrays.asList(requesteeID, requesterID),
+                QuerySnapshot -> {
+                    Group group;
+                    switch (QuerySnapshot.getDocuments().size()){
+                        case 2:
+                            group = Group.parseGroup(QuerySnapshot.getDocuments().get(0));
+                            Group group2 = Group.parseGroup(QuerySnapshot.getDocuments().get(1));
+                            group.getUserIds().addAll(group2.getUserIds());
+                            updateFieldToDb("groups", group.getUid(), "userIds", group.getUserIds());
+                            GroupRepository.deactivateGroup(group2.getUid());
+                            break;
+                        case 1:
+                            group = Group.parseGroup(QuerySnapshot.getDocuments().get(0));
+                            if (group.getCourseIDs().contains(requesterID)) {
+                                group.getUserIds().add(requesteeID);
+                            } else {
+                                group.getUserIds().add(requesterID);
+                            }
+                            updateFieldToDb("groups", group.getUid(), "userIds", group.getUserIds());
+                            break;
+                        default:
+                            group = new Group();
+                            group.setUserIds(new ArrayList<String>() {
+                                {
+                                    add(requesteeID);
+                                    add(requesterID);
+                                }
+                            });
+                            group.setCourseIDs(courseName);
+                            GroupRepository.createGroup(group, () -> {
+                                Toast.makeText(this, "New group created", Toast.LENGTH_SHORT).show();
+                            });
+                            break;
+                    }
+                }
+        );
     }
 
     private void updateRequestStatus(String action) {
