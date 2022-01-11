@@ -212,7 +212,7 @@
                 >
 
                 <TextView
-                    android:id="@+id/all_courses"
+                    android:id="@+id/all_groups"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins_light"
@@ -222,7 +222,7 @@
                     tools:ignore="TextContrastCheck" />
 
                 <LinearLayout
-                    android:id="@+id/courses_list"
+                    android:id="@+id/groups_list"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"

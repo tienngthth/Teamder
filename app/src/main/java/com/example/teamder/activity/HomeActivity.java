@@ -26,10 +26,12 @@ import androidx.core.app.ActivityCompat;
 import com.example.teamder.R;
 import com.example.teamder.broadcast.Receiver;
 import com.example.teamder.model.CurrentUser;
+import com.example.teamder.model.Group;
 import com.example.teamder.model.Request;
 import com.example.teamder.model.ToVisitUserList;
 import com.example.teamder.model.User;
 import com.example.teamder.repository.AuthenticationRepository;
+import com.example.teamder.repository.GroupRepository;
 import com.example.teamder.repository.NotificationRepository;
 import com.example.teamder.repository.UserRepository;
 import com.example.teamder.service.NotificationService;
@@ -43,9 +45,9 @@ public class HomeActivity extends AppCompatActivity {
     private static final int MY_PERMISSIONS_REQUEST = 99;
     private final ToVisitUserList toVisitUserList = ToVisitUserList.getInstance();
     private final User currentUser = CurrentUser.getInstance().getUser();
-    private TextView userNameView, coursesTitle;
+    private TextView userNameView, groupsTitle;
     private ImageButton logoutButton, notificationButton, profileButton, exploreButton;
-    private LinearLayout receivedRequestListView, courseListView, sentRequestListView, receivedRequests, sentRequests;
+    private LinearLayout receivedRequestListView, groupListView, sentRequestListView, receivedRequests, sentRequests;
     private LayoutInflater inflater;
     private TextView newNotificationCount;
     protected Receiver myReceiver;
@@ -78,8 +80,8 @@ public class HomeActivity extends AppCompatActivity {
         sentRequests = findViewById(R.id.all_sent_requests);
         receivedRequestListView = findViewById(R.id.requests_list);
         sentRequestListView = findViewById(R.id.sent_requests_list);
-        coursesTitle = findViewById(R.id.all_courses);
-        courseListView = findViewById(R.id.courses_list);
+        groupsTitle = findViewById(R.id.all_groups);
+        groupListView = findViewById(R.id.groups_list);
         newNotificationCount = findViewById(R.id.new_notification_count);
         profileButton = findViewById(R.id.profile_button);
         exploreButton = findViewById(R.id.explore_button);
@@ -229,26 +231,32 @@ public class HomeActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     private void generateCoursesListView() {
-        ArrayList<String> courses = currentUser.getCourses();
-        int total = courses.size();
-        if (total == 0) {
-            coursesTitle.setText("No courses found");
-            courseListView.setVisibility(View.GONE);
-        } else {
-            prepareCourseListView();
-            for (int index = 0; index < total; ++index) {
-                setupCustomCourseItemView(courses.get(index), index);
-            }
-        }
+        GroupRepository.getAllGroup(currentUser.getId(),
+                querySnapshot -> {
+                    ArrayList<String> courses = new ArrayList<>();
+                    for (DocumentSnapshot documentSnapshot : querySnapshot.getDocuments()) {
+                        courses.add(Group.parseGroup(documentSnapshot).getCourseIDs());
+                    }
+                    int total = courses.size();
+                    if (total == 0) {
+                        groupsTitle.setText("No group found");
+                        groupListView.setVisibility(View.GONE);
+                    } else {
+                        prepareCourseListView();
+                        for (int index = 0; index < total; ++index) {
+                            setupCustomCourseItemView(courses.get(index), index);
+                        }
+                    }
+                });
     }
 
     @SuppressLint("SetTextI18n, InflateParams")
     private void prepareCourseListView() {
         View itemView = inflater.inflate(R.layout.courses_header, null, false);
-        courseListView.setVisibility(View.VISIBLE);
-        courseListView.removeAllViews();
-        courseListView.addView(itemView);
-        coursesTitle.setText("All courses");
+        groupListView.setVisibility(View.VISIBLE);
+        groupListView.removeAllViews();
+        groupListView.addView(itemView);
+        groupsTitle.setText("All groups");
     }
 
     @SuppressLint("SetTextI18n, InflateParams")
@@ -259,7 +267,7 @@ public class HomeActivity extends AppCompatActivity {
         if (index % 2 == 0) {
             itemView.findViewById(R.id.row_linear).setBackgroundColor(getResources().getColor(R.color.blue_grey_050));
         }
-        courseListView.addView(itemView);
+        groupListView.addView(itemView);
         itemView.setOnClickListener((View view) -> toCourse(course));
         nextBtn.setOnClickListener((View view) -> toCourse(course));
     }
