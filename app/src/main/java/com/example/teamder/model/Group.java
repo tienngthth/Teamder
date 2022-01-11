@@ -48,6 +48,14 @@ public class Group {
         this.courseName = courseName;
     }
 
+    public Boolean getActive() {
+        return isActive;
+    }
+
+    public void setActive(Boolean active) {
+        isActive = active;
+    }
+
     public Group() {
     }
 

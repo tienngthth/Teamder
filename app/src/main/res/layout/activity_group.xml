@@ -65,7 +65,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:orientation="horizontal">
+            android:orientation="vertical">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:orientation="horizontal">
 
             <Button
                 android:id="@+id/leave_button"
@@ -94,16 +101,18 @@
                 android:background="@drawable/blue_round_item"
                 tools:ignore="HardcodedText" />
 
-            <Button
+            </LinearLayout>
+
+            <ImageButton
                 android:id="@+id/message"
-                android:layout_height="40dp"
-                android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center"
                 android:fontFamily="@font/poppins_bold"
                 android:text="Message"
                 android:textAllCaps="false"
                 android:textSize="12sp"
-                android:background="@drawable/blue_round_item"
+                android:background="@drawable/ic_messaging_button"
                 tools:ignore="HardcodedText" />
 
         </LinearLayout>

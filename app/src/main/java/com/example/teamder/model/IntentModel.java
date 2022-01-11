@@ -14,7 +14,9 @@ public class IntentModel {
         ActionType,
         TeammateId,
         Email,
-        Password
+        Password,
+        CourseName,
+        MessagesCount
     }
 
 }

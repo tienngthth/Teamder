@@ -1,14 +1,22 @@
 package com.example.teamder.activity;
 
-import static com.example.teamder.repository.UtilRepository.updateFieldToDb;
+import static com.example.teamder.model.IntentModel.IntentName.CourseName;
+import static com.example.teamder.model.IntentModel.IntentName.GroupId;
+import static com.example.teamder.repository.MessageRepository.addSnapshotListenerForMessageByGroupId;
+import static com.example.teamder.repository.MessageRepository.createMessage;
+import static com.example.teamder.util.ScreenUtil.clearFocus;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,7 +25,6 @@ import com.example.teamder.R;
 import com.example.teamder.model.CurrentUser;
 import com.example.teamder.model.Message;
 import com.example.teamder.model.User;
-import com.example.teamder.repository.MessageRepository;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.ListenerRegistration;
 
@@ -27,12 +34,14 @@ import java.util.List;
 public class MessageActivity extends AppCompatActivity {
     private final ArrayList<String> newNotificationIDs = new ArrayList<>();
     private final User currentUser = CurrentUser.getInstance().getUser();
-    private LinearLayout messageList, messageGroup;
+    private LinearLayout messageList, messageGroup, fullScreen;
+    private ScrollView messages;
     private LayoutInflater inflater;
-    private TextView noNotification;
+    private TextView noNotification, courseName;
     private EditText messageEditText;
     private ImageView sendButton;
     public static ListenerRegistration listenerRegistration;
+    private String groupId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +49,7 @@ public class MessageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_message);
         initialiseVariables();
         getMessages();
-        setUpOnClickListener();
+        setUpListeners();
     }
 
     @Override
@@ -51,16 +60,24 @@ public class MessageActivity extends AppCompatActivity {
 
     private void initialiseVariables() {
         inflater = LayoutInflater.from(this);
-        messageList = findViewById(R.id.past_notification_list);
-        messageGroup = findViewById(R.id.past_notification_group);
+        messageList = findViewById(R.id.message_list);
+        messageGroup = findViewById(R.id.messages_group);
         noNotification = findViewById(R.id.no_notification);
         sendButton = findViewById(R.id.sendButton);
-        messageEditText = findViewById(R.id.messageEditText);
+        messageEditText = findViewById(R.id.message);
+        courseName = findViewById(R.id.course_name);
+        fullScreen = findViewById(R.id.message_activity);
+        messages = findViewById(R.id.messages);
+        Intent intent = getIntent();
+        Bundle bundle = intent.getExtras();
+        groupId = bundle.getString(GroupId.toString());
+        courseName.setText(bundle.getString(CourseName.toString()));
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
     }
 
     private void getMessages() {
-        listenerRegistration = MessageRepository.addSnapshotListenerForMessageByGroupId(
-                "TrqiTVoaeRh9JioDxZU0",
+        listenerRegistration = addSnapshotListenerForMessageByGroupId(
+                groupId,
                 documentSnapshots -> {
                     updateMessageView(documentSnapshots);
                     noMessageFound();
@@ -68,15 +85,30 @@ public class MessageActivity extends AppCompatActivity {
         );
     }
 
-    private void setUpOnClickListener(){
-        sendButton.setOnClickListener(view -> {
-            Message message = new Message();
-            message.setGroupId("TrqiTVoaeRh9JioDxZU0");
-            message.setUserId(currentUser.getId());
-            message.setContent(messageEditText.getText().toString());
+    @SuppressLint("ClickableViewAccessibility")
+    private void setUpListeners() {
+        fullScreen.setOnTouchListener((view, event) -> clearInputFieldsFocus(view));
+        messages.setOnTouchListener((view, event) -> clearInputFieldsFocus(view));
+        sendButton.setOnClickListener((View view) -> sendMessage());
+    }
+
+    private boolean clearInputFieldsFocus(View view) {
+        clearFocus(view, messageEditText, this);
+        return true;
+
+    }
+
+    private void sendMessage() {
+        String content = messageEditText.getText().toString().trim();
+        if (!content.equals("")) {
+            Message message = new Message(
+                    content,
+                    groupId,
+                    currentUser.getId()
+            );
             messageEditText.setText("");
-            MessageRepository.createMessage(message,task -> {});
-        });
+            createMessage(message);
+        }
     }
 
     private void updateMessageView(List<DocumentSnapshot> documents) {
@@ -94,11 +126,15 @@ public class MessageActivity extends AppCompatActivity {
                         : View.GONE);
     }
 
-    @SuppressLint({"SetTextI18n", "InflateParams"})
+    @SuppressLint({"SetTextI18n", "InflateParams", "RtlHardcoded"})
     private void setupCustomItemView(LinearLayout list, Message message) {
         View itemView = inflater.inflate(R.layout.message_row, null, false);
         ((TextView) itemView.findViewById(R.id.message)).setText(message.getContent());
-        ((TextView) itemView.findViewById(R.id.timestamp)).setText(message.getTimeStamp());
+        ((TextView) itemView.findViewById(R.id.timestamp)).setText(message.getTimeStamp().substring(0, message.getTimeStamp().length() - 7));
         list.addView(itemView);
+        itemView.findViewById(R.id.avatar).setVisibility(message.getUserId().equals(currentUser.getId()) ? View.GONE : View.VISIBLE);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.gravity =  message.getUserId().equals(currentUser.getId()) ? Gravity.RIGHT : Gravity.LEFT;
+        itemView.setLayoutParams(params);
     }
 }

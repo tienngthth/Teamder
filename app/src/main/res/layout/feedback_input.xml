@@ -27,7 +27,7 @@
             android:id="@+id/feedback"
             android:hint="@string/feedback_hint"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="100dp"
             android:background="@drawable/white_list"
             android:fontFamily="@font/poppins_regular"
             android:gravity="top|start"

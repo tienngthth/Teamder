@@ -2,15 +2,14 @@ package com.example.teamder.model;
 
 import static com.example.teamder.util.DateTimeUtil.getCurrentTime;
 
-import com.example.teamder.repository.MessageRepository;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 public class Message {
-    private String uid;
+
     private String timeStamp = getCurrentTime();
     private String content;
     private String groupId;
-    private boolean isSeen;
+    private boolean isSeen = false;
     private String userId;
 
     public String getUserId() {
@@ -19,14 +18,6 @@ public class Message {
 
     public void setUserId(String userId) {
         this.userId = userId;
-    }
-
-    public String getUid() {
-        return uid;
-    }
-
-    public void setUid(String uid) {
-        this.uid = uid;
     }
 
     public String getTimeStamp() {
@@ -53,11 +44,11 @@ public class Message {
         this.groupId = userID;
     }
 
-    public boolean isSeen() {
+    public boolean getIsSeen() {
         return isSeen;
     }
 
-    public void setSeen(boolean seen) {
+    public void setIsSeen(boolean seen) {
         isSeen = seen;
     }
 
@@ -65,8 +56,16 @@ public class Message {
         Message message = new Message();
         message.setContent(document.getString("content"));
         message.setTimeStamp(document.getString("timeStamp"));
-        message.setUid(document.getId());
         message.setUserId(document.getString("userId"));
+        message.setIsSeen(document.getBoolean("isSeen"));
         return message;
     }
+
+    public Message(String content, String groupId, String userId) {
+        this.content = content;
+        this.groupId = groupId;
+        this.userId = userId;
+    }
+
+    public Message() {}
 }

@@ -27,7 +27,7 @@ public class DateTimeUtil {
     @SuppressLint("SimpleDateFormat")
     public static String getCurrentTime() {
         Date time = new Date();
-        SimpleDateFormat dateTimeFormat = new SimpleDateFormat("MMM dd, yyyy HH:mm");
+        SimpleDateFormat dateTimeFormat = new SimpleDateFormat("MMM dd, yyyy HH:mm:ss.SSS");
         return dateTimeFormat.format(time);
     }
 

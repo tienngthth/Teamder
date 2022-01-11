@@ -5,6 +5,7 @@ import static com.example.teamder.activity.ProfileActivity.Action.Review;
 import static com.example.teamder.activity.RequestActivity.Status.approved;
 import static com.example.teamder.model.Group.parseGroup;
 import static com.example.teamder.model.IntentModel.IntentName.ActionType;
+import static com.example.teamder.model.IntentModel.IntentName.CourseName;
 import static com.example.teamder.model.IntentModel.IntentName.GroupId;
 import static com.example.teamder.model.IntentModel.IntentName.UserId;
 import static com.example.teamder.model.User.parseUser;
@@ -21,6 +22,7 @@ import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,7 +44,8 @@ public class GroupActivity extends AppCompatActivity {
 
     private final User currentUser = CurrentUser.getInstance().getUser();
     private TextView course, status;
-    private Button closeButton, leaveButton, feedbackButton, messageButton;
+    private Button closeButton, leaveButton, feedbackButton;
+    private ImageButton messageButton;
     private LinearLayout teameeList, actions;
     private LayoutInflater inflater;
     private Group group;
@@ -96,7 +99,7 @@ public class GroupActivity extends AppCompatActivity {
         closeButton.setOnClickListener((View view) -> openCloseConfirmationDialog());
         leaveButton.setOnClickListener((View view) -> openLeaveConfirmationDialog());
         feedbackButton.setOnClickListener((View view) -> toFeedbackActivity());
-        messageButton.setOnClickListener((View view) -> viewMessage());
+        messageButton.setOnClickListener((View view) -> toMessage());
     }
 
 
@@ -123,6 +126,7 @@ public class GroupActivity extends AppCompatActivity {
             closeGroup();
         }
         updateRequestStatus(currentUser.getId());
+        Toast.makeText(this,"Left group successfully.", Toast.LENGTH_LONG).show();
         finish();
     }
 
@@ -156,8 +160,10 @@ public class GroupActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void viewMessage() {
+    private void toMessage() {
         Intent intent = new Intent(GroupActivity.this, MessageActivity.class);
+        intent.putExtra(GroupId.toString(), group.getId());
+        intent.putExtra(CourseName.toString(), group.getCourseName());
         startActivity(intent);
     }
 
