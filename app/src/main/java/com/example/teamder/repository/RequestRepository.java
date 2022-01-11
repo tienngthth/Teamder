@@ -2,6 +2,7 @@ package com.example.teamder.repository;
 
 import com.example.teamder.model.Request;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
@@ -80,6 +81,17 @@ public class RequestRepository {
                     if (task.isSuccessful()) {
                         querySnapShotCallBack.onCallBack(Objects.requireNonNull(task.getResult()));
                     }
+                });
+    }
+
+    public static ListenerRegistration addSnapshotListenerForRequestByField(String status, String field, String value, CallbackInterfaces.QuerySnapShotCallBack querySnapShotCallBack) {
+        return FirebaseFirestore.getInstance()
+                .collection("requests")
+                .whereEqualTo(field, value)
+                .whereEqualTo("status", status)
+                .addSnapshotListener((snapshot, error) -> {
+                    assert snapshot != null;
+                    querySnapShotCallBack.onCallBack(snapshot);
                 });
     }
 

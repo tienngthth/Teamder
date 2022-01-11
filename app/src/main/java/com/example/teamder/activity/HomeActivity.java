@@ -8,7 +8,6 @@ import static com.example.teamder.model.IntentModel.IntentName.Id;
 import static com.example.teamder.model.IntentModel.IntentName.Position;
 import static com.example.teamder.model.Request.parseRequest;
 import static com.example.teamder.model.User.parseUser;
-import static com.example.teamder.repository.RequestRepository.getRequestByStatusAndFieldValue;
 import static com.example.teamder.repository.UserRepository.getUserById;
 
 import android.Manifest;
@@ -38,8 +37,10 @@ import com.example.teamder.model.User;
 import com.example.teamder.repository.AuthenticationRepository;
 import com.example.teamder.repository.GroupRepository;
 import com.example.teamder.repository.NotificationRepository;
+import com.example.teamder.repository.RequestRepository;
 import com.example.teamder.service.NotificationService;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
 
@@ -56,6 +57,7 @@ public class HomeActivity extends AppCompatActivity {
     private TextView newNotificationCount;
     protected Receiver myReceiver;
     protected IntentFilter intentFilter;
+    public static ListenerRegistration groupListenerRegistration, incomingRequestListenerRegistration, outgoingRequestListenerRegistration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,6 +119,7 @@ public class HomeActivity extends AppCompatActivity {
         AuthenticationRepository.signOut();
         NotificationService.listenerRegistration.remove();
         navigateUser(LoginActivity.class);
+        removeListeners();
         finish();
     }
 
@@ -154,15 +157,17 @@ public class HomeActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     private void generateReceivedRequestsListView() {
-        getRequestByStatusAndFieldValue(pending.toString(), "requesteeID", currentUser.getId(), (snapshot) -> {
-            int size = snapshot.getDocuments().size();
-            receivedRequests.setVisibility(size == 0 ? View.GONE : View.VISIBLE);
-            prepareReceivedRequestListView();
-            for (int index = 0; index < size; ++index) {
-                Request request = parseRequest(snapshot.getDocuments().get(index));
-                setupCustomReceivedRequestView(request, index);
-            }
-        });
+        outgoingRequestListenerRegistration = RequestRepository.addSnapshotListenerForRequestByField(
+                pending.toString(), "requesteeID", currentUser.getId(), querySnapshot -> {
+                    int size = querySnapshot.getDocuments().size();
+                    receivedRequests.setVisibility(size == 0 ? View.GONE : View.VISIBLE);
+                    prepareReceivedRequestListView();
+                    for (int index = 0; index < size; ++index) {
+                        Request request = parseRequest(querySnapshot.getDocuments().get(index));
+                        setupCustomReceivedRequestView(request, index);
+                    }
+                }
+        );
     }
 
     @SuppressLint("SetTextI18n, InflateParams")
@@ -193,15 +198,18 @@ public class HomeActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     private void generateSentRequestsListView() {
-        getRequestByStatusAndFieldValue(pending.toString(), "requesterID", currentUser.getId(), (snapshot) -> {
-            int size = snapshot.getDocuments().size();
-            sentRequests.setVisibility(size == 0 ? View.GONE : View.VISIBLE);
-            prepareSentRequestListView();
-            for (int index = 0; index < size; ++index) {
-                Request request = parseRequest(snapshot.getDocuments().get(index));
-                setupCustomSentRequestView(request, index);
-            }
-        });
+        incomingRequestListenerRegistration = RequestRepository.addSnapshotListenerForRequestByField(
+                pending.toString(), "requesterID", currentUser.getId(), querySnapshot -> {
+                    int size = querySnapshot.getDocuments().size();
+                    sentRequests.setVisibility(size == 0 ? View.GONE : View.VISIBLE);
+                    prepareSentRequestListView();
+                    sentRequestListView.removeAllViews();
+                    for (int index = 0; index < size; ++index) {
+                        Request request = parseRequest(querySnapshot.getDocuments().get(index));
+                        setupCustomSentRequestView(request, index);
+                    }
+                }
+        );
     }
 
 
@@ -233,8 +241,8 @@ public class HomeActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     private void generateCoursesListView() {
-        GroupRepository.getAllActiveGroupOfUser(currentUser.getId(),
-                querySnapshot -> {
+        groupListenerRegistration = GroupRepository.addSnapshotListenerForGroupByUser(
+                currentUser.getId(), querySnapshot -> {
                     ArrayList<Group> groups = new ArrayList<>();
                     for (DocumentSnapshot documentSnapshot : querySnapshot.getDocuments()) {
                         groups.add(Group.parseGroup(documentSnapshot));
@@ -309,6 +317,12 @@ public class HomeActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "Let's update your profile and enrolling courses first", Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void removeListeners(){
+        groupListenerRegistration.remove();
+        incomingRequestListenerRegistration.remove();
+        outgoingRequestListenerRegistration.remove();
     }
 
     @Override
