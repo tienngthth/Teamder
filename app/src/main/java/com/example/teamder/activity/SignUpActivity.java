@@ -103,11 +103,13 @@ public class SignUpActivity extends AppCompatActivity {
         Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
         intent.putExtra(Email.toString(), email);
         intent.putExtra(Password.toString(), password);
-        startActivity(intent);
+        setResult(RESULT_OK, intent);
         finish();
     }
 
     private void toLogin() {
+        Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
+        setResult(RESULT_CANCELED, intent);
         finish();
     }
 }

@@ -23,6 +23,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -175,6 +176,7 @@ public class GroupActivity extends AppCompatActivity {
             toFeedbackActivity();
         }
         pushNotification("Your group for course " + group.getCourseName() + " has been closed by " + currentUser.getName() + ".");
+        Toast.makeText(this,"Group closed.", Toast.LENGTH_LONG).show();
         finish();
     }
 

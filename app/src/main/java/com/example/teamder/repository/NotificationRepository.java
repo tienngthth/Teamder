@@ -3,6 +3,7 @@ package com.example.teamder.repository;
 import com.example.teamder.model.Notification;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 
 import java.util.Objects;
 
@@ -13,6 +14,7 @@ public class NotificationRepository {
                 .collection("notifications")
                 .whereEqualTo("userId", userId)
                 .whereEqualTo("seen", isSeen)
+                .orderBy("timeStamp", Query.Direction.DESCENDING)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {

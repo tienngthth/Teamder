@@ -3,6 +3,7 @@ package com.example.teamder.repository;
 import com.example.teamder.model.Request;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -74,6 +75,7 @@ public class RequestRepository {
                 .collection("requests")
                 .whereEqualTo(field, value)
                 .whereEqualTo("status", status)
+                .orderBy("timeStamp", Query.Direction.DESCENDING)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {

@@ -1,13 +1,13 @@
 package com.example.teamder.model;
 
-import static com.example.teamder.util.DateTimeUtil.getToday;
+import static com.example.teamder.util.DateTimeUtil.getCurrentTime;
 
 import com.google.firebase.firestore.DocumentSnapshot;
 
 public class Review {
     private String userID;
     private String comment;
-    private String timeStamp = getToday();
+    private String timeStamp = getCurrentTime();
 
     public Review(String userID, String comment) {
         this.userID = userID;

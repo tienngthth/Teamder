@@ -20,6 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:visibility="gone"
             android:paddingStart="30dp"
             android:paddingTop="30dp"
             android:paddingEnd="30dp">
@@ -34,6 +35,8 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:id="@+id/name_group"
+                android:visibility="gone"
                 android:layout_marginBottom="30dp"
                 android:orientation="vertical">
 
@@ -76,6 +79,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="30dp"
+                android:visibility="gone"
+                android:id="@+id/introduction_group"
                 android:orientation="vertical">
 
                 <TextView
@@ -115,7 +120,9 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:id="@+id/gpa_group"
                 android:layout_marginBottom="30dp"
+                android:visibility="gone"
                 android:orientation="vertical">
 
                 <TextView
@@ -155,7 +162,9 @@
 
             <LinearLayout
                 android:layout_width="wrap_content"
+                android:visibility="gone"
                 android:layout_height="wrap_content"
+                android:id="@+id/major_group"
                 android:layout_marginBottom="30dp"
                 android:orientation="vertical">
 
@@ -370,6 +379,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="left"
+                android:visibility="gone"
+                android:id="@+id/reviews_title"
                 android:orientation="horizontal"
                 tools:ignore="RtlHardcoded">
 

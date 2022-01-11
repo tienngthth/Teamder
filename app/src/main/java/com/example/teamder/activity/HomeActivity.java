@@ -174,7 +174,6 @@ public class HomeActivity extends AppCompatActivity {
     private void prepareReceivedRequestListView() {
         View itemView = inflater.inflate(R.layout.requests_header, null, false);
         ((TextView) itemView.findViewById(R.id.position)).setText("From");
-        receivedRequestListView.setVisibility(View.VISIBLE);
         receivedRequestListView.removeAllViews();
         receivedRequestListView.addView(itemView);
     }
@@ -183,7 +182,7 @@ public class HomeActivity extends AppCompatActivity {
     private void setupCustomReceivedRequestView(Request request, int index) {
         View itemView = inflater.inflate(R.layout.requests_row, null, false);
         ImageButton nextBtn = itemView.findViewById(R.id.next_button);
-        ((TextView) itemView.findViewById(R.id.time)).setText(request.getCreatedTime());
+        ((TextView) itemView.findViewById(R.id.time)).setText(request.getTimeStamp());
         ((TextView) itemView.findViewById(R.id.course)).setText(request.getCourseName());
         if (index % 2 == 0) {
             itemView.findViewById(R.id.row_linear).setBackgroundColor(getResources().getColor(R.color.blue_grey_050));
@@ -218,7 +217,6 @@ public class HomeActivity extends AppCompatActivity {
     private void prepareSentRequestListView() {
         View itemView = inflater.inflate(R.layout.requests_header, null, false);
         ((TextView) itemView.findViewById(R.id.position)).setText("To");
-        sentRequestListView.setVisibility(View.VISIBLE);
         sentRequestListView.removeAllViews();
         sentRequestListView.addView(itemView);
     }
@@ -227,7 +225,7 @@ public class HomeActivity extends AppCompatActivity {
     private void setupCustomSentRequestView(Request request, int index) {
         View itemView = inflater.inflate(R.layout.requests_row, null, false);
         ImageButton nextBtn = itemView.findViewById(R.id.next_button);
-        ((TextView) itemView.findViewById(R.id.time)).setText(request.getCreatedTime());
+        ((TextView) itemView.findViewById(R.id.time)).setText(request.getTimeStamp());
         ((TextView) itemView.findViewById(R.id.course)).setText(request.getCourseName());
         if (index % 2 == 0) {
             itemView.findViewById(R.id.row_linear).setBackgroundColor(getResources().getColor(R.color.blue_grey_050));
@@ -251,7 +249,11 @@ public class HomeActivity extends AppCompatActivity {
                     }
                     int total = groups.size();
                     if (total == 0) {
-                        groupsTitle.setText("No group found");
+                        groupsTitle.setText(
+                                (currentUser.getCourses().size() == 0)
+                                        ? "Let's add some courses to your Profile."
+                                        : "No group found. Let's explore and review requests."
+                        );
                         groupListView.setVisibility(View.GONE);
                     } else {
                         prepareCourseListView();
@@ -313,7 +315,7 @@ public class HomeActivity extends AppCompatActivity {
                 Toast.makeText(this, "No potential teammate found", Toast.LENGTH_LONG).show();
             }
         } else {
-            Toast.makeText(this, "Let's update your profile and courses first", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Let's update your profile and enrolling courses first", Toast.LENGTH_LONG).show();
         }
     }
 
