@@ -1,11 +1,25 @@
 package com.example.teamder.model;
 
+import static com.example.teamder.util.DateTimeUtil.getCurrentTime;
+
+import com.example.teamder.repository.MessageRepository;
+import com.google.firebase.firestore.DocumentSnapshot;
+
 public class Message {
     private String uid;
-    private String timeStamp;
+    private String timeStamp = getCurrentTime();
     private String content;
-    private String userID;
+    private String groupId;
     private boolean isSeen;
+    private String userId;
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
     public String getUid() {
         return uid;
@@ -31,12 +45,12 @@ public class Message {
         this.content = content;
     }
 
-    public String getUserID() {
-        return userID;
+    public String getGroupId() {
+        return groupId;
     }
 
-    public void setUserID(String userID) {
-        this.userID = userID;
+    public void setGroupId(String userID) {
+        this.groupId = userID;
     }
 
     public boolean isSeen() {
@@ -45,5 +59,14 @@ public class Message {
 
     public void setSeen(boolean seen) {
         isSeen = seen;
+    }
+
+    public static Message parseMessage(DocumentSnapshot document){
+        Message message = new Message();
+        message.setContent(document.getString("content"));
+        message.setTimeStamp(document.getString("timeStamp"));
+        message.setUid(document.getId());
+        message.setUserId(document.getString("userId"));
+        return message;
     }
 }
