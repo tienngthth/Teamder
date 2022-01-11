@@ -30,6 +30,10 @@ public class CallbackInterfaces {
         void onCallBack(DocumentSnapshot documentSnapshot);
     }
 
+    public interface DocumentSnapshotsCallBack {
+        void onCallBack(List<DocumentSnapshot> documentSnapshots);
+    }
+
     public interface FirebaseUserCallBack {
         void onCallBack(FirebaseUser firebaseUser);
     }

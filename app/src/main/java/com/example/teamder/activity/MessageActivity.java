@@ -18,10 +18,11 @@ import com.example.teamder.model.CurrentUser;
 import com.example.teamder.model.Message;
 import com.example.teamder.model.User;
 import com.example.teamder.repository.MessageRepository;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MessageActivity extends AppCompatActivity {
     private final ArrayList<String> newNotificationIDs = new ArrayList<>();
@@ -31,6 +32,7 @@ public class MessageActivity extends AppCompatActivity {
     private TextView noNotification;
     private EditText messageEditText;
     private ImageView sendButton;
+    public static ListenerRegistration listenerRegistration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +41,12 @@ public class MessageActivity extends AppCompatActivity {
         initialiseVariables();
         getMessages();
         setUpOnClickListener();
+    }
+
+    @Override
+    public void onBackPressed() {
+        listenerRegistration.remove();
+        super.onBackPressed();
     }
 
     private void initialiseVariables() {
@@ -51,10 +59,10 @@ public class MessageActivity extends AppCompatActivity {
     }
 
     private void getMessages() {
-        MessageRepository.getMessageByGroupId(
+        listenerRegistration = MessageRepository.addSnapshotListenerForMessageByGroupId(
                 "TrqiTVoaeRh9JioDxZU0",
-                (querySnapshot) -> {
-                    updateMessageView(querySnapshot);
+                documentSnapshots -> {
+                    updateMessageView(documentSnapshots);
                     noMessageFound();
                 }
         );
@@ -67,14 +75,14 @@ public class MessageActivity extends AppCompatActivity {
             message.setUserId(currentUser.getId());
             message.setContent(messageEditText.getText().toString());
             messageEditText.setText("");
-            MessageRepository.createMessage(message, documentReference -> getMessages());
+            MessageRepository.createMessage(message,task -> {});
         });
     }
 
-    private void updateMessageView(QuerySnapshot documents) {
+    private void updateMessageView(List<DocumentSnapshot> documents) {
         messageGroup.setVisibility(documents.size() < 1 ? View.GONE : View.VISIBLE);
         messageList.removeAllViews();
-        for (QueryDocumentSnapshot document : documents) {
+        for (DocumentSnapshot document : documents) {
             setupCustomItemView(messageList, Message.parseMessage(document));
         }
     }
@@ -92,18 +100,5 @@ public class MessageActivity extends AppCompatActivity {
         ((TextView) itemView.findViewById(R.id.message)).setText(message.getContent());
         ((TextView) itemView.findViewById(R.id.timestamp)).setText(message.getTimeStamp());
         list.addView(itemView);
-    }
-
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        seenAllNotification();
-    }
-
-    private void seenAllNotification() {
-        for (String notificationID : newNotificationIDs) {
-            updateFieldToDb("notifications", notificationID, "seen", true);
-        }
     }
 }
