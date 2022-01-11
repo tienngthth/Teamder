@@ -1,9 +1,14 @@
 package com.example.teamder.activity;
 
 import static com.example.teamder.activity.ProfileActivity.Action.Explore;
+import static com.example.teamder.activity.RequestActivity.Status.pending;
+import static com.example.teamder.model.IntentModel.IntentName.ActionType;
+import static com.example.teamder.model.IntentModel.IntentName.GroupId;
+import static com.example.teamder.model.IntentModel.IntentName.Id;
+import static com.example.teamder.model.IntentModel.IntentName.Position;
 import static com.example.teamder.model.Request.parseRequest;
 import static com.example.teamder.model.User.parseUser;
-import static com.example.teamder.repository.RequestRepository.getPendingRequestByFieldValue;
+import static com.example.teamder.repository.RequestRepository.getRequestByStatusAndFieldValue;
 import static com.example.teamder.repository.UserRepository.getUserById;
 
 import android.Manifest;
@@ -33,7 +38,6 @@ import com.example.teamder.model.User;
 import com.example.teamder.repository.AuthenticationRepository;
 import com.example.teamder.repository.GroupRepository;
 import com.example.teamder.repository.NotificationRepository;
-import com.example.teamder.repository.UserRepository;
 import com.example.teamder.service.NotificationService;
 import com.google.firebase.firestore.DocumentSnapshot;
 
@@ -62,7 +66,7 @@ public class HomeActivity extends AppCompatActivity {
         registerService();
     }
 
-    private void registerService(){
+    private void registerService() {
         myReceiver = new Receiver();
         intentFilter = new IntentFilter();
         intentFilter.addAction("android.intent.action.PHONE_STATE");
@@ -150,7 +154,7 @@ public class HomeActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     private void generateReceivedRequestsListView() {
-        getPendingRequestByFieldValue("requesteeID", currentUser.getId(), (snapshot) -> {
+        getRequestByStatusAndFieldValue(pending.toString(), "requesteeID", currentUser.getId(), (snapshot) -> {
             int size = snapshot.getDocuments().size();
             receivedRequests.setVisibility(size == 0 ? View.GONE : View.VISIBLE);
             prepareReceivedRequestListView();
@@ -172,28 +176,29 @@ public class HomeActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n, InflateParams")
     private void setupCustomReceivedRequestView(Request request, int index) {
+        View itemView = inflater.inflate(R.layout.requests_row, null, false);
+        ImageButton nextBtn = itemView.findViewById(R.id.next_button);
+        ((TextView) itemView.findViewById(R.id.time)).setText(request.getCreatedTime());
+        ((TextView) itemView.findViewById(R.id.course)).setText(request.getCourseName());
+        if (index % 2 == 0) {
+            itemView.findViewById(R.id.row_linear).setBackgroundColor(getResources().getColor(R.color.blue_grey_050));
+        }
+        receivedRequestListView.addView(itemView);
+        itemView.setOnClickListener((View view) -> toReviewRequest(request, "received"));
+        nextBtn.setOnClickListener((View view) -> toReviewRequest(request, "received"));
         getUserById(request.getRequesterID(), (documentSnapshot -> {
             User user = parseUser(documentSnapshot);
-            View itemView = inflater.inflate(R.layout.requests_row, null, false);
-            ImageButton nextBtn = itemView.findViewById(R.id.next_button);
             ((TextView) itemView.findViewById(R.id.name)).setText(user.getName());
-            ((TextView) itemView.findViewById(R.id.time)).setText(request.getCreatedTime());
-            ((TextView) itemView.findViewById(R.id.course)).setText(request.getCourseName());
-            if (index % 2 == 0) {
-                itemView.findViewById(R.id.row_linear).setBackgroundColor(getResources().getColor(R.color.blue_grey_050));
-            }
-            receivedRequestListView.addView(itemView);
-            itemView.setOnClickListener((View view) -> toReviewRequest(request, "received"));
-            nextBtn.setOnClickListener((View view) -> toReviewRequest(request, "received"));
         }));
     }
 
     @SuppressLint("SetTextI18n")
     private void generateSentRequestsListView() {
-        getPendingRequestByFieldValue("requesterID", currentUser.getId(), (snapshot) -> {
+        getRequestByStatusAndFieldValue(pending.toString(), "requesterID", currentUser.getId(), (snapshot) -> {
             int size = snapshot.getDocuments().size();
             sentRequests.setVisibility(size == 0 ? View.GONE : View.VISIBLE);
             prepareSentRequestListView();
+            sentRequestListView.removeAllViews();
             for (int index = 0; index < size; ++index) {
                 Request request = parseRequest(snapshot.getDocuments().get(index));
                 setupCustomSentRequestView(request, index);
@@ -213,38 +218,38 @@ public class HomeActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n, InflateParams")
     private void setupCustomSentRequestView(Request request, int index) {
+        View itemView = inflater.inflate(R.layout.requests_row, null, false);
+        ImageButton nextBtn = itemView.findViewById(R.id.next_button);
+        ((TextView) itemView.findViewById(R.id.time)).setText(request.getCreatedTime());
+        ((TextView) itemView.findViewById(R.id.course)).setText(request.getCourseName());
+        if (index % 2 == 0) {
+            itemView.findViewById(R.id.row_linear).setBackgroundColor(getResources().getColor(R.color.blue_grey_050));
+        }
+        sentRequestListView.addView(itemView);
+        itemView.setOnClickListener((View view) -> toReviewRequest(request, "sent"));
+        nextBtn.setOnClickListener((View view) -> toReviewRequest(request, "sent"));
         getUserById(request.getRequesteeID(), (documentSnapshot -> {
             User user = parseUser(documentSnapshot);
-            View itemView = inflater.inflate(R.layout.requests_row, null, false);
-            ImageButton nextBtn = itemView.findViewById(R.id.next_button);
             ((TextView) itemView.findViewById(R.id.name)).setText(user.getName());
-            ((TextView) itemView.findViewById(R.id.time)).setText(request.getCreatedTime());
-            ((TextView) itemView.findViewById(R.id.course)).setText(request.getCourseName());
-            if (index % 2 == 0) {
-                itemView.findViewById(R.id.row_linear).setBackgroundColor(getResources().getColor(R.color.blue_grey_050));
-            }
-            sentRequestListView.addView(itemView);
-            itemView.setOnClickListener((View view) -> toReviewRequest(request, "sent"));
-            nextBtn.setOnClickListener((View view) -> toReviewRequest(request, "sent"));
         }));
     }
 
     @SuppressLint("SetTextI18n")
     private void generateCoursesListView() {
-        GroupRepository.getAllGroup(currentUser.getId(),
+        GroupRepository.getAllActiveGroupOfUser(currentUser.getId(),
                 querySnapshot -> {
-                    ArrayList<String> courses = new ArrayList<>();
+                    ArrayList<Group> groups = new ArrayList<>();
                     for (DocumentSnapshot documentSnapshot : querySnapshot.getDocuments()) {
-                        courses.add(Group.parseGroup(documentSnapshot).getCourseIDs());
+                        groups.add(Group.parseGroup(documentSnapshot));
                     }
-                    int total = courses.size();
+                    int total = groups.size();
                     if (total == 0) {
                         groupsTitle.setText("No group found");
                         groupListView.setVisibility(View.GONE);
                     } else {
                         prepareCourseListView();
                         for (int index = 0; index < total; ++index) {
-                            setupCustomCourseItemView(courses.get(index), index);
+                            setupCustomCourseItemView(groups.get(index).getCourseName(), groups.get(index).getId(), index);
                         }
                     }
                 });
@@ -260,7 +265,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     @SuppressLint("SetTextI18n, InflateParams")
-    private void setupCustomCourseItemView(String course, int index) {
+    private void setupCustomCourseItemView(String course, String groupId, int index) {
         View itemView = inflater.inflate(R.layout.courses_row, null, false);
         ImageButton nextBtn = itemView.findViewById(R.id.next_button);
         ((TextView) itemView.findViewById(R.id.course)).setText(course);
@@ -268,24 +273,20 @@ public class HomeActivity extends AppCompatActivity {
             itemView.findViewById(R.id.row_linear).setBackgroundColor(getResources().getColor(R.color.blue_grey_050));
         }
         groupListView.addView(itemView);
-        itemView.setOnClickListener((View view) -> toCourse(course));
-        nextBtn.setOnClickListener((View view) -> toCourse(course));
+        itemView.setOnClickListener((View view) -> toGroup(groupId));
+        nextBtn.setOnClickListener((View view) -> toGroup(groupId));
     }
 
-    private void toReviewRequest(Request request, String source) {
+    private void toReviewRequest(Request request, String position) {
         Intent intent = new Intent(HomeActivity.this, ReviewActivity.class);
-        intent.putExtra("id", request.getId());
-        intent.putExtra("message", request.getMessage());
-        intent.putExtra("course", request.getCourseName());
-        intent.putExtra("source", source);
-        intent.putExtra("requesteeID", request.getRequesteeID());
-        intent.putExtra("requesterID", request.getRequesterID());
+        intent.putExtra(Id.toString(), request.getId());
+        intent.putExtra(Position.toString(), position);
         startActivity(intent);
     }
 
-    private void toCourse(String course) {
-        Intent intent = new Intent(HomeActivity.this, CourseActivity.class);
-        intent.putExtra("course", course);
+    private void toGroup(String groupId) {
+        Intent intent = new Intent(HomeActivity.this, GroupActivity.class);
+        intent.putExtra(GroupId.toString(), groupId);
         startActivity(intent);
     }
 
@@ -296,27 +297,17 @@ public class HomeActivity extends AppCompatActivity {
 
     private void explore() {
         if (currentUser.getCourses().size() > 0) {
-            UserRepository.getUsersByCourse(currentUser.getCourses(),
-                    currentUser.getUid(),
-                    (QuerySnapshot) -> {
-                        for (DocumentSnapshot document : QuerySnapshot.getDocuments()) {
-                            String userID = document.getId();
-                            if (!toVisitUserList.getUserIDs().contains(userID) && !userID.equals(currentUser.getId()) && !currentUser.getVisitedTeameeIDs().contains(userID)) {
-                                toVisitUserList.addUserID(userID);
-                            }
-                        }
-                        if (toVisitUserList.getUserIDs().size() > 0) {
-                            Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
-                            intent.putExtra("action", Explore);
-                            startActivity(intent);
-                        } else {
-                            Toast.makeText(this, "No potential teammate found", Toast.LENGTH_LONG).show();
-                        }
-                    });
+            if (toVisitUserList.getUserIDs().size() > 0) {
+                Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
+                intent.putExtra(ActionType.toString(), Explore.toString());
+                startActivity(intent);
+            } else {
+                toVisitUserList.resetList();
+                Toast.makeText(this, "No potential teammate found", Toast.LENGTH_LONG).show();
+            }
         } else {
             Toast.makeText(this, "Let's update your profile and courses first", Toast.LENGTH_LONG).show();
         }
-
     }
 
     @Override

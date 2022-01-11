@@ -1,5 +1,7 @@
 package com.example.teamder.activity;
 
+import static com.example.teamder.model.IntentModel.IntentName.Email;
+import static com.example.teamder.model.IntentModel.IntentName.Password;
 import static com.example.teamder.repository.UtilRepository.updateFieldToDb;
 import static com.example.teamder.util.ScreenUtil.clearFocus;
 import static com.example.teamder.util.ValidationUtil.confirmPassword;
@@ -11,6 +13,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -28,7 +31,8 @@ public class SignUpActivity extends AppCompatActivity {
 
     private ConstraintLayout fullscreenConstraint;
     private EditText emailInput, passwordInput, confirmPasswordInput, nameInput;
-    private ImageButton loginLink, signUpButton;
+    private ImageButton loginLink;
+    private Button signUpButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,8 +101,8 @@ public class SignUpActivity extends AppCompatActivity {
     private void toLogin(String email, String password) {
         AuthenticationRepository.signOut();
         Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
-        intent.putExtra("email", email);
-        intent.putExtra("password", password);
+        intent.putExtra(Email.toString(), email);
+        intent.putExtra(Password.toString(), password);
         startActivity(intent);
         finish();
     }

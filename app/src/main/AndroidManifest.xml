@@ -18,7 +18,7 @@
             android:name=".activity.FeedbackActivity"
             android:exported="true" />
         <activity
-            android:name=".activity.CourseActivity"
+            android:name=".activity.GroupActivity"
             android:exported="true" />
         <activity
             android:name=".activity.ReviewActivity"

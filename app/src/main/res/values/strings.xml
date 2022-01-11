@@ -58,4 +58,10 @@
     <string name="course_name">Enter course name:</string>
     <string name="reviews">Reviews</string>
     <string name="pass">Pass</string>
+    <string name="feedback_form">Feedback form</string>
+    <string name="feedback_hint">Leave your feedback here…</string>
+    <string name="leave">Leave group</string>
+    <string name="all_team_members">All team members</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="request">Request</string>
 </resources>

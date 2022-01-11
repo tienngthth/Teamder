@@ -5,8 +5,16 @@ import static com.example.teamder.activity.NotificationActivity.Type.CancelReque
 import static com.example.teamder.activity.NotificationActivity.Type.RejectRequest;
 import static com.example.teamder.activity.ProfileActivity.Action.Profile;
 import static com.example.teamder.activity.ProfileActivity.Action.Review;
+import static com.example.teamder.activity.RequestActivity.Status.pending;
+import static com.example.teamder.model.IntentModel.IntentName.ActionType;
+import static com.example.teamder.model.IntentModel.IntentName.GroupId;
+import static com.example.teamder.model.IntentModel.IntentName.Id;
+import static com.example.teamder.model.IntentModel.IntentName.Position;
+import static com.example.teamder.model.IntentModel.IntentName.UserId;
+import static com.example.teamder.model.Request.parseRequest;
 import static com.example.teamder.model.User.parseUser;
 import static com.example.teamder.repository.NotificationRepository.createNotification;
+import static com.example.teamder.repository.RequestRepository.getRequestById;
 import static com.example.teamder.repository.UserRepository.getUserById;
 import static com.example.teamder.repository.UtilRepository.updateFieldToDb;
 
@@ -15,10 +23,8 @@ import android.os.Bundle;
 import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,20 +33,23 @@ import com.example.teamder.R;
 import com.example.teamder.model.CurrentUser;
 import com.example.teamder.model.Group;
 import com.example.teamder.model.Notification;
+import com.example.teamder.model.Request;
 import com.example.teamder.model.User;
 import com.example.teamder.repository.GroupRepository;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class ReviewActivity extends AppCompatActivity {
 
     private final User currentUser = CurrentUser.getInstance().getUser();
-    private TextView requester, requestee, message, course;
-    private Button rejectButton, cancelButton;
-    private ImageButton approveButton;
-    private String id, requesteeID, requesterID, source, courseName;
+    private TextView requester, requestee, message, course, status;
+    private Button rejectButton, cancelButton, approveButton;
+    private String position;
     private LinearLayout actions, requesterAvatar, requesteeAvatar;
+    private Request request;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,8 +62,6 @@ public class ReviewActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         checkIntent();
-        setUpScreen();
-        setUpListeners();
     }
 
     private void initialiseVariables() {
@@ -68,31 +75,34 @@ public class ReviewActivity extends AppCompatActivity {
         actions = findViewById(R.id.actions);
         requesterAvatar = findViewById(R.id.requester_avatar);
         requesteeAvatar = findViewById(R.id.requestee_avatar);
+        status = findViewById(R.id.status);
     }
 
     private void checkIntent() {
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
-        id = bundle.getString("id");
-        courseName = bundle.getString("course");
-        requesteeID = bundle.getString("requesteeID");
-        requesterID = bundle.getString("requesterID");
-        source = bundle.getString("source");
-        message.setText(bundle.getString("message"));
-        course.setText(courseName);
+        position = bundle.getString(Position.toString());
+        getRequestById(bundle.getString(Id.toString()), (documentSnapshot) -> {
+            request = parseRequest(documentSnapshot);
+            message.setText(request.getMessage());
+            course.setText(request.getCourseName());
+            setUpScreen();
+            setUpListeners();
+        });
     }
 
     private void setUpScreen() {
-        getUserById(requesteeID, (documentSnapshot -> {
+        getUserById(request.getRequesteeID(), (documentSnapshot -> {
             User user = parseUser(documentSnapshot);
             requestee.setText(user.getName());
         }));
-        getUserById(requesterID, (documentSnapshot -> {
+        getUserById(request.getRequesterID(), (documentSnapshot -> {
             User user = parseUser(documentSnapshot);
             requester.setText(user.getName());
         }));
-        cancelButton.setVisibility(source.equals("sent") ? View.VISIBLE : View.GONE);
-        actions.setVisibility(source.equals("received") ? View.VISIBLE : View.GONE);
+        status.setText(request.getStatus());
+        cancelButton.setVisibility(position.equals("sent") && request.getStatus().equals(pending.toString()) ? View.VISIBLE : View.GONE);
+        actions.setVisibility(position.equals("received") && request.getStatus().equals(pending.toString()) ? View.VISIBLE : View.GONE);
     }
 
     private void setUpListeners() {
@@ -108,7 +118,7 @@ public class ReviewActivity extends AppCompatActivity {
                 .setTitle("Confirmation")
                 .setMessage("Are you sure you want to " + action + " this request?")
                 .setPositiveButton("No", (dialog, which) -> dialog.dismiss())
-                .setNegativeButton("Yes", (dialog, which) -> {joinGroup(); updateRequestStatus(action); });
+                .setNegativeButton("Yes", (dialog, which) -> processAction(action));
         AlertDialog dialog = builder.create();
         dialog.show();
         dialog.getButton(dialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.white));
@@ -116,78 +126,101 @@ public class ReviewActivity extends AppCompatActivity {
         dialog.getButton(dialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.blue_grey_500));
     }
 
-    private void joinGroup() {
-        GroupRepository.getGroup(courseName, Arrays.asList(requesteeID, requesterID),
-                QuerySnapshot -> {
-                    Group group;
-                    switch (QuerySnapshot.getDocuments().size()){
-                        case 2:
-                            group = Group.parseGroup(QuerySnapshot.getDocuments().get(0));
-                            Group group2 = Group.parseGroup(QuerySnapshot.getDocuments().get(1));
-                            group.getUserIds().addAll(group2.getUserIds());
-                            updateFieldToDb("groups", group.getUid(), "userIds", group.getUserIds());
-                            GroupRepository.deactivateGroup(group2.getUid());
-                            break;
-                        case 1:
-                            group = Group.parseGroup(QuerySnapshot.getDocuments().get(0));
-                            if (group.getCourseIDs().contains(requesterID)) {
-                                group.getUserIds().add(requesteeID);
-                            } else {
-                                group.getUserIds().add(requesterID);
-                            }
-                            updateFieldToDb("groups", group.getUid(), "userIds", group.getUserIds());
-                            break;
-                        default:
-                            group = new Group();
-                            group.setUserIds(new ArrayList<String>() {
-                                {
-                                    add(requesteeID);
-                                    add(requesterID);
-                                }
-                            });
-                            group.setCourseIDs(courseName);
-                            GroupRepository.createGroup(group, () -> {
-                                Toast.makeText(this, "New group created", Toast.LENGTH_SHORT).show();
-                            });
-                            break;
+    private void processAction(String action) {
+        if (action.equals("approve")) {
+            GroupRepository.getGroupByCourseNameByUserIds(request.getCourseName(), Arrays.asList(request.getRequesteeID(), request.getRequesterID()),
+                    querySnapshot -> {
+                        int groupsCount = querySnapshot.getDocuments().size();
+                        switch (groupsCount){
+                            case 2:
+                                mergeGroup(querySnapshot.getDocuments());
+                                break;
+                            case 1:
+                                joinExistingGroup(querySnapshot.getDocuments());
+                                break;
+                            default:
+                                newGroup();
+                                break;
+                        }
                     }
-                }
-        );
+            );
+        } else {
+            updateRequestStatus(action, null);
+        }
     }
 
-    private void updateRequestStatus(String action) {
-        updateFieldToDb("requests", id, "status", action.equals("approve") ? "approved" : (action + "ed"));
-        String message = (action.equals("cancel") ? "Request from " : "Your request to ")
-                + currentUser.getName() + " for course " + courseName + " has been "
-                + (action.equals("approved") ? "approved" : (action + "ed")) + ".";
-        if (action.equals("approve")) {
-            toCourse();
-        } else {
+    private void newGroup() {
+        Group group = new Group(
+                new ArrayList<String>() {{
+                            add(request.getRequesteeID());
+                            add(request.getRequesterID());
+                        }},
+                request.getCourseName());
+        GroupRepository.createGroup(group, (documentReference) -> toGroup(documentReference.getId()), () -> {});
+    }
+
+    private void joinExistingGroup(List<DocumentSnapshot> documentSnapshots) {
+        Group group = Group.parseGroup(documentSnapshots.get(0));
+        group.getUserIds().add(group.getUserIds().contains(request.getRequesterID()) ? request.getRequesteeID() : request.getRequesterID());
+        updateFieldToDb("groups", group.getId(), "userIds", group.getUserIds(), (v) -> {
+            toGroup(group.getId());
+        });
+    }
+
+    private void mergeGroup(List<DocumentSnapshot> documentSnapshots) {
+        Group group = Group.parseGroup(documentSnapshots.get(0));
+        Group group2 = Group.parseGroup(documentSnapshots.get(1));
+        group.getUserIds().addAll(group2.getUserIds());
+        updateFieldToDb("groups", group.getId(), "userIds", group.getUserIds(), (v) -> {
+            toGroup(group.getId());
+        });
+        updateFieldToDb("groups", group2.getId(), "isActive", false);
+    }
+
+    private void toGroup(String groupId) {
+        Intent intent = new Intent(ReviewActivity.this, GroupActivity.class);
+        intent.putExtra(GroupId.toString(), groupId);
+        startActivity(intent);
+        finish();
+        updateRequestStatus("approve", groupId);
+    }
+
+    private void updateRequestStatus(String action, String groupId) {
+        updateFieldToDb("requests", request.getId(), "status", getPastTense(action), (v) -> {
+            createNotificationInDb(action, groupId);
+        });
+        if (!action.equals("approve")) {
             finish();
         }
+    }
+
+    private String getPastTense(String action) {
+        return action.equals("approve") ? "approved" : (action + "ed");
+    }
+
+    private String getMessageHead(String action) {
+        return action.equals("cancel") ? "Request from " : "Your request to ";
+    }
+
+    private void createNotificationInDb(String action, String groupId) {
+        String message = getMessageHead(action) + currentUser.getName() + " for course " + request.getCourseName() + " has been " + getPastTense(action) + ".";
         Notification notification = new Notification(
                 message,
-                requesteeID.equals(currentUser.getId()) ? requesterID : requesteeID,
-                action.equals("approve") ? ApproveRequest : action.equals("reject") ? RejectRequest : CancelRequest);
+                request.getRequesteeID().equals(currentUser.getId()) ? request.getRequesterID() : request.getRequesteeID(),
+                action.equals("approve") ? ApproveRequest : action.equals("reject") ? RejectRequest : CancelRequest,
+                action.equals("approve") ? groupId : request.getId());
         createNotification(notification);
     }
 
-    private void toCourse() {
-        Intent intent = new Intent(ReviewActivity.this, CourseActivity.class);
-        intent.putExtra("course", courseName);
-        startActivity(intent);
-        finish();
-    }
-
-    private void toReviewProfile(String position) {
+    private void toReviewProfile(String pagePosition) {
         Intent intent = new Intent(ReviewActivity.this, ProfileActivity.class);
-        intent.putExtra("action", isToProfile(position) ? Profile : Review);
-        intent.putExtra("userID", position.equals("requestee") ? requesteeID : requesterID);
+        intent.putExtra(ActionType.toString(),  isToProfile(pagePosition) ? Profile : Review);
+        intent.putExtra(UserId.toString(), pagePosition.equals("requestee") ? request.getRequesteeID() : request.getRequesterID());
         startActivity(intent);
     }
 
-    private boolean isToProfile(String position) {
-        return (source.equals("sent") && position.equals("requester")) || (source.equals("received") && position.equals("requestee"));
+    private boolean isToProfile(String pagePosition) {
+        return (position.equals("sent") && pagePosition.equals("requester")) || (position.equals("received") && pagePosition.equals("requestee"));
     }
 
 }

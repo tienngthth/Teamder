@@ -98,9 +98,28 @@
                 android:id="@+id/course"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="30dp"
+                android:layout_marginBottom="20dp"
                 android:fontFamily="@font/poppins_bold"
+                android:layout_marginTop="10dp"
                 android:text="@string/course_request"
+                android:textSize="18sp"
+                android:textColor="@color/blue_900" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins_regular"
+                android:text="@string/status"
+                android:textColor="@color/blue_900_70" />
+
+            <TextView
+                android:id="@+id/status"
+                android:layout_width="match_parent"
+                android:layout_marginTop="10dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:fontFamily="@font/poppins_bold"
+                android:text="@string/status"
                 android:textSize="18sp"
                 android:textColor="@color/blue_900" />
 
@@ -120,6 +139,7 @@
                 android:background="@drawable/white_list"
                 android:fontFamily="@font/poppins_regular"
                 android:gravity="top|start"
+                android:layout_marginTop="10dp"
                 android:importantForAutofill="no"
                 android:padding="20dp"
                 android:textColor="@color/blue_900"
@@ -151,7 +171,7 @@
             <Button
                 android:id="@+id/reject_button"
                 android:layout_width="0dp"
-                android:layout_height="50dp"
+                android:layout_height="40dp"
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
                 android:backgroundTint="@android:color/transparent"
@@ -160,18 +180,21 @@
                 android:text="@string/reject"
                 android:textAllCaps="false"
                 android:textColor="#546E7A"
-                android:textSize="16sp"
+                android:textSize="12sp"
                 tools:ignore="NestedWeights" />
 
-            <ImageButton
+            <Button
                 android:id="@+id/approve_button"
                 android:layout_width="0dp"
-                android:layout_height="50dp"
+                android:layout_height="40dp"
                 android:layout_weight="1"
-                android:backgroundTint="@color/blue_grey_050"
-                android:contentDescription="@string/send"
-                android:src="@drawable/ic_approve"
-                tools:ignore="SpeakableTextPresentCheck" />
+                android:fontFamily="@font/poppins_bold"
+                android:text="Approve"
+                android:textAllCaps="false"
+                android:textSize="12sp"
+                android:background="@drawable/blue_round_item"
+                tools:ignore="HardcodedText" />
+
         </LinearLayout>
 
     </LinearLayout>

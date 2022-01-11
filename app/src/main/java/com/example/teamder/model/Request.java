@@ -1,5 +1,7 @@
 package com.example.teamder.model;
 
+import static com.example.teamder.activity.RequestActivity.Status.pending;
+
 import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.ArrayList;
@@ -13,9 +15,7 @@ public class Request {
     private String createdTime;
     private String message = "";
     private String id;
-
-    // Pending, Reject, Accept
-    private String status = "Pending";
+    private String status = pending.toString();
 
     public Request(String courseName, String createdTime, String requesterID, String message, String requesteeID) {
         this.courseName = courseName;

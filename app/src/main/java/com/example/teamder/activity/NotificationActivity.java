@@ -1,6 +1,18 @@
 package com.example.teamder.activity;
 
+import static com.example.teamder.activity.NotificationActivity.Type.ApproveRequest;
+import static com.example.teamder.activity.NotificationActivity.Type.CancelRequest;
 import static com.example.teamder.activity.NotificationActivity.Type.Feedback;
+import static com.example.teamder.activity.NotificationActivity.Type.GroupChange;
+import static com.example.teamder.activity.NotificationActivity.Type.NewRequest;
+import static com.example.teamder.activity.NotificationActivity.Type.RejectRequest;
+import static com.example.teamder.activity.NotificationActivity.Type.Suggestion;
+import static com.example.teamder.activity.ProfileActivity.Action.Explore;
+import static com.example.teamder.model.IntentModel.IntentName.ActionType;
+import static com.example.teamder.model.IntentModel.IntentName.GroupId;
+import static com.example.teamder.model.IntentModel.IntentName.Id;
+import static com.example.teamder.model.IntentModel.IntentName.Position;
+import static com.example.teamder.model.IntentModel.IntentName.UserId;
 import static com.example.teamder.model.Notification.parseNotification;
 import static com.example.teamder.repository.UtilRepository.updateFieldToDb;
 
@@ -29,7 +41,7 @@ public class NotificationActivity extends AppCompatActivity {
         Feedback,
         Suggestion,
         Message,
-        DoneGroup,
+        GroupChange,
         ApproveRequest,
         RejectRequest,
         CancelRequest,
@@ -113,8 +125,32 @@ public class NotificationActivity extends AppCompatActivity {
     }
 
     private void navigateUser(Notification notification) {
-        if (notification.getType().equals(Feedback)) {
+        Type notificationType = notification.getType();
+        if (notificationType.equals(Feedback)) {
             Intent intent = new Intent(NotificationActivity.this, ProfileActivity.class);
+            startActivity(intent);
+        } else if (notificationType.equals(Suggestion)) {
+            Intent intent = new Intent(NotificationActivity.this, ProfileActivity.class);
+            intent.putExtra(ActionType.toString(), Explore);
+            intent.putExtra(UserId.toString(), notification.getObjectId());
+            startActivity(intent);
+        } else if (notificationType.equals(NewRequest) || notificationType.equals(CancelRequest) ) {
+            Intent intent = new Intent(NotificationActivity.this, ReviewActivity.class);
+            intent.putExtra(Id.toString(), notification.getObjectId());
+            intent.putExtra(Position.toString(), "received");
+            startActivity(intent);
+        } else if (notificationType.equals(RejectRequest)) {
+            Intent intent = new Intent(NotificationActivity.this, ReviewActivity.class);
+            intent.putExtra(Id.toString(), notification.getObjectId());
+            intent.putExtra(Position.toString(), "sent");
+            startActivity(intent);
+        } else if (notificationType.equals(ApproveRequest)) {
+            Intent intent = new Intent(NotificationActivity.this, GroupActivity.class);
+            intent.putExtra(GroupId.toString(), notification.getObjectId());
+            startActivity(intent);
+        } else if (notificationType.equals(GroupChange)) {
+            Intent intent = new Intent(NotificationActivity.this, GroupActivity.class);
+            intent.putExtra(GroupId.toString(), notification.getObjectId());
             startActivity(intent);
         }
     }

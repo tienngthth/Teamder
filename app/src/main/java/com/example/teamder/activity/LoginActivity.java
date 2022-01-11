@@ -1,5 +1,7 @@
 package com.example.teamder.activity;
 
+import static com.example.teamder.model.IntentModel.IntentName.Email;
+import static com.example.teamder.model.IntentModel.IntentName.Password;
 import static com.example.teamder.util.ScreenUtil.clearFocus;
 import static com.example.teamder.util.ScreenUtil.setViewAndChildrenEnabled;
 import static com.example.teamder.util.ValidationUtil.validateEmailInput;
@@ -9,6 +11,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -18,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.teamder.R;
 import com.example.teamder.model.CurrentUser;
+import com.example.teamder.model.ToVisitUserList;
 import com.example.teamder.repository.AuthenticationRepository;
 import com.example.teamder.repository.UserRepository;
 import com.example.teamder.service.NotificationService;
@@ -28,7 +32,8 @@ public class LoginActivity extends AppCompatActivity {
 
     private final CurrentUser currentUser = CurrentUser.getInstance();
     private EditText emailInput, passwordInput;
-    private ImageButton loginButton, signUpLink;
+    private ImageButton signUpLink;
+    private Button loginButton;
     private LinearLayout fullscreenConstraint;
 
     @Override
@@ -50,7 +55,7 @@ public class LoginActivity extends AppCompatActivity {
     private void initialiseVariables() {
         emailInput = findViewById(R.id.email_input);
         passwordInput = findViewById(R.id.password_input);
-        loginButton = findViewById(R.id.logout_button);
+        loginButton = findViewById(R.id.login_button);
         signUpLink = findViewById(R.id.sign_up_link);
         fullscreenConstraint = findViewById(R.id.activity_login);
     }
@@ -65,8 +70,8 @@ public class LoginActivity extends AppCompatActivity {
     public void setupScreen(Intent intent) {
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
-            emailInput.setText(bundle.get("email").toString());
-            passwordInput.setText(bundle.get("password").toString());
+            emailInput.setText(bundle.get(Email.toString()).toString());
+            passwordInput.setText(bundle.get(Password.toString()).toString());
         }
     }
 
@@ -75,6 +80,7 @@ public class LoginActivity extends AppCompatActivity {
         if (user != null) {
             navigateUser(user.getUid());
         } else {
+            fullscreenConstraint.setVisibility(View.VISIBLE);
             setViewAndChildrenEnabled(fullscreenConstraint, true);
         }
     }
@@ -87,6 +93,7 @@ public class LoginActivity extends AppCompatActivity {
             } else {
                 for (QueryDocumentSnapshot document : querySnapshot) {
                     currentUser.updateUser(document);
+                    ToVisitUserList.getInstance().resetList();
                     toHome();
                 }
                 if (currentUser.getUser() != null) {

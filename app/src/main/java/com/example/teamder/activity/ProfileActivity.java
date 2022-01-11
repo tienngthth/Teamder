@@ -3,10 +3,12 @@ package com.example.teamder.activity;
 import static com.example.teamder.activity.ProfileActivity.Action.Explore;
 import static com.example.teamder.activity.ProfileActivity.Action.Inspect;
 import static com.example.teamder.activity.ProfileActivity.Action.Profile;
+import static com.example.teamder.model.IntentModel.IntentName.ActionType;
+import static com.example.teamder.model.IntentModel.IntentName.TeammateId;
+import static com.example.teamder.model.IntentModel.IntentName.UserId;
+import static com.example.teamder.model.IntentModel.IntentName.UserName;
 import static com.example.teamder.model.Review.parseReview;
 import static com.example.teamder.model.User.parseUser;
-import static com.example.teamder.repository.RequestRepository.getApprovedRequestByParties;
-import static com.example.teamder.repository.RequestRepository.getPendingRequestByParties;
 import static com.example.teamder.repository.ReviewRepository.getReviewByUserId;
 import static com.example.teamder.repository.UserRepository.getOtherUserByFieldValue;
 import static com.example.teamder.repository.UserRepository.getUserById;
@@ -41,6 +43,7 @@ import com.example.teamder.util.ValidationUtil;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+
 public class ProfileActivity extends AppCompatActivity {
 
     public enum Action {
@@ -56,8 +59,8 @@ public class ProfileActivity extends AppCompatActivity {
     private String userId = null;
     private EditText name, major, sID, GPA, introduction, phone, email;
     private View phoneLine, nameLine, majorLine, sIDLine, GPALine, introductionLine;
-    private ImageButton addCourseButton, requestButton, feedbackButton;
-    private Button passButton;
+    private ImageButton addCourseButton, feedbackButton;
+    private Button passButton, requestButton;
     private LayoutInflater inflater;
     private LinearLayout reviewList, courseList, fullscreenConstraint, actions, emailGroup, sIdGroup, phoneGroup;
     private Action action = Profile;
@@ -69,44 +72,51 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         initialiseVariables();
+        checkActionType();
+    }
+
+    private void checkActionType() {
         if (userId != null && !action.equals(Profile)) {
             getUserById(userId, (document) -> {
                 user = parseUser(document);
-                if (action.equals(Explore)) {
-                    ArrayList<String> intersectCourses = new ArrayList<>(user.getCourses());
-                    intersectCourses.retainAll(currentUser.getCourses());
-                    ArrayList<String> parties = new ArrayList<>();
-                    parties.add(user.getId());
-                    parties.add(currentUser.getId());
-
-                    getApprovedRequestByParties(parties, (snapshot) -> {
-                        int requestNo = snapshot.getDocuments().size();
-                        if (requestNo > 0) {
-                            slideAnimation = false;
-                            nextUser();
-                        }
-                    });
-
-                    getPendingRequestByParties(parties, (snapshot) -> {
-                        int requestNo = snapshot.getDocuments().size();
-                        if ((intersectCourses.size() - requestNo) > 0) {
-                            setUpListeners();
-                            setUpScreen();
-                        } else {
-                            slideAnimation = false;
-                            nextUser();
-                        }
-                    });
-                } else {
-                    setUpListeners();
-                    setUpScreen();
-                }
+//                if (action.equals(Explore)) {
+//                    checkIntersectCourses();
+//                } else {
+//                    setUpListeners();
+//                    setUpScreen();
+//                }
+                setUpListeners();
+                setUpScreen();
             });
         } else {
-            user = CurrentUser.getInstance().getUser();
-            setUpListeners();
-            setUpScreen();
+            setUpCurrentUserScreen();
         }
+    }
+
+//    private void checkIntersectCourses() {
+//        ArrayList<String> parties = new ArrayList<>(Arrays.asList(user.getId(), currentUser.getId()));
+//        getRequestsByPartiesAndStatus(pending.toString(), parties, (snapshot) -> {
+//            if (snapshot.getDocuments().size() > 0) {
+//                slideAnimation = false;
+//                nextUser();
+//            } else {
+//                getRequestsByPartiesAndStatus(approved.toString(), parties, (documentSnapshots) -> {
+//                    if ((countIntersectCourses(user) - documentSnapshots.getDocuments().size()) > 0) {
+//                        setUpListeners();
+//                        setUpScreen();
+//                    } else {
+//                        slideAnimation = false;
+//                        nextUser();
+//                    }
+//                });
+//            }
+//        });
+//    }
+
+    private void setUpCurrentUserScreen() {
+        user = CurrentUser.getInstance().getUser();
+        setUpListeners();
+        setUpScreen();
     }
 
     private void initialiseVariables() {
@@ -150,14 +160,17 @@ public class ProfileActivity extends AppCompatActivity {
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
-            action = Action.valueOf(bundle.get("action").toString());
-            if (action.equals(Explore)) {
-                userId = toVisitUserList.getUserID();
-                showDetails = false;
-            } else if (action.equals(Inspect)){
-                userId = bundle.get("teammateID").toString();
-            } else {
-                userId = bundle.get("userID").toString();
+            action = Action.valueOf(bundle.get(ActionType.toString()).toString());
+            userId = bundle.getString(UserId.toString());
+            if (userId == null) {
+                if (action.equals(Explore)) {
+                    userId = toVisitUserList.getUserID();
+                    showDetails = false;
+                } else if (action.equals(Inspect)){
+                    userId = bundle.get(TeammateId.toString()).toString();
+                } else {
+                    userId = bundle.get(UserId.toString()).toString();
+                }
             }
         }
     }
@@ -173,21 +186,17 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void toRequest() {
         Intent intent = new Intent(ProfileActivity.this, RequestActivity.class);
-        intent.putExtra("userName", user.getName());
-        intent.putExtra("userID", user.getId());
+        intent.putExtra(UserName.toString(), user.getName());
+        intent.putExtra(UserId.toString(), user.getId());
         activityResultLauncher.launch(intent);
     }
 
     private void toFeedback() {
         Intent intent = new Intent(ProfileActivity.this, FeedbackActivity.class);
-        intent.putExtra("userName", user.getName());
-        intent.putExtra("userID", user.getId());
-        intent.putExtra("action", action);
+        intent.putExtra(UserName.toString(), user.getName());
+        intent.putExtra(UserId.toString(), user.getId());
+        intent.putExtra(ActionType.toString(), action);
         startActivity(intent);
-//        activityResultLauncher.launch(intent);
-        if (action.equals(Inspect)) {
-            finish();
-        }
     }
 
     private void nextUser() {
@@ -195,21 +204,25 @@ public class ProfileActivity extends AppCompatActivity {
         currentUser.addVisitedTeameeIDs(userId);
         updateFieldToDb("users", CurrentUser.getInstance().getUser().getId(), "visitedTeameeIDs", currentUser.getVisitedTeameeIDs());
         if (toVisitUserList.getUserIDs().size() > 0) {
-            finish();
-            Intent intent = new Intent(ProfileActivity.this, ProfileActivity.class);
-            intent.putExtra("action", Explore);
-            startActivity(intent);
-            if (slideAnimation) {
-                overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
-            }
-            slideAnimation = true;
+            toNextUserProfile();
         } else {
-            currentUser.setVisitedTeameeIDs(new ArrayList<String>());
-            updateFieldToDb("users", currentUser.getId(), "visitedTeameeIDs", currentUser.getVisitedTeameeIDs());
+            toVisitUserList.resetList();
             Toast.makeText(this, "No more potential teammate found", Toast.LENGTH_LONG).show();
             finish();
         }
     }
+
+    private void toNextUserProfile() {
+        finish();
+        Intent intent = new Intent(ProfileActivity.this, ProfileActivity.class);
+        intent.putExtra(ActionType.toString(), Explore);
+        startActivity(intent);
+        if (slideAnimation) {
+            overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+        }
+        slideAnimation = true;
+    }
+
 
     private boolean clearInputFieldsFocus(View view) {
         clearFocus(view, name, this);

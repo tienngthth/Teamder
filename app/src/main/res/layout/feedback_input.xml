@@ -1,0 +1,42 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="15dp"
+        android:backgroundTint="@color/white"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/poppins_regular"
+            android:text="@string/name"
+            android:textColor="@color/blue_800"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/feedback"
+            android:hint="@string/feedback_hint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/white_list"
+            android:fontFamily="@font/poppins_regular"
+            android:gravity="top|start"
+            android:importantForAutofill="no"
+            android:padding="20dp"
+            android:textColor="@color/blue_900"
+            android:textSize="12sp"
+            tools:ignore="RtlSymmetry,TextFields,DuplicateSpeakableTextCheck" />
+
+    </LinearLayout>
+
+</FrameLayout>

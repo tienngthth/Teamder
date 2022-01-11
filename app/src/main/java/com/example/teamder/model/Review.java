@@ -1,28 +1,20 @@
 package com.example.teamder.model;
 
+import static com.example.teamder.util.DateTimeUtil.getToday;
+
 import com.google.firebase.firestore.DocumentSnapshot;
 
 public class Review {
-    private String uid;
     private String userID;
     private String comment;
-    private String timeStamp;
+    private String timeStamp = getToday();
 
-    public Review(String userID, String comment, String timeStamp) {
+    public Review(String userID, String comment) {
         this.userID = userID;
         this.comment = comment;
-        this.timeStamp = timeStamp;
     }
 
     public Review() {
-    }
-
-    public String getUid() {
-        return uid;
-    }
-
-    public void setUid(String uid) {
-        this.uid = uid;
     }
 
     public String getUserID() {

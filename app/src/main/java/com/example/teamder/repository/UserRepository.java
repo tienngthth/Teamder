@@ -56,9 +56,9 @@ public class UserRepository {
                 .addOnFailureListener(e -> emptyCallBack.onCallBack());
     }
 
-    public static void getUsersByCourse(ArrayList<String> courses, String uid, CallbackInterfaces.QuerySnapShotCallBack querySnapShotCallBack) {
+    public static void getOtherUsersByCourse(ArrayList<String> courses, CallbackInterfaces.QuerySnapShotCallBack querySnapShotCallBack) {
         FirebaseFirestore.getInstance().collection("users")
-//                .whereNotEqualTo("uid", uid)
+                .whereNotEqualTo("id", CurrentUser.getInstance().getUser().getId())
                 .whereArrayContainsAny("courses", courses)
                 .get()
                 .addOnCompleteListener(task -> {
