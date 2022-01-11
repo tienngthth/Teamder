@@ -75,11 +75,19 @@ public class GroupActivity extends AppCompatActivity {
                 group = parseGroup(documentSnapshot);
                 course.setText(group.getCourseName());
                 status.setText(group.getIsActive() ? "Active" : "Inactive");
-                feedbackButton.setVisibility(group.getUserIds().size() > 1 || !group.getUserIds().contains(currentUser.getId()) ? View.VISIBLE : View.GONE);
-                actions.setVisibility((group.getIsActive() && group.getUserIds().contains(currentUser.getId())) ? View.VISIBLE : View.GONE);
+                actions.setVisibility(enableActions() ? View.VISIBLE : View.GONE);
+                feedbackButton.setVisibility(enableFeedback() ? View.VISIBLE : View.GONE);
                 generateTeameeListView(group.getUserIds());
             });
         }
+    }
+
+    private boolean enableActions() {
+        return (group.getIsActive() && group.getUserIds().contains(currentUser.getId()));
+    }
+
+    private boolean enableFeedback() {
+        return !enableActions() && group.getUserIds().size() > 0 && (group.getUserIds().size() > 1 || !group.getUserIds().contains(currentUser.getId()));
     }
 
     private void setUpListeners() {
@@ -111,6 +119,7 @@ public class GroupActivity extends AppCompatActivity {
         } else {
             closeGroup();
         }
+        updateRequestStatus(currentUser.getId());
         finish();
     }
 
@@ -130,15 +139,17 @@ public class GroupActivity extends AppCompatActivity {
             View itemView = inflater.inflate(R.layout.group_member, null, false);
             TextView nameView = itemView.findViewById(R.id.name);
             nameView.setText(user.getName());
-            nameView.setOnClickListener((View view) -> reviewProfile(user.getId()));
+            itemView.setOnClickListener((View view) -> reviewProfile(user.getId()));
             teameeList.addView(itemView);
         });
     }
 
     private void reviewProfile(String userID) {
         Intent intent = new Intent(GroupActivity.this, ProfileActivity.class);
-        intent.putExtra(ActionType.toString(), Review.toString());
-        intent.putExtra(UserId.toString(), userID);
+        if (!userID.equals(currentUser.getId())) {
+            intent.putExtra(ActionType.toString(), Review.toString());
+            intent.putExtra(UserId.toString(), userID);
+        }
         startActivity(intent);
     }
 
@@ -158,18 +169,22 @@ public class GroupActivity extends AppCompatActivity {
     private void closeGroup() {
         updateFieldToDb("groups", group.getId(), "isActive", false);
         for (String userId : group.getUserIds()) {
-            getRequestByUserIdStatusAndCourseName(userId, approved.toString(), group.getCourseName(), (documentSnapshots) -> {
-                List<DocumentSnapshot> documents = documentSnapshots.getDocuments();
-                for (DocumentSnapshot documentSnapshot : documents) {
-                    updateFieldToDb("requests", documentSnapshot.getId(), "status", "done");
-                }
-            });
+            updateRequestStatus(userId);
         }
         if (group.getUserIds().size() > 1) {
             toFeedbackActivity();
         }
         pushNotification("Your group for course " + group.getCourseName() + " has been closed by " + currentUser.getName() + ".");
         finish();
+    }
+
+    private void updateRequestStatus(String userId) {
+        getRequestByUserIdStatusAndCourseName(userId, approved.toString(), group.getCourseName(), (documentSnapshots) -> {
+            List<DocumentSnapshot> documents = documentSnapshots.getDocuments();
+            for (DocumentSnapshot documentSnapshot : documents) {
+                updateFieldToDb("requests", documentSnapshot.getId(), "status", "done");
+            }
+        });
     }
 
     private void pushNotification(String message) {

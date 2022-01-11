@@ -1,7 +1,5 @@
 package com.example.teamder.repository;
 
-import static com.example.teamder.activity.RequestActivity.Status.pending;
-
 import com.example.teamder.model.Request;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -56,10 +54,10 @@ public class RequestRepository {
                 });
     }
 
-    public static void getPendingRequestOfCourseByParties(ArrayList<String> parties, String course, CallbackInterfaces.QuerySnapShotCallBack querySnapShotCallBack) {
+    public static void getRequestOfCourseByParties(ArrayList<String> parties, String course, String status, CallbackInterfaces.QuerySnapShotCallBack querySnapShotCallBack) {
         FirebaseFirestore.getInstance()
                 .collection("requests")
-                .whereEqualTo("status", pending.toString())
+                .whereEqualTo("status", status)
                 .whereEqualTo("courseName", course)
                 .whereIn("parties", Arrays.asList(parties, new ArrayList<String>(){{ add(parties.get(1));  add(parties.get(0)); }}))
                 .get()

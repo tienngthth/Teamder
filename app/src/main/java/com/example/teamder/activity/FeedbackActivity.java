@@ -73,10 +73,11 @@ public class FeedbackActivity extends AppCompatActivity {
             if (userId != null) {
                 userIds.add(userId);
                 generateInputForm();
+                fullConstraint.setVisibility(View.VISIBLE);
             } else {
                 getGroupById(groupId, (documentSnapshot) -> {
                     userIds = parseGroup(documentSnapshot).getUserIds();
-                    if (userIds.size() > 1 || !userIds.contains(currentUser.getId())) {
+                    if (userIds.size() > 0 && (userIds.size() > 1 || !userIds.contains(currentUser.getId()))) {
                         fullConstraint.setVisibility(View.VISIBLE);
                         generateInputForm();
                     } else {

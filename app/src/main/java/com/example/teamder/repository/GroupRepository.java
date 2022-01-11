@@ -31,6 +31,7 @@ public class GroupRepository {
                 .collection("groups")
                 .whereArrayContainsAny("userIds", userIds)
                 .whereEqualTo("courseName", courseName)
+                .whereNotEqualTo("isActive", false)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {

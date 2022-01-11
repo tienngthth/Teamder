@@ -118,7 +118,7 @@ public class ReviewActivity extends AppCompatActivity {
                 .setTitle("Confirmation")
                 .setMessage("Are you sure you want to " + action + " this request?")
                 .setPositiveButton("No", (dialog, which) -> dialog.dismiss())
-                .setNegativeButton("Yes", (dialog, which) -> joinGroup(action));
+                .setNegativeButton("Yes", (dialog, which) -> processAction(action));
         AlertDialog dialog = builder.create();
         dialog.show();
         dialog.getButton(dialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.white));
@@ -126,7 +126,7 @@ public class ReviewActivity extends AppCompatActivity {
         dialog.getButton(dialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.blue_grey_500));
     }
 
-    private void joinGroup(String action) {
+    private void processAction(String action) {
         if (action.equals("approve")) {
             GroupRepository.getGroupByCourseNameByUserIds(request.getCourseName(), Arrays.asList(request.getRequesteeID(), request.getRequesterID()),
                     querySnapshot -> {
@@ -177,6 +177,14 @@ public class ReviewActivity extends AppCompatActivity {
         updateFieldToDb("groups", group2.getId(), "isActive", false);
     }
 
+    private void toGroup(String groupId) {
+        Intent intent = new Intent(ReviewActivity.this, GroupActivity.class);
+        intent.putExtra(GroupId.toString(), groupId);
+        startActivity(intent);
+        finish();
+        updateRequestStatus("approve", groupId);
+    }
+
     private void updateRequestStatus(String action, String groupId) {
         updateFieldToDb("requests", request.getId(), "status", getPastTense(action), (v) -> {
             createNotificationInDb(action, groupId);
@@ -202,14 +210,6 @@ public class ReviewActivity extends AppCompatActivity {
                 action.equals("approve") ? ApproveRequest : action.equals("reject") ? RejectRequest : CancelRequest,
                 action.equals("approve") ? groupId : request.getId());
         createNotification(notification);
-    }
-
-    private void toGroup(String groupId) {
-        Intent intent = new Intent(ReviewActivity.this, GroupActivity.class);
-        intent.putExtra(GroupId.toString(), groupId);
-        startActivity(intent);
-        finish();
-        updateRequestStatus("approve", groupId);
     }
 
     private void toReviewProfile(String pagePosition) {

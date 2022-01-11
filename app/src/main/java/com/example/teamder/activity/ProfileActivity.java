@@ -3,16 +3,12 @@ package com.example.teamder.activity;
 import static com.example.teamder.activity.ProfileActivity.Action.Explore;
 import static com.example.teamder.activity.ProfileActivity.Action.Inspect;
 import static com.example.teamder.activity.ProfileActivity.Action.Profile;
-import static com.example.teamder.activity.RequestActivity.Status.approved;
-import static com.example.teamder.activity.RequestActivity.Status.pending;
 import static com.example.teamder.model.IntentModel.IntentName.ActionType;
 import static com.example.teamder.model.IntentModel.IntentName.TeammateId;
 import static com.example.teamder.model.IntentModel.IntentName.UserId;
 import static com.example.teamder.model.IntentModel.IntentName.UserName;
 import static com.example.teamder.model.Review.parseReview;
-import static com.example.teamder.model.ToVisitUserList.countIntersectCourses;
 import static com.example.teamder.model.User.parseUser;
-import static com.example.teamder.repository.RequestRepository.getRequestsByPartiesAndStatus;
 import static com.example.teamder.repository.ReviewRepository.getReviewByUserId;
 import static com.example.teamder.repository.UserRepository.getOtherUserByFieldValue;
 import static com.example.teamder.repository.UserRepository.getUserById;
@@ -47,7 +43,6 @@ import com.example.teamder.util.ValidationUtil;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -84,37 +79,39 @@ public class ProfileActivity extends AppCompatActivity {
         if (userId != null && !action.equals(Profile)) {
             getUserById(userId, (document) -> {
                 user = parseUser(document);
-                if (action.equals(Explore)) {
-                    checkIntersectCourses();
-                } else {
-                    setUpListeners();
-                    setUpScreen();
-                }
+//                if (action.equals(Explore)) {
+//                    checkIntersectCourses();
+//                } else {
+//                    setUpListeners();
+//                    setUpScreen();
+//                }
+                setUpListeners();
+                setUpScreen();
             });
         } else {
             setUpCurrentUserScreen();
         }
     }
 
-    private void checkIntersectCourses() {
-        ArrayList<String> parties = new ArrayList<>(Arrays.asList(user.getId(), currentUser.getId()));
-        getRequestsByPartiesAndStatus(pending.toString(), parties, (snapshot) -> {
-            if (snapshot.getDocuments().size() > 0) {
-                slideAnimation = false;
-                nextUser();
-            } else {
-                getRequestsByPartiesAndStatus(approved.toString(), parties, (documentSnapshots) -> {
-                    if ((countIntersectCourses(user) - documentSnapshots.getDocuments().size()) > 0) {
-                        setUpListeners();
-                        setUpScreen();
-                    } else {
-                        slideAnimation = false;
-                        nextUser();
-                    }
-                });
-            }
-        });
-    }
+//    private void checkIntersectCourses() {
+//        ArrayList<String> parties = new ArrayList<>(Arrays.asList(user.getId(), currentUser.getId()));
+//        getRequestsByPartiesAndStatus(pending.toString(), parties, (snapshot) -> {
+//            if (snapshot.getDocuments().size() > 0) {
+//                slideAnimation = false;
+//                nextUser();
+//            } else {
+//                getRequestsByPartiesAndStatus(approved.toString(), parties, (documentSnapshots) -> {
+//                    if ((countIntersectCourses(user) - documentSnapshots.getDocuments().size()) > 0) {
+//                        setUpListeners();
+//                        setUpScreen();
+//                    } else {
+//                        slideAnimation = false;
+//                        nextUser();
+//                    }
+//                });
+//            }
+//        });
+//    }
 
     private void setUpCurrentUserScreen() {
         user = CurrentUser.getInstance().getUser();

@@ -94,7 +94,8 @@ public class ToVisitUserList {
                 final int[] requestNo = {snapshot.getDocuments().size()};
                     getRequestsByPartiesAndStatus(approved.toString(), parties, (documentSnapshots) -> {
                         requestNo[0] += documentSnapshots.getDocuments().size();
-                        if ((countIntersectCourses(user) - requestNo[0]) > 0) {
+                        int courseAvailable = (countIntersectCourses(user) - requestNo[0]);
+                        if (courseAvailable > 0) {
                             toVisitUserList.addUserID(userID);
                         }
                     });

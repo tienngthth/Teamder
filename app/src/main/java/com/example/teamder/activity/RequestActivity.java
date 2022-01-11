@@ -1,12 +1,14 @@
 package com.example.teamder.activity;
 
 import static com.example.teamder.activity.NotificationActivity.Type.NewRequest;
+import static com.example.teamder.activity.RequestActivity.Status.approved;
+import static com.example.teamder.activity.RequestActivity.Status.pending;
 import static com.example.teamder.model.IntentModel.IntentName.UserId;
 import static com.example.teamder.model.IntentModel.IntentName.UserName;
 import static com.example.teamder.model.User.parseUser;
 import static com.example.teamder.repository.NotificationRepository.createNotification;
 import static com.example.teamder.repository.RequestRepository.createRequest;
-import static com.example.teamder.repository.RequestRepository.getPendingRequestOfCourseByParties;
+import static com.example.teamder.repository.RequestRepository.getRequestOfCourseByParties;
 import static com.example.teamder.repository.UserRepository.getUserById;
 import static com.example.teamder.util.DateTimeUtil.getToday;
 import static com.example.teamder.util.ValidationUtil.validateMessage;
@@ -40,6 +42,7 @@ public class RequestActivity extends AppCompatActivity {
         rejected,
         canceled,
     }
+
     private final User currentUser = CurrentUser.getInstance().getUser();
     private final ArrayList<String> courseNames = new ArrayList<>();
     private User user = null;
@@ -94,21 +97,25 @@ public class RequestActivity extends AppCompatActivity {
             parties.add(user.getId());
             parties.add(currentUser.getId());
             if (user.getCourses().contains(course)) {
-                getPendingRequestOfCourseByParties(parties, course, (snapshot) -> {
+                getRequestOfCourseByParties(parties, course, pending.toString(), (snapshot) -> {
                     if (snapshot.getDocuments().size() == 0) {
-                        View itemView = inflater.inflate(R.layout.request_course_row, null, false);
-                        TextView courseName = itemView.findViewById(R.id.name);
-                        CheckBox checkBox = itemView.findViewById(R.id.checkbox);
-                        courseName.setText(course);
-                        coursesList.addView(itemView);
-                        checkBox.setOnCheckedChangeListener((compoundButton, isChecked) -> {
-                            if (isChecked) {
-                                courseNames.add(courseName.getText().toString());
-                            } else {
-                                courseNames.remove(courseName.getText().toString());
+                        getRequestOfCourseByParties(parties, course, approved.toString(), (documentSnapshots) -> {
+                            if (documentSnapshots.getDocuments().size() == 0) {
+                                View itemView = inflater.inflate(R.layout.request_course_row, null, false);
+                                TextView courseName = itemView.findViewById(R.id.name);
+                                CheckBox checkBox = itemView.findViewById(R.id.checkbox);
+                                courseName.setText(course);
+                                coursesList.addView(itemView);
+                                checkBox.setOnCheckedChangeListener((compoundButton, isChecked) -> {
+                                    if (isChecked) {
+                                        courseNames.add(courseName.getText().toString());
+                                    } else {
+                                        courseNames.remove(courseName.getText().toString());
+                                    }
+                                });
+                                courseName.setOnClickListener((View view) -> checkBox.setChecked(!checkBox.isChecked()));
                             }
                         });
-                        courseName.setOnClickListener((View view) -> checkBox.setChecked(!checkBox.isChecked()));
                     }
                 });
             }
@@ -126,7 +133,7 @@ public class RequestActivity extends AppCompatActivity {
         finish();
     }
 
-   private void sendRequest() {
+    private void sendRequest() {
         String messageText = validateMessage(message);
         if (messageText != null) {
             if (courseNames.size() > 0) {
