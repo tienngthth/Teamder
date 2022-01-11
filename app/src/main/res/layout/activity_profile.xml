@@ -19,11 +19,13 @@
             android:id="@+id/full_screen"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:minHeight="720dp"
             android:orientation="vertical"
-            android:visibility="gone"
             android:paddingStart="30dp"
             android:paddingTop="30dp"
-            android:paddingEnd="30dp">
+            android:paddingEnd="30dp"
+            android:visibility="gone"
+            >
 
             <ImageView
                 android:layout_width="match_parent"
@@ -33,12 +35,12 @@
                 tools:ignore="ContentDescription" />
 
             <LinearLayout
+                android:id="@+id/name_group"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/name_group"
-                android:visibility="gone"
                 android:layout_marginBottom="30dp"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -76,12 +78,12 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/introduction_group"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="30dp"
-                android:visibility="gone"
-                android:id="@+id/introduction_group"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -118,12 +120,12 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/gpa_group"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/gpa_group"
                 android:layout_marginBottom="30dp"
-                android:visibility="gone"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/gpa_text"
@@ -161,12 +163,12 @@
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="wrap_content"
-                android:visibility="gone"
-                android:layout_height="wrap_content"
                 android:id="@+id/major_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="30dp"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/end_date"
@@ -358,12 +360,12 @@
 
                 <ImageButton
                     android:id="@+id/add_course"
-                    android:visibility="gone"
                     android:layout_width="50dp"
                     android:layout_height="wrap_content"
                     android:backgroundTint="@android:color/transparent"
                     android:padding="0dp"
                     android:src="@drawable/ic_plus_circle"
+                    android:visibility="gone"
                     tools:ignore="ContentDescription,TouchTargetSizeCheck,SpeakableTextPresentCheck" />
 
             </LinearLayout>
@@ -376,12 +378,12 @@
                 android:orientation="vertical" />
 
             <LinearLayout
+                android:id="@+id/reviews_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="left"
-                android:visibility="gone"
-                android:id="@+id/reviews_title"
                 android:orientation="horizontal"
+                android:visibility="gone"
                 tools:ignore="RtlHardcoded">
 
                 <TextView
@@ -416,51 +418,61 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
                 android:gravity="bottom|center"
-                android:orientation="horizontal"
-                android:id="@+id/actions"
-                tools:ignore="NestedWeights">
+                android:orientation="vertical">
 
-                <Button
-                    android:id="@+id/pass_button"
-                    android:layout_width="0dp"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    android:background="@android:color/transparent"
-                    android:backgroundTint="@android:color/transparent"
-                    android:contentDescription="@string/cancel"
-                    android:fontFamily="@font/poppins_semibold"
-                    android:text="@string/pass"
-                    android:textAllCaps="false"
-                    android:textColor="#546E7A"
-                    android:textSize="12sp"
-                    tools:ignore="NestedWeights" />
+                <LinearLayout
+                    android:id="@+id/actions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="bottom|center"
+                    android:orientation="horizontal"
+                    tools:ignore="NestedWeights">
 
-                <Button
-                    android:id="@+id/request_button"
-                    android:layout_width="0dp"
-                    android:layout_height="40dp"
-                    android:layout_weight="1"
-                    android:fontFamily="@font/poppins_bold"
-                    android:text="@string/request"
-                    android:textAllCaps="false"
-                    android:textSize="12sp"
-                    android:background="@drawable/blue_round_item" />
+                    <Button
+                        android:id="@+id/pass_button"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:background="@android:color/transparent"
+                        android:backgroundTint="@android:color/transparent"
+                        android:contentDescription="@string/cancel"
+                        android:fontFamily="@font/poppins_semibold"
+                        android:text="@string/pass"
+                        android:textAllCaps="false"
+                        android:textColor="#546E7A"
+                        android:textSize="12sp"
+                        tools:ignore="NestedWeights" />
+
+                    <Button
+                        android:id="@+id/request_button"
+                        android:layout_width="0dp"
+                        android:layout_height="40dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/blue_round_item"
+                        android:fontFamily="@font/poppins_bold"
+                        android:text="@string/request"
+                        android:textAllCaps="false"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+                <ImageButton
+                    android:id="@+id/feedback_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/blue_grey_050"
+                    android:gravity="bottom|center"
+                    android:minHeight="48dp"
+                    app:srcCompat="@drawable/ic_comment_link"
+                    tools:ignore="SpeakableTextPresentCheck,RedundantDescriptionCheck,ImageContrastCheck" />
 
             </LinearLayout>
 
-            <ImageButton
-                android:id="@+id/feedback_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:backgroundTint="@color/blue_grey_050"
-                android:gravity="bottom|center"
-                android:minHeight="48dp"
-                app:srcCompat="@drawable/ic_comment_link"
-                tools:ignore="SpeakableTextPresentCheck,RedundantDescriptionCheck,ImageContrastCheck" />
-
         </LinearLayout>
+
 
     </ScrollView>
 

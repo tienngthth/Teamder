@@ -17,6 +17,7 @@ import static com.example.teamder.repository.UserRepository.getOtherUserByFieldV
 import static com.example.teamder.repository.UserRepository.getUserById;
 import static com.example.teamder.repository.UtilRepository.updateFieldToDb;
 import static com.example.teamder.util.ScreenUtil.clearFocus;
+import static com.example.teamder.util.ValidationUtil.validateUniqueNameInput;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -42,7 +43,6 @@ import com.example.teamder.model.Review;
 import com.example.teamder.model.ToVisitUserList;
 import com.example.teamder.model.User;
 import com.example.teamder.repository.UserRepository;
-import com.example.teamder.util.ValidationUtil;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -428,7 +428,7 @@ public class ProfileActivity extends AppCompatActivity {
         dialog.getButton(dialog.BUTTON_NEGATIVE).setBackgroundColor(getResources().getColor(R.color.red_300));
         dialog.getButton(dialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.blue_grey_500));
         dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(v -> {
-            String name = ValidationUtil.validateNameInput(editText);
+            String name = validateUniqueNameInput(editText, user.getCourses());
             if (name != null) {
                 user.addCourse(name);
                 dialog.dismiss();

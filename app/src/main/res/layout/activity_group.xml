@@ -6,129 +6,148 @@
     android:background="@drawable/background_img"
     tools:context=".activity.GroupActivity">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="20dp"
-        >
-
-        <TextView
-            android:id="@+id/course"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="60dp"
-            android:fontFamily="@font/poppins_bold"
-            android:text="@string/course"
-            android:textColor="@color/blue_900"
-            android:layout_marginBottom="20dp"
-            android:textSize="25sp" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/poppins_regular"
-            android:text="@string/status"
-            android:textSize="14sp"
-            android:textColor="@color/blue_900_70" />
-
-        <TextView
-            android:id="@+id/status"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:layout_marginTop="10dp"
-            android:fontFamily="@font/poppins_bold"
-            android:text="@string/status"
-            android:textSize="18sp"
-            android:textColor="@color/blue_900" />
-
-        <TextView
-            android:id="@+id/no_notification"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/poppins_light"
-            android:text="@string/all_team_members"
-            android:textColor="@color/blue_900"
-            android:textSize="14sp" />
+        tools:ignore="SpeakableTextPresentCheck">
 
         <LinearLayout
-            android:id="@+id/teamee_list"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="10dp"
-            android:layout_weight="1"
-            android:orientation="vertical" />
-
-        <LinearLayout
-            android:id="@+id/actions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:minHeight="700dp"
+            android:paddingStart="30dp"
+            android:paddingEnd="30dp"
+            android:paddingTop="30dp"
+            >
 
+            <TextView
+                android:id="@+id/course"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="60dp"
+                android:layout_marginBottom="20dp"
+                android:fontFamily="@font/poppins_bold"
+                android:text="@string/course"
+                android:textColor="@color/blue_900"
+                android:textSize="25sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins_regular"
+                android:text="@string/status"
+                android:textColor="@color/blue_900_70"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="20dp"
+                android:fontFamily="@font/poppins_bold"
+                android:text="@string/status"
+                android:textColor="@color/blue_900"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/no_notification"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins_light"
+                android:text="@string/all_team_members"
+                android:textColor="@color/blue_900"
+                android:textSize="14sp" />
+
+            <LinearLayout
+                android:id="@+id/teamee_list"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="10dp"
+                android:layout_weight="1"
+                android:orientation="vertical" />
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/leave_button"
-                android:layout_width="0dp"
-                android:layout_height="40dp"
+                android:layout_height="0dp"
                 android:layout_weight="1"
-                android:background="@android:color/transparent"
-                android:backgroundTint="@android:color/transparent"
-                android:contentDescription="@string/cancel"
-                android:fontFamily="@font/poppins_semibold"
-                android:text="@string/leave"
-                android:textAllCaps="false"
-                android:textColor="#546E7A"
-                android:textSize="12sp"
-                tools:ignore="NestedWeights" />
+                android:gravity="bottom|center"
+                android:orientation="vertical">
 
-            <Button
-                android:id="@+id/close_button"
-                android:layout_height="40dp"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:fontFamily="@font/poppins_bold"
-                android:text="Close group"
-                android:textAllCaps="false"
-                android:textSize="12sp"
-                android:background="@drawable/blue_round_item"
-                tools:ignore="HardcodedText" />
+                <LinearLayout
+                    android:id="@+id/actions"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/leave_button"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="1"
+                            android:background="@android:color/transparent"
+                            android:backgroundTint="@android:color/transparent"
+                            android:contentDescription="@string/cancel"
+                            android:fontFamily="@font/poppins_semibold"
+                            android:text="@string/leave"
+                            android:textAllCaps="false"
+                            android:textColor="#546E7A"
+                            android:textSize="12sp"
+                            tools:ignore="NestedWeights" />
+
+                        <Button
+                            android:id="@+id/close_button"
+                            android:layout_width="0dp"
+                            android:layout_height="40dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/blue_round_item"
+                            android:fontFamily="@font/poppins_bold"
+                            android:text="Close group"
+                            android:textAllCaps="false"
+                            android:textSize="12sp"
+                            tools:ignore="HardcodedText" />
+
+                    </LinearLayout>
+
+                    <ImageButton
+                        android:id="@+id/message"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:background="@drawable/ic_messaging_button"
+                        android:fontFamily="@font/poppins_bold"
+                        android:text="Message"
+                        android:textAllCaps="false"
+                        android:textSize="12sp"
+                        tools:ignore="HardcodedText" />
+
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/feedback_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@drawable/blue_round_item"
+                    android:text="Leave feedback"
+                    android:textAllCaps="false"
+                    android:textSize="14sp"
+                    android:visibility="gone"
+                    tools:ignore="HardcodedText" />
 
             </LinearLayout>
 
-            <ImageButton
-                android:id="@+id/message"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:layout_gravity="center"
-                android:fontFamily="@font/poppins_bold"
-                android:text="Message"
-                android:textAllCaps="false"
-                android:textSize="12sp"
-                android:background="@drawable/ic_messaging_button"
-                tools:ignore="HardcodedText" />
 
         </LinearLayout>
 
-        <Button
-            android:id="@+id/feedback_button"
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:layout_gravity="center"
-            android:text="Leave feedback"
-            android:textAllCaps="false"
-            android:visibility="gone"
-            android:textSize="14sp"
-            android:background="@drawable/blue_round_item"
-            tools:ignore="HardcodedText" />
-
-    </LinearLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

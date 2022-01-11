@@ -87,14 +87,14 @@ public class MessageActivity extends AppCompatActivity {
 
     @SuppressLint("ClickableViewAccessibility")
     private void setUpListeners() {
-        fullScreen.setOnTouchListener((view, event) -> clearInputFieldsFocus(view));
-        messages.setOnTouchListener((view, event) -> clearInputFieldsFocus(view));
+        fullScreen.setOnTouchListener((view, event) -> clearInputFieldsFocus(view, true));
+        messages.setOnTouchListener((view, event) -> clearInputFieldsFocus(view, false));
         sendButton.setOnClickListener((View view) -> sendMessage());
     }
 
-    private boolean clearInputFieldsFocus(View view) {
+    private boolean clearInputFieldsFocus(View view, Boolean returnValue) {
         clearFocus(view, messageEditText, this);
-        return true;
+        return returnValue;
 
     }
 
@@ -117,6 +117,7 @@ public class MessageActivity extends AppCompatActivity {
         for (DocumentSnapshot document : documents) {
             setupCustomItemView(messageList, Message.parseMessage(document));
         }
+        messages.post(() -> messages.fullScroll(ScrollView.FOCUS_DOWN));
     }
 
     private void noMessageFound() {

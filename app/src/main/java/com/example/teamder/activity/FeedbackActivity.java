@@ -32,6 +32,7 @@ import com.example.teamder.model.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class FeedbackActivity extends AppCompatActivity {
 
@@ -68,7 +69,9 @@ public class FeedbackActivity extends AppCompatActivity {
 
     private boolean clearInputFieldsFocus(View view) {
         for(String userId: userIds) {
-            clearFocus(view, feedbackMessages.get(userId), this);
+            if (feedbackMessages.get(userId) != null) {
+                clearFocus(view, Objects.requireNonNull(feedbackMessages.get(userId)), this);
+            }
         }
         return true;
     }

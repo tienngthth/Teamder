@@ -5,200 +5,208 @@
     android:layout_height="match_parent"
     tools:context=".activity.ReviewActivity">
 
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="20dp"
-        android:orientation="vertical">
+        tools:ignore="SpeakableTextPresentCheck">
 
         <LinearLayout
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="40dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:minHeight="700dp"
+            android:orientation="vertical"
+            android:paddingStart="30dp"
+            android:paddingEnd="30dp"
+            android:paddingTop="30dp"
+            >
 
             <LinearLayout
-                android:id="@+id/requester_avatar"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                tools:ignore="UseCompoundDrawables">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="40dp"
+                android:orientation="horizontal">
 
-                <ImageView
+                <LinearLayout
+                    android:id="@+id/requester_avatar"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    tools:ignore="UseCompoundDrawables">
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_avatar"
+                        tools:ignore="ContentDescription" />
+
+                    <TextView
+                        android:id="@+id/requester"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:fontFamily="@font/poppins_bold"
+                        android:text="@string/name"
+                        android:textColor="@color/blue_900"
+                        android:textSize="18sp" />
+                </LinearLayout>
+
+                <ImageButton
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_avatar"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/ic_next_round"
                     tools:ignore="ContentDescription" />
 
-                <TextView
-                    android:id="@+id/requester"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/poppins_bold"
-                    android:textColor="@color/blue_900"
-                    android:text="@string/name"
-                    android:textSize="18sp"
-                    android:layout_marginTop="10dp"
-                    />
-            </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/requestee_avatar"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    tools:ignore="UseCompoundDrawables">
 
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:src="@drawable/ic_next_round"
-                android:background="@android:color/transparent"
-                tools:ignore="ContentDescription" />
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_avatar"
+                        tools:ignore="ContentDescription" />
+
+                    <TextView
+                        android:id="@+id/requestee"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:fontFamily="@font/poppins_bold"
+                        android:text="@string/name"
+                        android:textColor="@color/blue_900"
+                        android:textSize="18sp" />
+                </LinearLayout>
+
+            </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/requestee_avatar"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
                 android:layout_weight="1"
-                android:gravity="center"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                tools:ignore="UseCompoundDrawables">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_avatar"
-                    tools:ignore="ContentDescription" />
+                android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/requestee"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/poppins_bold"
-                    android:textColor="@color/blue_900"
-                    android:text="@string/name"
-                    android:textSize="18sp"
+                    android:fontFamily="@font/poppins_regular"
+                    android:text="@string/course_request"
+                    android:textColor="@color/blue_900_70" />
+
+                <TextView
+                    android:id="@+id/course"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    />
+                    android:layout_marginBottom="20dp"
+                    android:fontFamily="@font/poppins_bold"
+                    android:text="@string/course_request"
+                    android:textColor="@color/blue_900"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins_regular"
+                    android:text="@string/status"
+                    android:textColor="@color/blue_900_70" />
+
+                <TextView
+                    android:id="@+id/status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="20dp"
+                    android:fontFamily="@font/poppins_bold"
+                    android:text="@string/status"
+                    android:textColor="@color/blue_900"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:fontFamily="@font/poppins_regular"
+                    android:text="@string/review_note"
+                    android:textColor="@color/blue_900_70" />
+
+                <TextView
+                    android:id="@+id/message"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="30dp"
+                    android:background="@drawable/white_list"
+                    android:fontFamily="@font/poppins_regular"
+                    android:gravity="top|start"
+                    android:importantForAutofill="no"
+                    android:padding="20dp"
+                    android:textColor="@color/blue_900"
+                    android:textSize="14sp"
+                    tools:ignore="RtlSymmetry,TextFields,DuplicateSpeakableTextCheck" />
+
             </LinearLayout>
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/poppins_regular"
-                android:text="@string/course_request"
-                android:textColor="@color/blue_900_70" />
-
-            <TextView
-                android:id="@+id/course"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:fontFamily="@font/poppins_bold"
-                android:layout_marginTop="10dp"
-                android:text="@string/course_request"
-                android:textSize="18sp"
-                android:textColor="@color/blue_900" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/poppins_regular"
-                android:text="@string/status"
-                android:textColor="@color/blue_900_70" />
-
-            <TextView
-                android:id="@+id/status"
-                android:layout_width="match_parent"
-                android:layout_marginTop="10dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:fontFamily="@font/poppins_bold"
-                android:text="@string/status"
-                android:textSize="18sp"
-                android:textColor="@color/blue_900" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:fontFamily="@font/poppins_regular"
-                android:text="@string/review_note"
-                android:textColor="@color/blue_900_70" />
-
-            <TextView
-                android:id="@+id/message"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="30dp"
-                android:background="@drawable/white_list"
-                android:fontFamily="@font/poppins_regular"
-                android:gravity="top|start"
-                android:layout_marginTop="10dp"
-                android:importantForAutofill="no"
-                android:padding="20dp"
-                android:textColor="@color/blue_900"
-                android:textSize="14sp"
-                tools:ignore="RtlSymmetry,TextFields,DuplicateSpeakableTextCheck" />
-
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/cancel_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Cancel request"
-            android:textAllCaps="false"
-            android:layout_marginBottom="10dp"
-            android:visibility="gone"
-            android:background="@drawable/blue_round_item"
-            tools:ignore="HardcodedText" />
-
-        <LinearLayout
-            android:id="@+id/actions"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="bottom|center"
-            android:orientation="horizontal"
-            android:visibility="visible"
-            tools:ignore="NestedWeights">
-
             <Button
-                android:id="@+id/reject_button"
-                android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:layout_weight="1"
-                android:background="@android:color/transparent"
-                android:backgroundTint="@android:color/transparent"
-                android:contentDescription="@string/cancel"
-                android:fontFamily="@font/poppins_semibold"
-                android:text="@string/reject"
-                android:textAllCaps="false"
-                android:textColor="#546E7A"
-                android:textSize="12sp"
-                tools:ignore="NestedWeights" />
-
-            <Button
-                android:id="@+id/approve_button"
-                android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:layout_weight="1"
-                android:fontFamily="@font/poppins_bold"
-                android:text="Approve"
-                android:textAllCaps="false"
-                android:textSize="12sp"
+                android:id="@+id/cancel_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:background="@drawable/blue_round_item"
+                android:text="Cancel request"
+                android:textAllCaps="false"
+                android:visibility="gone"
                 tools:ignore="HardcodedText" />
 
+            <LinearLayout
+                android:id="@+id/actions"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="bottom|center"
+                android:orientation="horizontal"
+                android:visibility="visible"
+                tools:ignore="NestedWeights">
+
+                <Button
+                    android:id="@+id/reject_button"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:backgroundTint="@android:color/transparent"
+                    android:contentDescription="@string/cancel"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:text="@string/reject"
+                    android:textAllCaps="false"
+                    android:textColor="#546E7A"
+                    android:textSize="12sp"
+                    tools:ignore="NestedWeights" />
+
+                <Button
+                    android:id="@+id/approve_button"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/blue_round_item"
+                    android:fontFamily="@font/poppins_bold"
+                    android:text="Approve"
+                    android:textAllCaps="false"
+                    android:textSize="12sp"
+                    tools:ignore="HardcodedText" />
+
+            </LinearLayout>
+
         </LinearLayout>
 
-    </LinearLayout>
-
+    </ScrollView>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

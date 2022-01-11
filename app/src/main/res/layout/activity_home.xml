@@ -234,8 +234,6 @@
                     android:padding="15dp">
                 </LinearLayout>
             </LinearLayout>
-
-
         </LinearLayout>
     </ScrollView>
 
