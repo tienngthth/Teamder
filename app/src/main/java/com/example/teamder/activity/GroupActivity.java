@@ -42,7 +42,7 @@ public class GroupActivity extends AppCompatActivity {
 
     private final User currentUser = CurrentUser.getInstance().getUser();
     private TextView course, status;
-    private Button closeButton, leaveButton, feedbackButton;
+    private Button closeButton, leaveButton, feedbackButton, messageButton;
     private LinearLayout teameeList, actions;
     private LayoutInflater inflater;
     private Group group;
@@ -61,6 +61,7 @@ public class GroupActivity extends AppCompatActivity {
         teameeList = findViewById(R.id.teamee_list);
         closeButton = findViewById(R.id.close_button);
         leaveButton = findViewById(R.id.leave_button);
+        messageButton = findViewById(R.id.message);
         status = findViewById(R.id.status);
         feedbackButton = findViewById(R.id.feedback_button);
         actions = findViewById(R.id.actions);
@@ -95,6 +96,7 @@ public class GroupActivity extends AppCompatActivity {
         closeButton.setOnClickListener((View view) -> openCloseConfirmationDialog());
         leaveButton.setOnClickListener((View view) -> openLeaveConfirmationDialog());
         feedbackButton.setOnClickListener((View view) -> toFeedbackActivity());
+        messageButton.setOnClickListener((View view) -> viewMessage());
     }
 
 
@@ -151,6 +153,11 @@ public class GroupActivity extends AppCompatActivity {
             intent.putExtra(ActionType.toString(), Review.toString());
             intent.putExtra(UserId.toString(), userID);
         }
+        startActivity(intent);
+    }
+
+    private void viewMessage() {
+        Intent intent = new Intent(GroupActivity.this, MessageActivity.class);
         startActivity(intent);
     }
 

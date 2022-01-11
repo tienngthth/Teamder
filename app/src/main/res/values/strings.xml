@@ -16,6 +16,7 @@
     <string name="past_notifications">Past notifications</string>
     <string name="new_notifications">New notifications</string>
     <string name="no_notification">You don\'t have any notifications</string>
+    <string name="no_message">You don\'t have any messages</string>
     <string name="top_background">top background</string>
     <string name="home_welcome">Hi</string>
     <string name="home_username" />
