@@ -10,9 +10,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.telephony.TelephonyManager;
+
 import com.example.teamder.model.CurrentUser;
 import com.example.teamder.model.Notification;
 import com.example.teamder.model.User;
+import com.google.firebase.firestore.DocumentSnapshot;
+
+import java.util.List;
 
 public class Receiver extends BroadcastReceiver {
 
@@ -37,8 +41,9 @@ public class Receiver extends BroadcastReceiver {
                 getNotificationByUserIdAndMessage(currentUser.getId(), message, (querySnapshot) ->  {
                     if (querySnapshot.getDocuments().size() == 0) {
                         getUserByFieldValue("phone", phoneNumber, (documentSnapshots) -> {
-                            if (documentSnapshots.getDocuments().size() > 0) {
-                                createNotification(new Notification(message, currentUser.getId(), Suggestion));
+                            List<DocumentSnapshot> documents = documentSnapshots.getDocuments();
+                            if (documents.size() > 0) {
+                                createNotification(new Notification(message, currentUser.getId(), Suggestion, documents.get(0).getString("id")));
                             }
                         });
                     }

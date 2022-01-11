@@ -1,94 +1,135 @@
 package com.example.teamder.activity;
 
 import static com.example.teamder.activity.NotificationActivity.Type.Feedback;
+import static com.example.teamder.model.Group.parseGroup;
+import static com.example.teamder.model.IntentModel.IntentName.GroupId;
+import static com.example.teamder.model.IntentModel.IntentName.UserId;
 import static com.example.teamder.model.User.parseUser;
+import static com.example.teamder.repository.GroupRepository.getGroupById;
 import static com.example.teamder.repository.NotificationRepository.createNotification;
 import static com.example.teamder.repository.ReviewRepository.createReview;
 import static com.example.teamder.repository.UserRepository.getUserById;
-import static com.example.teamder.util.DateTimeUtil.getToday;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.teamder.R;
+import com.example.teamder.model.CurrentUser;
 import com.example.teamder.model.Notification;
 import com.example.teamder.model.Review;
 import com.example.teamder.model.User;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public class FeedbackActivity extends AppCompatActivity {
 
-    private User user = null;
-    private TextView name, feedback;
-    private String userName = null;
-    private String userID = null;
-    private Button cancelButton;
-    private ImageButton sendButton;
-    private ProfileActivity.Action action;
+    private final User currentUser = CurrentUser.getInstance().getUser();
+    private Button sendButton, cancelButton;
+    private LinearLayout feedbackListView, fullConstraint;
+    private ArrayList<String> userIds = new ArrayList<>();
+    private LayoutInflater inflater;
+    private HashMap<String, EditText> feedbackMessages = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_feedback);
         initialiseVariables();
+        setUpListeners();
         checkIntent();
-        getUserById(userID, (document) -> {
-            user = parseUser(document);
-            setUpScreen();
-            setUpListeners();
-        });
     }
 
     private void initialiseVariables() {
-        name = findViewById(R.id.name);
         cancelButton = findViewById(R.id.cancel_button);
+        feedbackListView = findViewById(R.id.feedback_list);
         sendButton = findViewById(R.id.send_button);
-        feedback = findViewById(R.id.feedback);
+        fullConstraint = findViewById(R.id.feedback_activity);
+        inflater = LayoutInflater.from(this);
     }
+
+    private void setUpListeners() {
+        sendButton.setOnClickListener((View view) -> sendFeedback());
+        cancelButton.setOnClickListener((View view) -> finish());
+    }
+
 
     private void checkIntent() {
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
-            userName = bundle.getString("userName");
-            userID = bundle.getString("userID");
-            action = ProfileActivity.Action.valueOf(bundle.getString("action"));
+            String userId = bundle.getString(UserId.toString());
+            String groupId = bundle.getString(GroupId.toString());
+            if (userId != null) {
+                userIds.add(userId);
+                generateInputForm();
+            } else {
+                getGroupById(groupId, (documentSnapshot) -> {
+                    userIds = parseGroup(documentSnapshot).getUserIds();
+                    if (userIds.size() > 1 || !userIds.contains(currentUser.getId())) {
+                        fullConstraint.setVisibility(View.VISIBLE);
+                        generateInputForm();
+                    } else {
+                        finish();
+                    }
+                });
+            }
         }
     }
 
-    private void setUpScreen() {
-        name.setText(userName);
+    private void generateInputForm() {
+        feedbackListView.removeAllViews();
+        for (String userId: userIds) {
+            if (!currentUser.getId().equals(userId)) {
+                getUserById(userId, (documentSnapshot -> {
+                    setupCustomReceivedRequestView(parseUser(documentSnapshot));
+                }));
+            }
+        }
     }
 
-    private void setUpListeners() {
-        cancelButton.setOnClickListener((View view) -> cancel());
-        sendButton.setOnClickListener((View view) -> sendFeedback());
-    }
-
-    private void cancel() {
-        finish();
+    @SuppressLint("SetTextI18n, InflateParams")
+    private void setupCustomReceivedRequestView(User user) {
+        View itemView = inflater.inflate(R.layout.feedback_input, null, false);
+        EditText editText = itemView.findViewById(R.id.feedback);
+        ((TextView) itemView.findViewById(R.id.name)).setText("To " + user.getName());
+        feedbackListView.addView(itemView);
+        feedbackMessages.put(user.getId(), editText);
     }
 
     private void sendFeedback() {
-        String messageText = feedback.getText().toString();
-        if (messageText.trim().equals("")) {
-            Toast.makeText(this, "Message can not be empty.", Toast.LENGTH_LONG).show();
-        } else {
-            Toast.makeText(this, "Thank you for your review!", Toast.LENGTH_LONG).show();
-            createNotification(new Notification(" You have a new feedback from your friend.", user.getId(), Feedback));
-            createReview(new Review(userID, messageText, getToday()));
-            if (action != null) {
-                Intent intent = new Intent(FeedbackActivity.this, CourseActivity.class);
-                setResult(RESULT_OK, intent);
+        for (String userId: userIds) {
+            EditText editText = feedbackMessages.get(userId);
+            if (editText != null) {
+                String message = editText.getText().toString().trim();
+                if (!message.equals("")) {
+                    createReview(new Review(userId, message));
+                    createNotificationInDb(userId);
+                }
             }
-            finish();
         }
+        displayToast();
+        finish();
+    }
+
+    private void displayToast() {
+        String reviewSuccess = "Thank you for your review!";
+        Toast.makeText(this, reviewSuccess, Toast.LENGTH_LONG).show();
+    }
+
+    private void createNotificationInDb(String userId) {
+        String newFeedbackNotification = "You have a new feedback from your friend.";
+        createNotification(new Notification(newFeedbackNotification, userId, Feedback));
     }
 
 }

@@ -1,12 +1,21 @@
 package com.example.teamder.model;
 
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
+import static com.example.teamder.activity.RequestActivity.Status.approved;
+import static com.example.teamder.activity.RequestActivity.Status.pending;
+import static com.example.teamder.model.User.parseUser;
+import static com.example.teamder.repository.RequestRepository.getRequestsByPartiesAndStatus;
+import static com.example.teamder.repository.UserRepository.getUserById;
+import static com.example.teamder.repository.UtilRepository.updateFieldToDb;
+
+import com.example.teamder.repository.UserRepository;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ToVisitUserList {
 
+    private static final User currentUser = CurrentUser.getInstance().getUser();
     private volatile static ToVisitUserList toVisitUserList;
 
     private final ArrayList<String> userIDs = new ArrayList<>();
@@ -42,18 +51,62 @@ public class ToVisitUserList {
     }
 
     public void removeUserID() {
-        userIDs.remove(0);
+        if (userIDs.size() > 0) {
+            userIDs.remove(0);
+        }
     }
 
     public ArrayList<String> getUserIDs() {
         return userIDs;
     }
 
-    public void generateUsersList(QuerySnapshot querySnapshot) {
-        this.removeAllUserIDs();
-        for (QueryDocumentSnapshot document : querySnapshot) {
-            this.addUserID(document.getId());
+    public void resetList() {
+        currentUser.setVisitedTeameeIDs(new ArrayList<String>());
+        updateFieldToDb("users", currentUser.getId(), "visitedTeameeIDs", currentUser.getVisitedTeameeIDs());
+        userIDs.removeAll(userIDs);
+        if (currentUser.getCourses().size() > 0) {
+            UserRepository.getOtherUsersByCourse(
+                    currentUser.getCourses(),
+                    (QuerySnapshot) -> {
+                        for (DocumentSnapshot document : QuerySnapshot.getDocuments()) {
+                            String userID = document.getId();
+                            if (ableToVisit(userID)) {
+                                checkIntersectCourse(userID);
+                            }
+                        }
+                    }
+            );
         }
+    }
+
+    private boolean ableToVisit(String userID) {
+        return !toVisitUserList.getUserIDs().contains(userID)
+                && !userID.equals(currentUser.getId())
+                && !currentUser.getVisitedTeameeIDs().contains(userID);
+    }
+
+
+    private void checkIntersectCourse(String userID) {
+        getUserById(userID, (documentSnapshot -> {
+            User user = parseUser(documentSnapshot);
+            ArrayList<String> parties = new ArrayList<>(Arrays.asList(userID, currentUser.getId()));
+            getRequestsByPartiesAndStatus(pending.toString(), parties, (snapshot) -> {
+                final int[] requestNo = {snapshot.getDocuments().size()};
+                    getRequestsByPartiesAndStatus(approved.toString(), parties, (documentSnapshots) -> {
+                        requestNo[0] += documentSnapshots.getDocuments().size();
+                        if ((countIntersectCourses(user) - requestNo[0]) > 0) {
+                            toVisitUserList.addUserID(userID);
+                        }
+                    });
+                }
+            );
+        }));
+    }
+
+    public static int countIntersectCourses(User user) {
+        ArrayList<String> intersectCourses = new ArrayList<>(user.getCourses());
+        intersectCourses.retainAll(currentUser.getCourses());
+        return intersectCourses.size();
     }
 
 }

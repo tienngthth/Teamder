@@ -12,6 +12,7 @@ public class Notification {
     private String userId;
     private String id;
     private Type type;
+    private String objectId;
     private boolean hasPushed = false;
     private boolean isSeen = false;
 
@@ -24,12 +25,20 @@ public class Notification {
         this.type = type;
     }
 
+    public Notification(String message, String userId, Type type, String objectId) {
+        this.message = message;
+        this.userId = userId;
+        this.type = type;
+        this.objectId = objectId;
+    }
+
     public static Notification parseNotification(DocumentSnapshot document) {
         Notification notification = new Notification();
         notification.setMessage(document.getString("message"));
         notification.setTimeStamp(document.getString("timeStamp"));
         notification.setType(Type.valueOf(document.getString("type")));
         notification.setId(document.getId());
+        notification.setObjectId(document.getString("objectId"));
         return notification;
     }
 
@@ -87,5 +96,13 @@ public class Notification {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getObjectId() {
+        return objectId;
+    }
+
+    public void setObjectId(String objectId) {
+        this.objectId = objectId;
     }
 }

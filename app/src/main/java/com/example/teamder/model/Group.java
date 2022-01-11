@@ -5,16 +5,31 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import java.util.ArrayList;
 
 public class Group {
-    private String uid;
-    private ArrayList<String> userIds;
-    private String courseId;
 
-    public String getUid() {
-        return uid;
+    private String id;
+    private ArrayList<String> userIds;
+    private String courseName;
+    private Boolean isActive = true;
+
+    public Group(ArrayList<String> userIds, String courseName) {
+        this.userIds = userIds;
+        this.courseName = courseName;
     }
 
-    public void setUid(String uid) {
-        this.uid = uid;
+    public Boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public ArrayList<String> getUserIds() {
@@ -25,19 +40,24 @@ public class Group {
         this.userIds = userIds;
     }
 
-    public String getCourseIDs() {
-        return courseId;
+    public String getCourseName() {
+        return courseName;
     }
 
-    public void setCourseIDs(String courseIDs) {
-        this.courseId = courseIDs;
+    public void setCourseName(String courseName) {
+        this.courseName = courseName;
+    }
+
+    public Group() {
     }
 
     public static Group parseGroup(DocumentSnapshot document) {
         Group group = new Group();
-        group.setUid(document.getId());
-        group.setUserIds((ArrayList<String>) document.get("userIds"));
-        group.setCourseIDs(document.getString("courseIDs"));
+        group.setId(document.getId());
+        ArrayList<String> userIds = (ArrayList<String>) document.getData().get("userIds");
+        group.setUserIds(userIds);
+        group.setCourseName(document.getString("courseName"));
+        group.setIsActive(document.getBoolean("isActive"));
         return group;
     }
 }

@@ -1,12 +1,15 @@
 package com.example.teamder.activity;
 
 import static com.example.teamder.activity.NotificationActivity.Type.NewRequest;
+import static com.example.teamder.model.IntentModel.IntentName.UserId;
+import static com.example.teamder.model.IntentModel.IntentName.UserName;
 import static com.example.teamder.model.User.parseUser;
+import static com.example.teamder.repository.NotificationRepository.createNotification;
 import static com.example.teamder.repository.RequestRepository.createRequest;
 import static com.example.teamder.repository.RequestRepository.getPendingRequestOfCourseByParties;
 import static com.example.teamder.repository.UserRepository.getUserById;
-import static com.example.teamder.repository.NotificationRepository.createNotification;
 import static com.example.teamder.util.DateTimeUtil.getToday;
+import static com.example.teamder.util.ValidationUtil.validateMessage;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,7 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.ImageButton;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,14 +34,20 @@ import java.util.ArrayList;
 
 public class RequestActivity extends AppCompatActivity {
 
+    public enum Status {
+        pending,
+        approved,
+        rejected,
+        canceled,
+    }
     private final User currentUser = CurrentUser.getInstance().getUser();
     private final ArrayList<String> courseNames = new ArrayList<>();
     private User user = null;
-    private TextView name, message;
+    private TextView name;
+    private EditText message;
     private String userName = null;
     private String userID = null;
-    private Button cancelButton;
-    private ImageButton sendButton;
+    private Button cancelButton, sendButton;
     private LinearLayout coursesList;
     private LayoutInflater inflater;
 
@@ -68,8 +77,8 @@ public class RequestActivity extends AppCompatActivity {
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
-            userName = bundle.getString("userName");
-            userID = bundle.getString("userID");
+            userName = bundle.getString(UserName.toString());
+            userID = bundle.getString(UserId.toString());
         }
     }
 
@@ -117,20 +126,36 @@ public class RequestActivity extends AppCompatActivity {
         finish();
     }
 
-    private void sendRequest() {
-        String messageText = message.getText().toString();
-        if (courseNames.size() > 0) {
-            for (String course : courseNames) {
-                Request request = new Request(course, getToday(), currentUser.getId(), messageText, user.getId());
-                Notification notification = new Notification(currentUser.getName() + " sends you a request for course " + course + ".", user.getId(), NewRequest);
-                createRequest(request);
-                createNotification(notification);
+   private void sendRequest() {
+        String messageText = validateMessage(message);
+        if (messageText != null) {
+            if (courseNames.size() > 0) {
+                for (String course : courseNames) {
+                    createRequestAndNotificationInDb(course, messageText);
+                }
+                navigateUser();
+            } else {
+                Toast.makeText(this, "Please select some courses.", Toast.LENGTH_LONG).show();
             }
-            Intent intent = new Intent(RequestActivity.this, ProfileActivity.class);
-            setResult(RESULT_OK, intent);
-            finish();
-        } else {
-            Toast.makeText(this, "Please select some courses", Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void createRequestAndNotificationInDb(String course, String messageText) {
+        Request request = new Request(course, getToday(), currentUser.getId(), messageText, user.getId());
+        createRequest(request, (documentReference) -> {
+            Notification notification = new Notification(
+                    currentUser.getName() + " sends you a request for course " + course + ".",
+                    user.getId(),
+                    NewRequest,
+                    documentReference.getId()
+            );
+            createNotification(notification);
+        });
+    }
+
+    private void navigateUser() {
+        Intent intent = new Intent(RequestActivity.this, ProfileActivity.class);
+        setResult(RESULT_OK, intent);
+        finish();
     }
 }
