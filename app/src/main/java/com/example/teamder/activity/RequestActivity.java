@@ -20,6 +20,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,6 +32,8 @@ import com.example.teamder.model.CurrentUser;
 import com.example.teamder.model.Notification;
 import com.example.teamder.model.Request;
 import com.example.teamder.model.User;
+import com.google.firebase.storage.FirebaseStorage;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -51,6 +54,7 @@ public class RequestActivity extends AppCompatActivity {
     private String userID = null;
     private Button cancelButton, sendButton;
     private LinearLayout coursesList, fullScreen, actions;
+    private ImageView avatar;
     private LayoutInflater inflater;
 
     @Override
@@ -72,6 +76,7 @@ public class RequestActivity extends AppCompatActivity {
         sendButton = findViewById(R.id.send_button);
         coursesList = findViewById(R.id.courses_list);
         message = findViewById(R.id.message);
+        avatar = findViewById(R.id.avatar);
         fullScreen = findViewById(R.id.full_screen);
         actions = findViewById(R.id.actions);
         inflater = LayoutInflater.from(this);
@@ -87,7 +92,19 @@ public class RequestActivity extends AppCompatActivity {
 
     private void setUpScreen() {
         name.setText(user.getName());
+        updateUserAvatar();
         setUpCourseList();
+    }
+
+    private void updateUserAvatar() {
+        FirebaseStorage
+                .getInstance()
+                .getReference()
+                .child(user.getId())
+                .getDownloadUrl()
+                .addOnSuccessListener(
+                        uri -> Picasso.get().load(uri).into(avatar)
+                );
     }
 
     private void setUpCourseList() {

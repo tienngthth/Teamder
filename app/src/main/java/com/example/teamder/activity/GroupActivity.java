@@ -23,6 +23,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,6 +38,8 @@ import com.example.teamder.model.Notification;
 import com.example.teamder.model.User;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.storage.FirebaseStorage;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -150,7 +153,19 @@ public class GroupActivity extends AppCompatActivity {
             nameView.setText(user.getName());
             itemView.setOnClickListener((View view) -> reviewProfile(user.getId()));
             teameeList.addView(itemView);
+            updateUserAvatar(user.getId(), (ImageView) itemView.findViewById(R.id.avatar));
         });
+    }
+
+    private void updateUserAvatar(String userId, ImageView avatar) {
+        FirebaseStorage
+                .getInstance()
+                .getReference()
+                .child(userId)
+                .getDownloadUrl()
+                .addOnSuccessListener(
+                        uri -> Picasso.get().load(uri).into(avatar)
+                );
     }
 
     private void reviewProfile(String userID) {

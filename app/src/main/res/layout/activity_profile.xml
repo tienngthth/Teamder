@@ -31,28 +31,30 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                app:cardCornerRadius="25dp"
+                app:cardCornerRadius="30dp"
                 app:cardPreventCornerOverlap="false">
 
                 <ImageView
                     android:id="@+id/avatar"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:src="@drawable/ic_avatar"
                     tools:ignore="ContentDescription" />
 
             </androidx.cardview.widget.CardView>
 
-
-
-            <ImageButton
+            <Button
                 android:id="@+id/change_profile"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/blue_grey_050"
+                android:textColor="@color/blue_900"
+                android:fontFamily="@font/poppins_light"
                 android:gravity="bottom|center"
+                android:textSize="12sp"
                 android:minHeight="48dp"
-                app:srcCompat="@drawable/ic_comment_link"
+                android:text="@string/upload_photo"
+                android:textAllCaps="false"
+                android:background="@android:color/transparent"
                 tools:ignore="SpeakableTextPresentCheck,RedundantDescriptionCheck,ImageContrastCheck" />
 
             <LinearLayout

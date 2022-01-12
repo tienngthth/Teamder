@@ -124,7 +124,7 @@ public class NotificationActivity extends AppCompatActivity {
     private void setupCustomItemView(LinearLayout list, Notification notification) {
         View itemView = inflater.inflate(R.layout.notification_row, null, false);
         ((TextView) itemView.findViewById(R.id.message)).setText(notification.getMessage());
-        ((TextView) itemView.findViewById(R.id.timestamp)).setText(notification.getTimeStamp());
+        ((TextView) itemView.findViewById(R.id.timestamp)).setText(notification.getTimeStamp().substring(0, notification.getTimeStamp().length() - 7));
         list.addView(itemView);
         itemView.setOnClickListener((view -> navigateUser(notification)));
     }

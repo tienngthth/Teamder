@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,6 +40,8 @@ import com.example.teamder.model.User;
 import com.example.teamder.repository.GroupRepository;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.storage.FirebaseStorage;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,8 +53,10 @@ public class ReviewActivity extends AppCompatActivity {
     private TextView requester, requestee, message, course, status;
     private Button rejectButton, cancelButton, approveButton;
     private String position;
-    private LinearLayout actions, requesterAvatar, requesteeAvatar;
+    private LinearLayout actions;
     private Request request;
+    private ImageView requesterAvatar, requesteeAvatar;
+    private LinearLayout requesterGroup, requesteeGroup;
     public static ListenerRegistration requestListenerRegistration;
     private String id;
 
@@ -72,8 +77,10 @@ public class ReviewActivity extends AppCompatActivity {
         rejectButton = findViewById(R.id.reject_button);
         approveButton = findViewById(R.id.approve_button);
         actions = findViewById(R.id.actions);
-        requesterAvatar = findViewById(R.id.requester_avatar);
-        requesteeAvatar = findViewById(R.id.requestee_avatar);
+        requesterAvatar = findViewById(R.id.avatar_requester);
+        requesteeAvatar = findViewById(R.id.avatar_requestee);
+        requesterGroup = findViewById(R.id.requester_group);
+        requesteeGroup = findViewById(R.id.requestee_group);
         status = findViewById(R.id.status);
     }
 
@@ -96,14 +103,27 @@ public class ReviewActivity extends AppCompatActivity {
         getUserById(request.getRequesteeID(), (documentSnapshot -> {
             User user = parseUser(documentSnapshot);
             requestee.setText(user.getName());
+            updateUserAvatar(user.getId(), requesteeAvatar);
         }));
         getUserById(request.getRequesterID(), (documentSnapshot -> {
             User user = parseUser(documentSnapshot);
             requester.setText(user.getName());
+            updateUserAvatar(user.getId(), requesterAvatar);
         }));
         status.setText(request.getStatus());
         cancelButton.setVisibility(position.equals("sent") && request.getStatus().equals(pending.toString()) ? View.VISIBLE : View.GONE);
         actions.setVisibility(position.equals("received") && request.getStatus().equals(pending.toString()) ? View.VISIBLE : View.GONE);
+    }
+
+    private void updateUserAvatar(String userId, ImageView view) {
+        FirebaseStorage
+                .getInstance()
+                .getReference()
+                .child(userId)
+                .getDownloadUrl()
+                .addOnSuccessListener(
+                        uri -> Picasso.get().load(uri).into(view)
+                );
     }
 
     private void setUpListeners() {

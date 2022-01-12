@@ -1,16 +1,22 @@
 package com.example.teamder.activity;
 
+import static com.example.teamder.activity.NotificationActivity.Type.GroupChange;
 import static com.example.teamder.activity.ProfileActivity.Action.Explore;
 import static com.example.teamder.activity.ProfileActivity.Action.Inspect;
 import static com.example.teamder.activity.ProfileActivity.Action.Profile;
 import static com.example.teamder.activity.RequestActivity.Status.approved;
+import static com.example.teamder.activity.RequestActivity.Status.canceled;
 import static com.example.teamder.activity.RequestActivity.Status.pending;
+import static com.example.teamder.model.Group.parseGroup;
 import static com.example.teamder.model.IntentModel.IntentName.ActionType;
 import static com.example.teamder.model.IntentModel.IntentName.TeammateId;
 import static com.example.teamder.model.IntentModel.IntentName.UserId;
 import static com.example.teamder.model.IntentModel.IntentName.UserName;
 import static com.example.teamder.model.Review.parseReview;
 import static com.example.teamder.model.User.parseUser;
+import static com.example.teamder.repository.GroupRepository.getGroupByCourseNameByUserIds;
+import static com.example.teamder.repository.NotificationRepository.createNotification;
+import static com.example.teamder.repository.RequestRepository.getRequestByUserIdStatusAndCourseName;
 import static com.example.teamder.repository.RequestRepository.getRequestsByPartiesAndStatus;
 import static com.example.teamder.repository.ReviewRepository.getReviewByUserId;
 import static com.example.teamder.repository.UserRepository.getOtherUserByFieldValue;
@@ -21,7 +27,6 @@ import static com.example.teamder.util.ScreenUtil.clearFocus;
 import static com.example.teamder.util.ValidationUtil.validateUniqueNameInput;
 
 import android.annotation.SuppressLint;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -29,7 +34,6 @@ import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -45,10 +49,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.teamder.R;
 import com.example.teamder.model.CurrentUser;
+import com.example.teamder.model.Group;
+import com.example.teamder.model.Notification;
 import com.example.teamder.model.Review;
 import com.example.teamder.model.ToVisitUserList;
 import com.example.teamder.model.User;
 import com.example.teamder.repository.UserRepository;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.FirebaseStorage;
@@ -57,6 +64,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -74,9 +82,9 @@ public class ProfileActivity extends AppCompatActivity {
     private String userId = null;
     private EditText name, major, sID, GPA, introduction, phone, email;
     private View phoneLine, nameLine, majorLine, sIDLine, GPALine, introductionLine;
-    private ImageButton addCourseButton, feedbackButton, changeProfileButton;
+    private ImageButton addCourseButton, feedbackButton;
     private ImageView avatar;
-    private Button passButton, requestButton;
+    private Button passButton, requestButton, changeProfileButton;
     private LayoutInflater inflater;
     private LinearLayout reviewTitle, reviewList, courseList, fullscreenConstraint, actions, emailGroup, sIdGroup, phoneGroup, nameGroup, majorGroup, gpaGroup, introductionGroup;
     private Action action = Profile;
@@ -90,6 +98,14 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
         initialiseVariables();
         checkActionType();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (action.equals(Profile)){
+            updateUserInformation();
+        }
     }
 
     private void initialiseVariables() {
@@ -214,6 +230,7 @@ public class ProfileActivity extends AppCompatActivity {
         requestButton.setOnClickListener((View view) -> toRequest());
         feedbackButton.setOnClickListener((View view) -> toFeedback());
         changeProfileButton.setOnClickListener(view -> changeAvatar());
+        avatar.setOnClickListener(view -> changeAvatar());
     }
 
     private void changeAvatar() {
@@ -228,11 +245,15 @@ public class ProfileActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, intent);
         if (requestCode == 1000) {
             if (resultCode == RESULT_OK) {
-                Uri uri = intent.getData();
-                StorageReference file = FirebaseStorage.getInstance().getReference().child(currentUser.getId());
-                file.putFile(uri);
+                putFileToStorage(intent.getData());
+                avatar.setImageURI(intent.getData());
             }
         }
+    }
+
+    private void putFileToStorage(Uri uri) {
+        StorageReference file = FirebaseStorage.getInstance().getReference().child(currentUser.getId());
+        file.putFile(uri);
     }
 
     private void toRequest() {
@@ -253,20 +274,13 @@ public class ProfileActivity extends AppCompatActivity {
         toVisitUserList.removeUserID();
         currentUser.addVisitedTeameeIDs(userId);
         updateFieldToDb("users", CurrentUser.getInstance().getUser().getId(), "visitedTeameeIDs", currentUser.getVisitedTeameeIDs());
-        if (isAlreadyVisited()) {
-            toVisitUserList.removeUserID();
-        } else if (toVisitUserList.getUserIDs().size() > 0) {
+        if (toVisitUserList.getUserIDs().size() > 0) {
             toNextUserProfile();
         } else {
             toVisitUserList.resetList();
             Toast.makeText(this, "No more potential teammate found", Toast.LENGTH_LONG).show();
             finish();
         }
-    }
-
-    private Boolean isAlreadyVisited() {
-        int toVisitSize = toVisitUserList.getUserIDs().size();
-        return (toVisitSize > 0) && !currentUser.getVisitedTeameeIDs().contains(toVisitUserList.getUserID( toVisitSize - 1));
     }
 
     private void toNextUserProfile() {
@@ -303,20 +317,31 @@ public class ProfileActivity extends AppCompatActivity {
         sIdGroup.setVisibility(showDetails ? View.VISIBLE : View.GONE);
         phoneGroup.setVisibility(showDetails ? View.VISIBLE : View.GONE);
         emailGroup.setVisibility(showDetails ? View.VISIBLE : View.GONE);
-        nameGroup.setVisibility(!user.getName().equals("") ? View.VISIBLE : View.GONE);
-        gpaGroup.setVisibility(!user.getGpa().equals("") ? View.VISIBLE : View.GONE);
-        majorGroup.setVisibility(!user.getMajor().equals("") ? View.VISIBLE : View.GONE);
+        nameGroup.setVisibility((action.equals(Profile) || !user.getName().equals("")) ? View.VISIBLE : View.GONE);
+        gpaGroup.setVisibility((action.equals(Profile) || !user.getGpa().equals("")) ? View.VISIBLE : View.GONE);
+        majorGroup.setVisibility((action.equals(Profile) || !user.getMajor().equals("")) ? View.VISIBLE : View.GONE);
         introductionGroup.setVisibility(!user.getIntroduction().equals("") ? View.VISIBLE : View.GONE);
         setUpCoursesList();
         setUpReviewsList();
         setEditable();
         fullscreenConstraint.setVisibility(View.VISIBLE);
-        FirebaseStorage.getInstance().getReference().child(user.getId()).getDownloadUrl().addOnSuccessListener(
-                uri ->  Picasso.get().load(uri).into(avatar)
-        );
+        updateUserAvatar();
+    }
+
+    private void updateUserAvatar() {
+        FirebaseStorage
+                .getInstance()
+                .getReference()
+                .child(user.getId())
+                .getDownloadUrl()
+                .addOnSuccessListener(
+                        uri -> Picasso.get().load(uri).into(avatar)
+                );
     }
 
     private void setEditable() {
+        changeProfileButton.setVisibility(action.equals(Profile) ? View.VISIBLE : View.GONE);
+        avatar.setClickable(action.equals(Profile));
         addCourseButton.setVisibility(action.equals(Profile) ? View.VISIBLE : View.GONE);
         majorLine.setVisibility(action.equals(Profile) ? View.VISIBLE : View.GONE);
         nameLine.setVisibility(action.equals(Profile) ? View.VISIBLE : View.GONE);
@@ -363,7 +388,7 @@ public class ProfileActivity extends AppCompatActivity {
         Review review = parseReview(snapshot);
         View itemView = inflater.inflate(R.layout.notification_row, null, false);
         ((TextView) itemView.findViewById(R.id.message)).setText(review.getComment());
-        ((TextView) itemView.findViewById(R.id.timestamp)).setText(review.getTimeStamp());
+        ((TextView) itemView.findViewById(R.id.timestamp)).setText(review.getTimeStamp().substring(0, review.getTimeStamp().length() - 7));
         reviewList.addView(itemView);
     }
 
@@ -388,14 +413,63 @@ public class ProfileActivity extends AppCompatActivity {
         itemView.findViewById(R.id.remove_course).setVisibility(action.equals(Profile) ? View.VISIBLE : View.GONE);
         if (action.equals(Profile)) {
             itemView.findViewById(R.id.remove_course).setOnClickListener((View view) -> {
-                user.removeCourse(index);
-                updateFieldToDb("users", user.getId(), "courses", user.getCourses());
-                setUpCoursesList();
+                //open confirmation
+                removeCourse(name, index);
             });
         }
         courseList.addView(itemView);
     }
 
+
+
+    private void removeCourse(String courseName, int index) {
+        user.removeCourse(index);
+        updateFieldToDb("users", user.getId(), "courses", user.getCourses());
+        setUpCoursesList();
+        getGroupByCourseNameByUserIds(courseName, Arrays.asList(user.getId()), (querySnapshot) -> {
+            if (querySnapshot.getDocuments().size() > 0) {
+                leaveGroup(parseGroup(querySnapshot.getDocuments().get(0)));
+            }
+        });
+        cancelPendingRequests(courseName);
+    }
+
+    private void leaveGroup(Group group) {
+        group.getUserIds().remove(currentUser.getId());
+        updateFieldToDb("groups", group.getId(), "userIds", group.getUserIds());
+        pushNotification(currentUser.getName() + " has left your group for course " + group.getCourseName() + ".", group);
+        updateRequestStatus(currentUser.getId(), group.getCourseName());
+        if (group.getUserIds().size() == 0) {
+            updateFieldToDb("groups", group.getId(), "isActive", false);
+            pushNotification("Your group for course " + group.getCourseName() + " has been closed by " + currentUser.getName() + ".", group);
+        }
+    }
+
+    private void pushNotification(String message, Group group) {
+        for (String userId : group.getUserIds()) {
+            if (!currentUser.getId().equals(userId)) {
+                createNotification(new Notification(message, userId, GroupChange, group.getId()));
+            }
+        }
+    }
+
+    private void updateRequestStatus(String userId, String courseName) {
+        getRequestByUserIdStatusAndCourseName(userId, approved.toString(), courseName, (documentSnapshots) -> {
+            List<DocumentSnapshot> documents = documentSnapshots.getDocuments();
+            for (DocumentSnapshot documentSnapshot : documents) {
+                updateFieldToDb("requests", documentSnapshot.getId(), "status", "done");
+            }
+        });
+    }
+
+    private void cancelPendingRequests(String courseName) {
+        getRequestByUserIdStatusAndCourseName(user.getId(), pending.toString(), courseName, (documentSnapshots) -> {
+            for (DocumentSnapshot documentSnapshot: documentSnapshots.getDocuments()) {
+                updateFieldToDb("requests", documentSnapshot.getId(), "status", canceled.toString());
+            }
+            // notify
+        });
+    }
 
     private void updateUserInformation() {
         checkChangesAndUpdate(name, user.getName(), "name");

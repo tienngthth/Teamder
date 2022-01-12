@@ -182,7 +182,7 @@ public class HomeActivity extends AppCompatActivity {
     private void setupCustomReceivedRequestView(Request request, int index) {
         View itemView = inflater.inflate(R.layout.requests_row, null, false);
         ImageButton nextBtn = itemView.findViewById(R.id.next_button);
-        ((TextView) itemView.findViewById(R.id.time)).setText(request.getTimeStamp());
+        ((TextView) itemView.findViewById(R.id.time)).setText(request.getTimeStamp().substring(0, request.getTimeStamp().length() - 7));
         ((TextView) itemView.findViewById(R.id.course)).setText(request.getCourseName());
         if (index % 2 == 0) {
             itemView.findViewById(R.id.row_linear).setBackgroundColor(getResources().getColor(R.color.blue_grey_050));
@@ -225,7 +225,7 @@ public class HomeActivity extends AppCompatActivity {
     private void setupCustomSentRequestView(Request request, int index) {
         View itemView = inflater.inflate(R.layout.requests_row, null, false);
         ImageButton nextBtn = itemView.findViewById(R.id.next_button);
-        ((TextView) itemView.findViewById(R.id.time)).setText(request.getTimeStamp());
+        ((TextView) itemView.findViewById(R.id.time)).setText(request.getTimeStamp().substring(0, request.getTimeStamp().length() - 7));
         ((TextView) itemView.findViewById(R.id.course)).setText(request.getCourseName());
         if (index % 2 == 0) {
             itemView.findViewById(R.id.row_linear).setBackgroundColor(getResources().getColor(R.color.blue_grey_050));

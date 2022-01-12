@@ -18,6 +18,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,6 +30,8 @@ import com.example.teamder.model.CurrentUser;
 import com.example.teamder.model.Notification;
 import com.example.teamder.model.Review;
 import com.example.teamder.model.User;
+import com.google.firebase.storage.FirebaseStorage;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -118,6 +121,18 @@ public class FeedbackActivity extends AppCompatActivity {
         ((TextView) itemView.findViewById(R.id.name)).setText("To " + user.getName());
         feedbackListView.addView(itemView);
         feedbackMessages.put(user.getId(), editText);
+        updateUserAvatar(user.getId(), (ImageView) itemView.findViewById(R.id.avatar));
+    }
+
+    private void updateUserAvatar(String userId, ImageView avatar) {
+        FirebaseStorage
+                .getInstance()
+                .getReference()
+                .child(userId)
+                .getDownloadUrl()
+                .addOnSuccessListener(
+                        uri -> Picasso.get().load(uri).into(avatar)
+                );
     }
 
     private void sendFeedback() {

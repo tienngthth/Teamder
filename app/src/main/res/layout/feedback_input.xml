@@ -2,6 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:gravity="center_vertical">
 
     <LinearLayout
@@ -12,16 +13,41 @@
         android:gravity="center_vertical"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/poppins_regular"
-            android:text="@string/name"
-            android:textColor="@color/blue_800"
-            android:layout_marginBottom="5dp"
-            android:layout_marginTop="5dp"
-            android:textSize="14sp" />
+        <LinearLayout
+            android:id="@+id/row_linear"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:padding="10dp">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="15dp"
+                android:layout_marginEnd="10dp"
+                app:cardPreventCornerOverlap="false">
+
+                <ImageView
+                    android:id="@+id/avatar"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/ic_avatar"
+                    tools:ignore="ContentDescription" />
+
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins_regular"
+                android:text="@string/name"
+                android:textColor="@color/blue_800"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="5dp"
+                android:textSize="14sp" />
+
+        </LinearLayout>
 
         <EditText
             android:id="@+id/feedback"

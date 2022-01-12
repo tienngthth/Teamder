@@ -27,6 +27,8 @@ import com.example.teamder.model.Message;
 import com.example.teamder.model.User;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.storage.FirebaseStorage;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -137,5 +139,18 @@ public class MessageActivity extends AppCompatActivity {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         params.gravity =  message.getUserId().equals(currentUser.getId()) ? Gravity.RIGHT : Gravity.LEFT;
         itemView.setLayoutParams(params);
+        updateUserAvatar(message.getUserId(), (ImageView) itemView.findViewById(R.id.avatar));
     }
+
+    private void updateUserAvatar(String userId, ImageView avatar) {
+        FirebaseStorage
+                .getInstance()
+                .getReference()
+                .child(userId)
+                .getDownloadUrl()
+                .addOnSuccessListener(
+                        uri -> Picasso.get().load(uri).into(avatar)
+                );
+    }
+
 }
