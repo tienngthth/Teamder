@@ -20,14 +20,19 @@ import static com.example.teamder.util.ScreenUtil.clearFocus;
 import static com.example.teamder.util.ValidationUtil.validateUniqueNameInput;
 
 import android.annotation.SuppressLint;
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,6 +49,9 @@ import com.example.teamder.model.ToVisitUserList;
 import com.example.teamder.model.User;
 import com.example.teamder.repository.UserRepository;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,7 +72,8 @@ public class ProfileActivity extends AppCompatActivity {
     private String userId = null;
     private EditText name, major, sID, GPA, introduction, phone, email;
     private View phoneLine, nameLine, majorLine, sIDLine, GPALine, introductionLine;
-    private ImageButton addCourseButton, feedbackButton;
+    private ImageButton addCourseButton, feedbackButton, changeProfileButton;
+    private ImageView avatar;
     private Button passButton, requestButton;
     private LayoutInflater inflater;
     private LinearLayout reviewTitle, reviewList, courseList, fullscreenConstraint, actions, emailGroup, sIdGroup, phoneGroup, nameGroup, majorGroup, gpaGroup, introductionGroup;
@@ -111,6 +120,8 @@ public class ProfileActivity extends AppCompatActivity {
         gpaGroup = findViewById(R.id.gpa_group);
         reviewTitle = findViewById(R.id.reviews_title);
         inflater = LayoutInflater.from(this);
+        avatar = findViewById(R.id.avatar);
+        changeProfileButton = findViewById(R.id.change_profile);
         activityResultLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
@@ -199,6 +210,26 @@ public class ProfileActivity extends AppCompatActivity {
         passButton.setOnClickListener((View view) -> nextUser());
         requestButton.setOnClickListener((View view) -> toRequest());
         feedbackButton.setOnClickListener((View view) -> toFeedback());
+        changeProfileButton.setOnClickListener(view -> changeAvatar());
+    }
+
+    private void changeAvatar() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(
+                intent, 1000
+        );
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @androidx.annotation.Nullable Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        if (requestCode == 1000) {
+            if (resultCode == RESULT_OK) {
+                Uri uri = intent.getData();
+                StorageReference file = FirebaseStorage.getInstance().getReference().child(currentUser.getId());
+                file.putFile(uri);
+            }
+        }
     }
 
     private void toRequest() {
@@ -271,6 +302,9 @@ public class ProfileActivity extends AppCompatActivity {
         setUpReviewsList();
         setEditable();
         fullscreenConstraint.setVisibility(View.VISIBLE);
+        FirebaseStorage.getInstance().getReference().child(user.getId()).getDownloadUrl().addOnSuccessListener(
+                uri ->  Picasso.get().load(uri).into(avatar)
+        );
     }
 
     private void setEditable() {
