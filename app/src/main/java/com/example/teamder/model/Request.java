@@ -27,7 +27,22 @@ public class Request {
         parties.add(requesteeID);
     }
 
-    public Request() {}
+    public Request() {
+    }
+
+    public static Request parseRequest(DocumentSnapshot document) {
+        Request request = new Request();
+        request.setRequesteeID(document.getString("requesteeID"));
+        request.setRequesterID(document.getString("requesterID"));
+        request.setMessage(document.getString("message"));
+        request.setTimeStamp(document.getString("timeStamp"));
+        request.setStatus(document.getString("status"));
+        request.setCourseName(document.getString("courseName"));
+        request.setId(document.getId());
+        ArrayList<String> parties = (ArrayList<String>) document.getData().get("parties");
+        request.setParties(parties == null ? new ArrayList<>() : parties);
+        return request;
+    }
 
     public String getId() {
         return id;
@@ -91,19 +106,5 @@ public class Request {
 
     public void setTimeStamp(String timeStamp) {
         this.timeStamp = timeStamp;
-    }
-
-    public static Request parseRequest(DocumentSnapshot document) {
-        Request request = new Request();
-        request.setRequesteeID(document.getString("requesteeID"));
-        request.setRequesterID(document.getString("requesterID"));
-        request.setMessage(document.getString("message"));
-        request.setTimeStamp(document.getString("timeStamp"));
-        request.setStatus(document.getString("status"));
-        request.setCourseName(document.getString("courseName"));
-        request.setId(document.getId());
-        ArrayList<String> parties = (ArrayList<String>) document.getData().get("parties");
-        request.setParties(parties == null ? new ArrayList<>() : parties);
-        return request;
     }
 }

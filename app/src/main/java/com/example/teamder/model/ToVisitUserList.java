@@ -34,6 +34,12 @@ public class ToVisitUserList {
         return toVisitUserList;
     }
 
+    public static int countIntersectCourses(User user) {
+        ArrayList<String> intersectCourses = new ArrayList<>(user.getCourses());
+        intersectCourses.retainAll(currentUser.getCourses());
+        return intersectCourses.size();
+    }
+
     public void removeAllUserIDs() {
         userIDs.removeAll(userIDs);
     }
@@ -85,29 +91,22 @@ public class ToVisitUserList {
                 && !currentUser.getVisitedTeameeIDs().contains(userID);
     }
 
-
     private void checkIntersectCourse(String userID) {
         getUserById(userID, (documentSnapshot -> {
             User user = parseUser(documentSnapshot);
             ArrayList<String> parties = new ArrayList<>(Arrays.asList(userID, currentUser.getId()));
             getRequestsByPartiesAndStatus(pending.toString(), parties, (snapshot) -> {
-                final int[] requestNo = {snapshot.getDocuments().size()};
-                    getRequestsByPartiesAndStatus(approved.toString(), parties, (documentSnapshots) -> {
-                        requestNo[0] += documentSnapshots.getDocuments().size();
-                        int courseAvailable = (countIntersectCourses(user) - requestNo[0]);
-                        if (courseAvailable > 0) {
-                            toVisitUserList.addUserID(userID);
-                        }
-                    });
-                }
+                        final int[] requestNo = {snapshot.getDocuments().size()};
+                        getRequestsByPartiesAndStatus(approved.toString(), parties, (documentSnapshots) -> {
+                            requestNo[0] += documentSnapshots.getDocuments().size();
+                            int courseAvailable = (countIntersectCourses(user) - requestNo[0]);
+                            if (courseAvailable > 0) {
+                                toVisitUserList.addUserID(userID);
+                            }
+                        });
+                    }
             );
         }));
-    }
-
-    public static int countIntersectCourses(User user) {
-        ArrayList<String> intersectCourses = new ArrayList<>(user.getCourses());
-        intersectCourses.retainAll(currentUser.getCourses());
-        return intersectCourses.size();
     }
 
 }

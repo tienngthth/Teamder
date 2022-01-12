@@ -16,6 +16,19 @@ public class Group {
         this.courseName = courseName;
     }
 
+    public Group() {
+    }
+
+    public static Group parseGroup(DocumentSnapshot document) {
+        Group group = new Group();
+        group.setId(document.getId());
+        ArrayList<String> userIds = (ArrayList<String>) document.getData().get("userIds");
+        group.setUserIds(userIds);
+        group.setCourseName(document.getString("courseName"));
+        group.setIsActive(document.getBoolean("isActive"));
+        return group;
+    }
+
     public Boolean getIsActive() {
         return isActive;
     }
@@ -54,18 +67,5 @@ public class Group {
 
     public void setActive(Boolean active) {
         isActive = active;
-    }
-
-    public Group() {
-    }
-
-    public static Group parseGroup(DocumentSnapshot document) {
-        Group group = new Group();
-        group.setId(document.getId());
-        ArrayList<String> userIds = (ArrayList<String>) document.getData().get("userIds");
-        group.setUserIds(userIds);
-        group.setCourseName(document.getString("courseName"));
-        group.setIsActive(document.getBoolean("isActive"));
-        return group;
     }
 }

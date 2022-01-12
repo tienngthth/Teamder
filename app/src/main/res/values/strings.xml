@@ -11,7 +11,6 @@
     <string name="email_title">Email</string>
     <string name="name_title">Your name</string>
     <string name="confirm_password">Confirm password</string>
-    <string name="sign_up_button">Sign Up</string>
     <string name="notification">Notification</string>
     <string name="past_notifications">Past notifications</string>
     <string name="new_notifications">New notifications</string>
@@ -23,8 +22,6 @@
     <string name="logout_icon">logout icon</string>
     <string name="notification_icon">notification icon</string>
     <string name="new_notification"> (+1)</string>
-    <string name="dashboard">Dashboard</string>
-    <string name="teamee">Teamee</string>
     <string name="status">Status</string>
     <string name="group">Group</string>
     <string name="course">Course</string>
@@ -44,10 +41,7 @@
     <string name="requester">Requester</string>
     <string name="received_requests">Requests received</string>
     <string name="sent_requests">Requests sent</string>
-    <string name="groups">Groups</string>
     <string name="courses">Courses</string>
-    <string name="channel_name">notification_channel</string>
-    <string name="channel_description">notification_description</string>
     <string name="course_request">Course</string>
     <string name="sID">sID</string>
     <string name="gpa">GPA</string>
@@ -55,7 +49,6 @@
     <string name="major">Major</string>
     <string name="introduction">Introduction</string>
     <string name="enrolling_courses">Enrolling courses</string>
-    <string name="comments">Comments</string>
     <string name="course_name">Enter course name:</string>
     <string name="reviews">Reviews</string>
     <string name="pass">Pass</string>

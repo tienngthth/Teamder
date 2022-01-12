@@ -17,6 +17,13 @@ public class Review {
     public Review() {
     }
 
+    public static Review parseReview(DocumentSnapshot document) {
+        Review review = new Review();
+        review.setComment(document.getString("comment"));
+        review.setTimeStamp(document.getString("timeStamp"));
+        return review;
+    }
+
     public String getUserID() {
         return userID;
     }
@@ -39,12 +46,5 @@ public class Review {
 
     public void setTimeStamp(String timeStamp) {
         this.timeStamp = timeStamp;
-    }
-
-    public static Review parseReview(DocumentSnapshot document) {
-        Review review = new Review();
-        review.setComment(document.getString("comment"));
-        review.setTimeStamp(document.getString("timeStamp"));
-        return review;
     }
 }

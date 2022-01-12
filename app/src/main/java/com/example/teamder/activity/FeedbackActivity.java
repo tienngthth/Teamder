@@ -44,7 +44,7 @@ public class FeedbackActivity extends AppCompatActivity {
     private LinearLayout feedbackListView, fullConstraint;
     private ArrayList<String> userIds = new ArrayList<>();
     private LayoutInflater inflater;
-    private HashMap<String, EditText> feedbackMessages = new HashMap<>();
+    private final HashMap<String, EditText> feedbackMessages = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +71,7 @@ public class FeedbackActivity extends AppCompatActivity {
     }
 
     private boolean clearInputFieldsFocus(View view) {
-        for(String userId: userIds) {
+        for (String userId : userIds) {
             if (feedbackMessages.get(userId) != null) {
                 clearFocus(view, Objects.requireNonNull(feedbackMessages.get(userId)), this);
             }
@@ -105,7 +105,7 @@ public class FeedbackActivity extends AppCompatActivity {
 
     private void generateInputForm() {
         feedbackListView.removeAllViews();
-        for (String userId: userIds) {
+        for (String userId : userIds) {
             if (!currentUser.getId().equals(userId)) {
                 getUserById(userId, (documentSnapshot -> {
                     setupCustomReceivedRequestView(parseUser(documentSnapshot));
@@ -121,7 +121,7 @@ public class FeedbackActivity extends AppCompatActivity {
         ((TextView) itemView.findViewById(R.id.name)).setText("To " + user.getName());
         feedbackListView.addView(itemView);
         feedbackMessages.put(user.getId(), editText);
-        updateUserAvatar(user.getId(), (ImageView) itemView.findViewById(R.id.avatar));
+        updateUserAvatar(user.getId(), itemView.findViewById(R.id.avatar));
     }
 
     private void updateUserAvatar(String userId, ImageView avatar) {
@@ -136,7 +136,7 @@ public class FeedbackActivity extends AppCompatActivity {
     }
 
     private void sendFeedback() {
-        for (String userId: userIds) {
+        for (String userId : userIds) {
             EditText editText = feedbackMessages.get(userId);
             if (editText != null) {
                 String message = editText.getText().toString().trim();

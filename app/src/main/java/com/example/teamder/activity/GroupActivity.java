@@ -46,6 +46,7 @@ import java.util.List;
 
 public class GroupActivity extends AppCompatActivity {
 
+    public static ListenerRegistration groupListenerRegistration;
     private final User currentUser = CurrentUser.getInstance().getUser();
     private TextView course, status;
     private Button closeButton, leaveButton, feedbackButton;
@@ -53,7 +54,6 @@ public class GroupActivity extends AppCompatActivity {
     private LinearLayout teameeList, actions;
     private LayoutInflater inflater;
     private Group group;
-    public static ListenerRegistration groupListenerRegistration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,7 +153,7 @@ public class GroupActivity extends AppCompatActivity {
             nameView.setText(user.getName());
             itemView.setOnClickListener((View view) -> reviewProfile(user.getId()));
             teameeList.addView(itemView);
-            updateUserAvatar(user.getId(), (ImageView) itemView.findViewById(R.id.avatar));
+            updateUserAvatar(user.getId(), itemView.findViewById(R.id.avatar));
         });
     }
 

@@ -1,8 +1,8 @@
 package com.example.teamder.model;
 
+import static com.example.teamder.activity.NotificationActivity.Type;
 import static com.example.teamder.util.DateTimeUtil.getCurrentTime;
 
-import static com.example.teamder.activity.NotificationActivity.Type;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 public class Notification {

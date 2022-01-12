@@ -49,6 +49,7 @@ import java.util.List;
 
 public class ReviewActivity extends AppCompatActivity {
 
+    public static ListenerRegistration requestListenerRegistration;
     private final User currentUser = CurrentUser.getInstance().getUser();
     private TextView requester, requestee, message, course, status;
     private Button rejectButton, cancelButton, approveButton;
@@ -57,7 +58,6 @@ public class ReviewActivity extends AppCompatActivity {
     private Request request;
     private ImageView requesterAvatar, requesteeAvatar;
     private LinearLayout requesterGroup, requesteeGroup;
-    public static ListenerRegistration requestListenerRegistration;
     private String id;
 
     @Override

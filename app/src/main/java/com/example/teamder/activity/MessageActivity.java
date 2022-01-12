@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MessageActivity extends AppCompatActivity {
+    public static ListenerRegistration listenerRegistration;
     private final ArrayList<String> newNotificationIDs = new ArrayList<>();
     private final User currentUser = CurrentUser.getInstance().getUser();
     private LinearLayout messageList, messageGroup, fullScreen;
@@ -42,7 +43,6 @@ public class MessageActivity extends AppCompatActivity {
     private TextView noNotification, courseName;
     private EditText messageEditText;
     private ImageView sendButton;
-    public static ListenerRegistration listenerRegistration;
     private String groupId;
 
     @Override
@@ -137,9 +137,9 @@ public class MessageActivity extends AppCompatActivity {
         list.addView(itemView);
         itemView.findViewById(R.id.avatar).setVisibility(message.getUserId().equals(currentUser.getId()) ? View.GONE : View.VISIBLE);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        params.gravity =  message.getUserId().equals(currentUser.getId()) ? Gravity.RIGHT : Gravity.LEFT;
+        params.gravity = message.getUserId().equals(currentUser.getId()) ? Gravity.RIGHT : Gravity.LEFT;
         itemView.setLayoutParams(params);
-        updateUserAvatar(message.getUserId(), (ImageView) itemView.findViewById(R.id.avatar));
+        updateUserAvatar(message.getUserId(), itemView.findViewById(R.id.avatar));
     }
 
     private void updateUserAvatar(String userId, ImageView avatar) {

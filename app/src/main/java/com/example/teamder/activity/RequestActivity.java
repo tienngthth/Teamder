@@ -39,13 +39,6 @@ import java.util.ArrayList;
 
 public class RequestActivity extends AppCompatActivity {
 
-    public enum Status {
-        pending,
-        approved,
-        rejected,
-        canceled,
-    }
-
     private final User currentUser = CurrentUser.getInstance().getUser();
     private final ArrayList<String> courseNames = new ArrayList<>();
     private User user = null;
@@ -191,5 +184,12 @@ public class RequestActivity extends AppCompatActivity {
         Intent intent = new Intent(RequestActivity.this, ProfileActivity.class);
         setResult(RESULT_OK, intent);
         finish();
+    }
+
+    public enum Status {
+        pending,
+        approved,
+        rejected,
+        canceled,
     }
 }

@@ -1,5 +1,6 @@
 package com.example.teamder.activity;
 
+import static com.example.teamder.activity.NotificationActivity.Type.CancelRequest;
 import static com.example.teamder.activity.NotificationActivity.Type.GroupChange;
 import static com.example.teamder.activity.ProfileActivity.Action.Explore;
 import static com.example.teamder.activity.ProfileActivity.Action.Inspect;
@@ -7,11 +8,13 @@ import static com.example.teamder.activity.ProfileActivity.Action.Profile;
 import static com.example.teamder.activity.RequestActivity.Status.approved;
 import static com.example.teamder.activity.RequestActivity.Status.canceled;
 import static com.example.teamder.activity.RequestActivity.Status.pending;
+import static com.example.teamder.activity.RequestActivity.Status.rejected;
 import static com.example.teamder.model.Group.parseGroup;
 import static com.example.teamder.model.IntentModel.IntentName.ActionType;
 import static com.example.teamder.model.IntentModel.IntentName.TeammateId;
 import static com.example.teamder.model.IntentModel.IntentName.UserId;
 import static com.example.teamder.model.IntentModel.IntentName.UserName;
+import static com.example.teamder.model.Request.parseRequest;
 import static com.example.teamder.model.Review.parseReview;
 import static com.example.teamder.model.User.parseUser;
 import static com.example.teamder.repository.GroupRepository.getGroupByCourseNameByUserIds;
@@ -31,6 +34,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,12 +55,12 @@ import com.example.teamder.R;
 import com.example.teamder.model.CurrentUser;
 import com.example.teamder.model.Group;
 import com.example.teamder.model.Notification;
+import com.example.teamder.model.Request;
 import com.example.teamder.model.Review;
 import com.example.teamder.model.ToVisitUserList;
 import com.example.teamder.model.User;
 import com.example.teamder.repository.UserRepository;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -67,13 +71,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ProfileActivity extends AppCompatActivity {
-
-    public enum Action {
-        Explore,
-        Profile,
-        Review,
-        Inspect,
-    }
 
     private final ToVisitUserList toVisitUserList = ToVisitUserList.getInstance();
     private final User currentUser = CurrentUser.getInstance().getUser();
@@ -90,7 +87,6 @@ public class ProfileActivity extends AppCompatActivity {
     private Action action = Profile;
     private boolean slideAnimation = true;
     private boolean showDetails = true;
-    private ListenerRegistration userListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +99,7 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        if (action.equals(Profile)){
+        if (action.equals(Profile)) {
             updateUserInformation();
         }
     }
@@ -173,7 +169,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void checkActionType() {
         if (userId != null && !action.equals(Profile)) {
-            userListener = getUserListenerById(userId, document -> {
+            getUserListenerById(userId, document -> {
                 user = parseUser(document);
                 if (action.equals(Explore)) {
                     checkIntersectCourses();
@@ -220,7 +216,6 @@ public class ProfileActivity extends AppCompatActivity {
         setUpListeners();
         setUpScreen();
     }
-
 
     @SuppressLint("ClickableViewAccessibility")
     private void setUpListeners() {
@@ -293,7 +288,6 @@ public class ProfileActivity extends AppCompatActivity {
         }
         slideAnimation = true;
     }
-
 
     private boolean clearInputFieldsFocus(View view) {
         clearFocus(view, name, this);
@@ -413,14 +407,24 @@ public class ProfileActivity extends AppCompatActivity {
         itemView.findViewById(R.id.remove_course).setVisibility(action.equals(Profile) ? View.VISIBLE : View.GONE);
         if (action.equals(Profile)) {
             itemView.findViewById(R.id.remove_course).setOnClickListener((View view) -> {
-                //open confirmation
-                removeCourse(name, index);
+                openRemoveCourseConfirmationDialog(name, index);
             });
         }
         courseList.addView(itemView);
     }
 
-
+    private void openRemoveCourseConfirmationDialog(String courseName, int index) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(ProfileActivity.this, R.style.AlertDialogCustom))
+                .setTitle("Confirmation")
+                .setMessage("Are you sure you want to remove this course?")
+                .setPositiveButton("No", (dialog, which) -> dialog.dismiss())
+                .setNegativeButton("Yes", (dialog, which) -> removeCourse(courseName, index));
+        AlertDialog dialog = builder.create();
+        dialog.show();
+        dialog.getButton(dialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.white));
+        dialog.getButton(dialog.BUTTON_NEGATIVE).setBackgroundColor(getResources().getColor(R.color.red_300));
+        dialog.getButton(dialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.blue_grey_500));
+    }
 
     private void removeCourse(String courseName, int index) {
         user.removeCourse(index);
@@ -464,11 +468,24 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void cancelPendingRequests(String courseName) {
         getRequestByUserIdStatusAndCourseName(user.getId(), pending.toString(), courseName, (documentSnapshots) -> {
-            for (DocumentSnapshot documentSnapshot: documentSnapshots.getDocuments()) {
-                updateFieldToDb("requests", documentSnapshot.getId(), "status", canceled.toString());
+            for (DocumentSnapshot documentSnapshot : documentSnapshots.getDocuments()) {
+                Request request = parseRequest(documentSnapshot);
+                updateFieldToDb("requests", documentSnapshot.getId(), "status", request.getRequesterID().equals(currentUser.getId()) ? rejected.toString() : canceled.toString());
+                createNotificationInDb(request);
             }
-            // notify
         });
+    }
+
+    private void createNotificationInDb(Request request) {
+        String message = request.getRequesteeID().equals(currentUser.getId()) ?
+                "Your request to " + currentUser.getName() + " for course " + request.getCourseName() + " has been rejected." :
+                "Request from " + currentUser.getName() + " for course " + request.getCourseName() + " has been canceled.";
+        Notification notification = new Notification(
+                message,
+                request.getRequesteeID().equals(currentUser.getId()) ? request.getRequesterID() : request.getRequesteeID(),
+                CancelRequest,
+                request.getId());
+        createNotification(notification);
     }
 
     private void updateUserInformation() {
@@ -546,6 +563,13 @@ public class ProfileActivity extends AppCompatActivity {
                 updateFieldToDb("users", user.getId(), "courses", user.getCourses());
             }
         });
+    }
+
+    public enum Action {
+        Explore,
+        Profile,
+        Review,
+        Inspect,
     }
 
 }

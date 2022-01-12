@@ -88,7 +88,8 @@ public class SignUpActivity extends AppCompatActivity {
         UserRepository.addUser(
                 new User(name, email, uid),
                 (docRefCallBack) -> {
-                    updateFieldToDb("users", docRefCallBack.getId(), "id", docRefCallBack.getId(), (v) -> {});
+                    updateFieldToDb("users", docRefCallBack.getId(), "id", docRefCallBack.getId(), (v) -> {
+                    });
                     Toast.makeText(SignUpActivity.this, "Sign up successfully.", Toast.LENGTH_SHORT).show();
                     toLogin(email, password);
                 },

@@ -1,11 +1,13 @@
 package com.example.teamder.activity;
 
 import static com.example.teamder.activity.ProfileActivity.Action.Explore;
+import static com.example.teamder.activity.ProfileActivity.Action.Profile;
 import static com.example.teamder.activity.RequestActivity.Status.pending;
 import static com.example.teamder.model.IntentModel.IntentName.ActionType;
 import static com.example.teamder.model.IntentModel.IntentName.GroupId;
 import static com.example.teamder.model.IntentModel.IntentName.Id;
 import static com.example.teamder.model.IntentModel.IntentName.Position;
+import static com.example.teamder.model.IntentModel.IntentName.UserId;
 import static com.example.teamder.model.Request.parseRequest;
 import static com.example.teamder.model.User.parseUser;
 import static com.example.teamder.repository.NotificationRepository.getNotificationListenerByUserIdAndSeenValue;
@@ -48,16 +50,16 @@ import java.util.ArrayList;
 public class HomeActivity extends AppCompatActivity {
 
     private static final int MY_PERMISSIONS_REQUEST = 99;
+    public static ListenerRegistration groupListenerRegistration, incomingRequestListenerRegistration, outgoingRequestListenerRegistration, newNotificationListenerRegistration;
     private final ToVisitUserList toVisitUserList = ToVisitUserList.getInstance();
     private final User currentUser = CurrentUser.getInstance().getUser();
+    protected Receiver myReceiver;
+    protected IntentFilter intentFilter;
     private TextView userNameView, groupsTitle;
     private ImageButton logoutButton, notificationButton, profileButton, exploreButton;
     private LinearLayout receivedRequestListView, groupListView, sentRequestListView, receivedRequests, sentRequests;
     private LayoutInflater inflater;
     private TextView newNotificationCount;
-    protected Receiver myReceiver;
-    protected IntentFilter intentFilter;
-    public static ListenerRegistration groupListenerRegistration, incomingRequestListenerRegistration, outgoingRequestListenerRegistration, newNotificationListenerRegistration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,7 +99,7 @@ public class HomeActivity extends AppCompatActivity {
     private void setupListener() {
         logoutButton.setOnClickListener((View view) -> openConfirmationDialog());
         notificationButton.setOnClickListener((View view) -> navigateUser(NotificationActivity.class));
-        profileButton.setOnClickListener((View view) -> navigateUser(ProfileActivity.class));
+        profileButton.setOnClickListener((View view) -> toProfile());
         exploreButton.setOnClickListener((View view) -> explore());
     }
 
@@ -304,6 +306,13 @@ public class HomeActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    private void toProfile() {
+        Intent intent = new Intent(HomeActivity.this, ProfileActivity.class);
+        intent.putExtra(ActionType.toString(), Profile.toString());
+        intent.putExtra(UserId.toString(), currentUser.getId());
+        startActivity(intent);
+    }
+
     private void explore() {
         if (currentUser.getCourses().size() > 0) {
             if (toVisitUserList.getUserIDs().size() > 0) {
@@ -319,7 +328,7 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-    private void removeListeners(){
+    private void removeListeners() {
         groupListenerRegistration.remove();
         incomingRequestListenerRegistration.remove();
         outgoingRequestListenerRegistration.remove();

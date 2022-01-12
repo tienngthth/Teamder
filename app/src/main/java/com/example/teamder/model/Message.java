@@ -12,6 +12,24 @@ public class Message {
     private boolean isSeen = false;
     private String userId;
 
+    public Message(String content, String groupId, String userId) {
+        this.content = content;
+        this.groupId = groupId;
+        this.userId = userId;
+    }
+
+    public Message() {
+    }
+
+    public static Message parseMessage(DocumentSnapshot document) {
+        Message message = new Message();
+        message.setContent(document.getString("content"));
+        message.setTimeStamp(document.getString("timeStamp"));
+        message.setUserId(document.getString("userId"));
+        message.setIsSeen(document.getBoolean("isSeen"));
+        return message;
+    }
+
     public String getUserId() {
         return userId;
     }
@@ -51,21 +69,4 @@ public class Message {
     public void setIsSeen(boolean seen) {
         isSeen = seen;
     }
-
-    public static Message parseMessage(DocumentSnapshot document){
-        Message message = new Message();
-        message.setContent(document.getString("content"));
-        message.setTimeStamp(document.getString("timeStamp"));
-        message.setUserId(document.getString("userId"));
-        message.setIsSeen(document.getBoolean("isSeen"));
-        return message;
-    }
-
-    public Message(String content, String groupId, String userId) {
-        this.content = content;
-        this.groupId = groupId;
-        this.userId = userId;
-    }
-
-    public Message() {}
 }
