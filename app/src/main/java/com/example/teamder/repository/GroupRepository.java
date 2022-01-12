@@ -27,6 +27,17 @@ public class GroupRepository {
                 .addOnSuccessListener(documentSnapshotCallBack::onCallBack);
     }
 
+    public static ListenerRegistration getGroupListenerById(String groupId, CallbackInterfaces.DocumentSnapshotCallBack documentSnapshotCallBack) {
+        return FirebaseFirestore
+                .getInstance()
+                .collection("groups")
+                .document(groupId)
+                .addSnapshotListener((snapshot, error) -> {
+                    assert snapshot != null;
+                    documentSnapshotCallBack.onCallBack(snapshot);
+                });
+    }
+
     public static void getGroupByCourseNameByUserIds(String courseName, List userIds, CallbackInterfaces.QuerySnapShotCallBack querySnapShotCallBack) {
         FirebaseFirestore.getInstance()
                 .collection("groups")

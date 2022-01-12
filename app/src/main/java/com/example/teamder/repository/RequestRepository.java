@@ -19,6 +19,16 @@ public class RequestRepository {
                 .addOnSuccessListener(documentSnapshotCallBack::onCallBack);
     }
 
+    public static ListenerRegistration getRequestListenerById(String id, CallbackInterfaces.DocumentSnapshotCallBack documentSnapshotCallBack) {
+        return FirebaseFirestore.getInstance()
+                .collection("requests")
+                .document(id)
+                .addSnapshotListener((snapshot, error) -> {
+                    assert snapshot != null;
+                    documentSnapshotCallBack.onCallBack(snapshot);
+                });
+    }
+
     public static void getRequestByUserIdStatusAndCourseName(String userId, String status, String courseName, CallbackInterfaces.QuerySnapShotCallBack querySnapShotCallBack) {
         FirebaseFirestore.getInstance()
                 .collection("requests")

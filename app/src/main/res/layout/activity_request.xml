@@ -104,6 +104,8 @@
                 android:gravity="bottom|center"
                 android:orientation="horizontal"
                 android:paddingStart="30dp"
+                android:visibility="gone"
+                android:id="@+id/actions"
                 android:paddingTop="30dp"
                 android:paddingEnd="30dp"
                 tools:ignore="NestedWeights">

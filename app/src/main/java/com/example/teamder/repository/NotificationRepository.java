@@ -23,6 +23,18 @@ public class NotificationRepository {
                 });
     }
 
+    public static ListenerRegistration getNotificationListenerByUserIdAndSeenValue(String userId, boolean isSeen, CallbackInterfaces.QuerySnapShotCallBack querySnapShotCallBack) {
+        return FirebaseFirestore.getInstance()
+                .collection("notifications")
+                .whereEqualTo("userId", userId)
+                .whereEqualTo("seen", isSeen)
+                .orderBy("timeStamp", Query.Direction.DESCENDING)
+                .addSnapshotListener((snapshot, error) -> {
+                    assert snapshot != null;
+                    querySnapShotCallBack.onCallBack(snapshot);
+                });
+    }
+
     public static void getNotificationByUserIdAndMessage(String userId, String message, CallbackInterfaces.QuerySnapShotCallBack querySnapShotCallBack) {
         FirebaseFirestore.getInstance()
                 .collection("notifications")

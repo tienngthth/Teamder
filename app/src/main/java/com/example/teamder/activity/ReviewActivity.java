@@ -14,7 +14,7 @@ import static com.example.teamder.model.IntentModel.IntentName.UserId;
 import static com.example.teamder.model.Request.parseRequest;
 import static com.example.teamder.model.User.parseUser;
 import static com.example.teamder.repository.NotificationRepository.createNotification;
-import static com.example.teamder.repository.RequestRepository.getRequestById;
+import static com.example.teamder.repository.RequestRepository.getRequestListenerById;
 import static com.example.teamder.repository.UserRepository.getUserById;
 import static com.example.teamder.repository.UtilRepository.updateFieldToDb;
 
@@ -38,6 +38,7 @@ import com.example.teamder.model.Request;
 import com.example.teamder.model.User;
 import com.example.teamder.repository.GroupRepository;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,18 +52,15 @@ public class ReviewActivity extends AppCompatActivity {
     private String position;
     private LinearLayout actions, requesterAvatar, requesteeAvatar;
     private Request request;
+    public static ListenerRegistration requestListenerRegistration;
+    private String id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_review);
         initialiseVariables();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        checkIntent();
+        setupRegistrationListeners();
     }
 
     private void initialiseVariables() {
@@ -79,17 +77,19 @@ public class ReviewActivity extends AppCompatActivity {
         status = findViewById(R.id.status);
     }
 
-    private void checkIntent() {
+    private void setupRegistrationListeners() {
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
         position = bundle.getString(Position.toString());
-        getRequestById(bundle.getString(Id.toString()), (documentSnapshot) -> {
-            request = parseRequest(documentSnapshot);
-            message.setText(request.getMessage());
-            course.setText(request.getCourseName());
-            setUpScreen();
-            setUpListeners();
-        });
+        requestListenerRegistration = getRequestListenerById(
+                bundle.getString(Id.toString()), (documentSnapshot) -> {
+                    request = parseRequest(documentSnapshot);
+                    message.setText(request.getMessage());
+                    course.setText(request.getCourseName());
+                    setUpScreen();
+                    setUpListeners();
+                }
+        );
     }
 
     private void setUpScreen() {
@@ -132,7 +132,7 @@ public class ReviewActivity extends AppCompatActivity {
             GroupRepository.getGroupByCourseNameByUserIds(request.getCourseName(), Arrays.asList(request.getRequesteeID(), request.getRequesterID()),
                     querySnapshot -> {
                         int groupsCount = querySnapshot.getDocuments().size();
-                        switch (groupsCount){
+                        switch (groupsCount) {
                             case 2:
                                 mergeGroup(querySnapshot.getDocuments());
                                 break;
@@ -153,11 +153,12 @@ public class ReviewActivity extends AppCompatActivity {
     private void newGroup() {
         Group group = new Group(
                 new ArrayList<String>() {{
-                            add(request.getRequesteeID());
-                            add(request.getRequesterID());
-                        }},
+                    add(request.getRequesteeID());
+                    add(request.getRequesterID());
+                }},
                 request.getCourseName());
-        GroupRepository.createGroup(group, (documentReference) -> toGroup(documentReference.getId()), () -> {});
+        GroupRepository.createGroup(group, (documentReference) -> toGroup(documentReference.getId()), () -> {
+        });
     }
 
     private void joinExistingGroup(List<DocumentSnapshot> documentSnapshots) {
@@ -216,7 +217,7 @@ public class ReviewActivity extends AppCompatActivity {
 
     private void toReviewProfile(String pagePosition) {
         Intent intent = new Intent(ReviewActivity.this, ProfileActivity.class);
-        intent.putExtra(ActionType.toString(),  isToProfile(pagePosition) ? Profile : Review);
+        intent.putExtra(ActionType.toString(), isToProfile(pagePosition) ? Profile : Review);
         intent.putExtra(UserId.toString(), pagePosition.equals("requestee") ? request.getRequesteeID() : request.getRequesterID());
         startActivity(intent);
     }

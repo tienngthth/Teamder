@@ -4,12 +4,11 @@ import static com.example.teamder.activity.NotificationActivity.Type.NewRequest;
 import static com.example.teamder.activity.RequestActivity.Status.approved;
 import static com.example.teamder.activity.RequestActivity.Status.pending;
 import static com.example.teamder.model.IntentModel.IntentName.UserId;
-import static com.example.teamder.model.IntentModel.IntentName.UserName;
 import static com.example.teamder.model.User.parseUser;
 import static com.example.teamder.repository.NotificationRepository.createNotification;
 import static com.example.teamder.repository.RequestRepository.createRequest;
 import static com.example.teamder.repository.RequestRepository.getRequestOfCourseByParties;
-import static com.example.teamder.repository.UserRepository.getUserById;
+import static com.example.teamder.repository.UserRepository.getUserListenerById;
 import static com.example.teamder.util.ScreenUtil.clearFocus;
 import static com.example.teamder.util.ValidationUtil.validateMessage;
 
@@ -49,10 +48,9 @@ public class RequestActivity extends AppCompatActivity {
     private User user = null;
     private TextView name;
     private EditText message;
-    private String userName = null;
     private String userID = null;
     private Button cancelButton, sendButton;
-    private LinearLayout coursesList, fullScreen;
+    private LinearLayout coursesList, fullScreen, actions;
     private LayoutInflater inflater;
 
     @Override
@@ -61,7 +59,7 @@ public class RequestActivity extends AppCompatActivity {
         setContentView(R.layout.activity_request);
         initialiseVariables();
         checkIntent();
-        getUserById(userID, (document) -> {
+        getUserListenerById(userID, (document) -> {
             user = parseUser(document);
             setUpScreen();
             setUpListeners();
@@ -75,6 +73,7 @@ public class RequestActivity extends AppCompatActivity {
         coursesList = findViewById(R.id.courses_list);
         message = findViewById(R.id.message);
         fullScreen = findViewById(R.id.full_screen);
+        actions = findViewById(R.id.actions);
         inflater = LayoutInflater.from(this);
     }
 
@@ -82,17 +81,17 @@ public class RequestActivity extends AppCompatActivity {
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
-            userName = bundle.getString(UserName.toString());
             userID = bundle.getString(UserId.toString());
         }
     }
 
     private void setUpScreen() {
-        name.setText(userName);
+        name.setText(user.getName());
         setUpCourseList();
     }
 
     private void setUpCourseList() {
+        actions.setVisibility(View.GONE);
         coursesList.removeAllViews();
         for (String course : currentUser.getCourses()) {
             ArrayList<String> parties = new ArrayList<>();
@@ -116,6 +115,7 @@ public class RequestActivity extends AppCompatActivity {
                                     }
                                 });
                                 courseName.setOnClickListener((View view) -> checkBox.setChecked(!checkBox.isChecked()));
+                                actions.setVisibility(View.VISIBLE);
                             }
                         });
                     }

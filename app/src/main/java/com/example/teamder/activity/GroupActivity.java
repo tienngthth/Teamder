@@ -9,7 +9,7 @@ import static com.example.teamder.model.IntentModel.IntentName.CourseName;
 import static com.example.teamder.model.IntentModel.IntentName.GroupId;
 import static com.example.teamder.model.IntentModel.IntentName.UserId;
 import static com.example.teamder.model.User.parseUser;
-import static com.example.teamder.repository.GroupRepository.getGroupById;
+import static com.example.teamder.repository.GroupRepository.getGroupListenerById;
 import static com.example.teamder.repository.NotificationRepository.createNotification;
 import static com.example.teamder.repository.RequestRepository.getRequestByUserIdStatusAndCourseName;
 import static com.example.teamder.repository.UserRepository.getUserById;
@@ -36,6 +36,7 @@ import com.example.teamder.model.Group;
 import com.example.teamder.model.Notification;
 import com.example.teamder.model.User;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +50,7 @@ public class GroupActivity extends AppCompatActivity {
     private LinearLayout teameeList, actions;
     private LayoutInflater inflater;
     private Group group;
+    public static ListenerRegistration groupListenerRegistration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +78,7 @@ public class GroupActivity extends AppCompatActivity {
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
             String groupId = bundle.getString(GroupId.toString());
-            getGroupById(groupId, (documentSnapshot) -> {
+            groupListenerRegistration = getGroupListenerById(groupId, (documentSnapshot) -> {
                 group = parseGroup(documentSnapshot);
                 course.setText(group.getCourseName());
                 status.setText(group.getIsActive() ? "Active" : "Inactive");
@@ -126,7 +128,7 @@ public class GroupActivity extends AppCompatActivity {
             closeGroup();
         }
         updateRequestStatus(currentUser.getId());
-        Toast.makeText(this,"Left group successfully.", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Left group successfully.", Toast.LENGTH_LONG).show();
         finish();
     }
 
@@ -189,7 +191,7 @@ public class GroupActivity extends AppCompatActivity {
             toFeedbackActivity();
         }
         pushNotification("Your group for course " + group.getCourseName() + " has been closed by " + currentUser.getName() + ".");
-        Toast.makeText(this,"Group closed.", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Group closed.", Toast.LENGTH_LONG).show();
         finish();
     }
 

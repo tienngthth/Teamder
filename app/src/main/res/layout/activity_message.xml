@@ -24,6 +24,16 @@
             android:textColor="@color/blue_900"
             android:textSize="25sp" />
 
+        <TextView
+            android:id="@+id/no_notification"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/poppins_light"
+            android:text="@string/no_message"
+            android:textColor="@color/blue_900"
+            android:textSize="16sp"
+            android:visibility="gone" />
+
         <ScrollView
             android:layout_marginTop="5dp"
             android:layout_width="match_parent"
@@ -35,19 +45,9 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/no_notification"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/poppins_light"
-                    android:text="@string/no_message"
-                    android:textColor="@color/blue_900"
-                    android:textSize="16sp"
-                    android:visibility="gone" />
-
                 <LinearLayout
                     android:id="@+id/messages_group"
-                    android:layout_width="match_parent"
+                    android:layout_width="match_parent"                android:layout_gravity="bottom"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:visibility="gone">

@@ -15,6 +15,7 @@ import static com.example.teamder.repository.RequestRepository.getRequestsByPart
 import static com.example.teamder.repository.ReviewRepository.getReviewByUserId;
 import static com.example.teamder.repository.UserRepository.getOtherUserByFieldValue;
 import static com.example.teamder.repository.UserRepository.getUserById;
+import static com.example.teamder.repository.UserRepository.getUserListenerById;
 import static com.example.teamder.repository.UtilRepository.updateFieldToDb;
 import static com.example.teamder.util.ScreenUtil.clearFocus;
 import static com.example.teamder.util.ValidationUtil.validateUniqueNameInput;
@@ -43,6 +44,7 @@ import com.example.teamder.model.Review;
 import com.example.teamder.model.ToVisitUserList;
 import com.example.teamder.model.User;
 import com.example.teamder.repository.UserRepository;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -71,6 +73,7 @@ public class ProfileActivity extends AppCompatActivity {
     private Action action = Profile;
     private boolean slideAnimation = true;
     private boolean showDetails = true;
+    private ListenerRegistration userListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,7 +146,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void checkActionType() {
         if (userId != null && !action.equals(Profile)) {
-            getUserById(userId, (document) -> {
+            userListener = getUserListenerById(userId, document -> {
                 user = parseUser(document);
                 if (action.equals(Explore)) {
                     checkIntersectCourses();
@@ -203,7 +206,6 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void toRequest() {
         Intent intent = new Intent(ProfileActivity.this, RequestActivity.class);
-        intent.putExtra(UserName.toString(), user.getName());
         intent.putExtra(UserId.toString(), user.getId());
         activityResultLauncher.launch(intent);
     }
@@ -220,13 +222,20 @@ public class ProfileActivity extends AppCompatActivity {
         toVisitUserList.removeUserID();
         currentUser.addVisitedTeameeIDs(userId);
         updateFieldToDb("users", CurrentUser.getInstance().getUser().getId(), "visitedTeameeIDs", currentUser.getVisitedTeameeIDs());
-        if (toVisitUserList.getUserIDs().size() > 0) {
+        if (isAlreadyVisited()) {
+            toVisitUserList.removeUserID();
+        } else if (toVisitUserList.getUserIDs().size() > 0) {
             toNextUserProfile();
         } else {
             toVisitUserList.resetList();
             Toast.makeText(this, "No more potential teammate found", Toast.LENGTH_LONG).show();
             finish();
         }
+    }
+
+    private Boolean isAlreadyVisited() {
+        int toVisitSize = toVisitUserList.getUserIDs().size();
+        return (toVisitSize > 0) && !currentUser.getVisitedTeameeIDs().contains(toVisitUserList.getUserID( toVisitSize - 1));
     }
 
     private void toNextUserProfile() {
@@ -353,17 +362,10 @@ public class ProfileActivity extends AppCompatActivity {
         courseList.addView(itemView);
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (currentUser.getId().equals(user.getId())) {
-            updateUserInformation();
-        }
-    }
 
     private void updateUserInformation() {
-        user.setName(name.getText().toString());
         checkChangesAndUpdate(name, user.getName(), "name");
+        user.setName(name.getText().toString());
         checkChangesAndUpdate(major, user.getMajor(), "major");
         checkChangesAndUpdate(GPA, user.getGpa(), "gpa");
         checkChangesAndUpdate(introduction, user.getIntroduction(), "introduction");

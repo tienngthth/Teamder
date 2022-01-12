@@ -8,6 +8,7 @@ import static com.example.teamder.model.IntentModel.IntentName.Id;
 import static com.example.teamder.model.IntentModel.IntentName.Position;
 import static com.example.teamder.model.Request.parseRequest;
 import static com.example.teamder.model.User.parseUser;
+import static com.example.teamder.repository.NotificationRepository.getNotificationListenerByUserIdAndSeenValue;
 import static com.example.teamder.repository.UserRepository.getUserById;
 
 import android.Manifest;
@@ -36,7 +37,6 @@ import com.example.teamder.model.ToVisitUserList;
 import com.example.teamder.model.User;
 import com.example.teamder.repository.AuthenticationRepository;
 import com.example.teamder.repository.GroupRepository;
-import com.example.teamder.repository.NotificationRepository;
 import com.example.teamder.repository.RequestRepository;
 import com.example.teamder.service.NotificationService;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -57,7 +57,7 @@ public class HomeActivity extends AppCompatActivity {
     private TextView newNotificationCount;
     protected Receiver myReceiver;
     protected IntentFilter intentFilter;
-    public static ListenerRegistration groupListenerRegistration, incomingRequestListenerRegistration, outgoingRequestListenerRegistration;
+    public static ListenerRegistration groupListenerRegistration, incomingRequestListenerRegistration, outgoingRequestListenerRegistration, newNotificationListenerRegistration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,13 +125,12 @@ public class HomeActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
     public void setupScreen() {
-        countNewNotification();
         userNameView.setText(", " + CurrentUser.getInstance().getUser().getName());
     }
 
     @SuppressLint("SetTextI18n")
     private void countNewNotification() {
-        NotificationRepository.getNotificationByUserIdAndSeenValue(
+        newNotificationListenerRegistration = getNotificationListenerByUserIdAndSeenValue(
                 currentUser.getId(),
                 false,
                 (querySnapshot) -> {
@@ -153,6 +152,7 @@ public class HomeActivity extends AppCompatActivity {
         generateReceivedRequestsListView();
         generateSentRequestsListView();
         generateCoursesListView();
+        countNewNotification();
     }
 
     @SuppressLint("SetTextI18n")

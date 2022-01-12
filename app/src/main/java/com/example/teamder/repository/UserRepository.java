@@ -5,6 +5,7 @@ import android.util.Log;
 import com.example.teamder.model.CurrentUser;
 import com.example.teamder.model.User;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -47,6 +48,15 @@ public class UserRepository {
                 .document(userID)
                 .get()
                 .addOnSuccessListener(documentSnapshotCallBack::onCallBack);
+    }
+
+    public static ListenerRegistration getUserListenerById(String userID, CallbackInterfaces.DocumentSnapshotCallBack documentSnapshotCallBack) {
+        return FirebaseFirestore.getInstance().collection("users")
+                .document(userID)
+                .addSnapshotListener((snapshot, error) -> {
+                    assert snapshot != null;
+                    documentSnapshotCallBack.onCallBack(snapshot);
+                });
     }
 
     public static void addUser(User user, CallbackInterfaces.DocRefCallBack docRefCallBack, CallbackInterfaces.EmptyCallBack emptyCallBack) {

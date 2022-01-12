@@ -58,6 +58,11 @@ public class NotificationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notification);
         initialiseVariables();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
         getPastNotifications();
     }
 
