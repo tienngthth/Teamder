@@ -8,12 +8,19 @@ import static com.example.teamder.activity.NotificationActivity.Type.NewRequest;
 import static com.example.teamder.activity.NotificationActivity.Type.RejectRequest;
 import static com.example.teamder.activity.NotificationActivity.Type.Suggestion;
 import static com.example.teamder.activity.ProfileActivity.Action.Explore;
+import static com.example.teamder.activity.ProfileActivity.Action.Review;
+import static com.example.teamder.activity.RequestActivity.Status.approved;
+import static com.example.teamder.activity.RequestActivity.Status.pending;
 import static com.example.teamder.model.IntentModel.IntentName.ActionType;
 import static com.example.teamder.model.IntentModel.IntentName.GroupId;
 import static com.example.teamder.model.IntentModel.IntentName.Id;
 import static com.example.teamder.model.IntentModel.IntentName.Position;
 import static com.example.teamder.model.IntentModel.IntentName.UserId;
 import static com.example.teamder.model.Notification.parseNotification;
+import static com.example.teamder.model.ToVisitUserList.countIntersectCourses;
+import static com.example.teamder.model.User.parseUser;
+import static com.example.teamder.repository.RequestRepository.getRequestsByPartiesAndStatus;
+import static com.example.teamder.repository.UserRepository.getUserById;
 import static com.example.teamder.repository.UtilRepository.updateFieldToDb;
 
 import android.annotation.SuppressLint;
@@ -29,11 +36,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.teamder.R;
 import com.example.teamder.model.CurrentUser;
 import com.example.teamder.model.Notification;
+import com.example.teamder.model.User;
 import com.example.teamder.repository.NotificationRepository;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class NotificationActivity extends AppCompatActivity {
 
@@ -47,6 +56,7 @@ public class NotificationActivity extends AppCompatActivity {
         CancelRequest,
         NewRequest,
     }
+
     private final ArrayList<String> newNotificationIDs = new ArrayList<>();
     private final String currentUserID = CurrentUser.getInstance().getUser().getId();
     private LinearLayout pastNotificationList, newNotificationList, pastNotificationGroup, newNotificationGroup;
@@ -100,11 +110,13 @@ public class NotificationActivity extends AppCompatActivity {
     private void updateNotificationView(String notificationGroup, QuerySnapshot documents) {
         if (notificationGroup.equals("PAST")) {
             pastNotificationGroup.setVisibility(documents.size() < 1 ? View.GONE : View.VISIBLE);
+            pastNotificationList.removeAllViews();
             for (QueryDocumentSnapshot document : documents) {
                 setupCustomItemView(pastNotificationList, parseNotification(document));
             }
         } else {
             newNotificationGroup.setVisibility(documents.size() < 1 ? View.GONE : View.VISIBLE);
+            newNotificationList.removeAllViews();
             for (QueryDocumentSnapshot document : documents) {
                 Notification notification = parseNotification(document);
                 setupCustomItemView(newNotificationList, notification);
@@ -135,11 +147,8 @@ public class NotificationActivity extends AppCompatActivity {
             Intent intent = new Intent(NotificationActivity.this, ProfileActivity.class);
             startActivity(intent);
         } else if (notificationType.equals(Suggestion)) {
-            Intent intent = new Intent(NotificationActivity.this, ProfileActivity.class);
-            intent.putExtra(ActionType.toString(), Explore);
-            intent.putExtra(UserId.toString(), notification.getObjectId());
-            startActivity(intent);
-        } else if (notificationType.equals(NewRequest) || notificationType.equals(CancelRequest) ) {
+            checkIntersectCourses(notification.getObjectId());
+        } else if (notificationType.equals(NewRequest) || notificationType.equals(CancelRequest)) {
             Intent intent = new Intent(NotificationActivity.this, ReviewActivity.class);
             intent.putExtra(Id.toString(), notification.getObjectId());
             intent.putExtra(Position.toString(), "received");
@@ -158,6 +167,30 @@ public class NotificationActivity extends AppCompatActivity {
             intent.putExtra(GroupId.toString(), notification.getObjectId());
             startActivity(intent);
         }
+    }
+
+    private void checkIntersectCourses(String userId) {
+        Intent intent = new Intent(NotificationActivity.this, ProfileActivity.class);
+        intent.putExtra(UserId.toString(), userId);
+        getUserById(userId, (documentSnapshot -> {
+            User user = parseUser(documentSnapshot);
+            ArrayList<String> parties = new ArrayList<>(Arrays.asList(currentUserID, userId));
+            getRequestsByPartiesAndStatus(pending.toString(), parties, (snapshot) -> {
+                        final int[] requestNo = {snapshot.getDocuments().size()};
+                        getRequestsByPartiesAndStatus(approved.toString(), parties, (documentSnapshots) -> {
+                            requestNo[0] += documentSnapshots.getDocuments().size();
+                            int courseAvailable = (countIntersectCourses(user) - requestNo[0]);
+                            if (courseAvailable > 0) {
+                                intent.putExtra(ActionType.toString(), Explore);
+                                finish();
+                            } else {
+                                intent.putExtra(ActionType.toString(), Review);
+                            }
+                            startActivity(intent);
+                        });
+                    }
+            );
+        }));
     }
 
     @Override

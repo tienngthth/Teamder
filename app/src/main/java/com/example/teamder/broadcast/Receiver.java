@@ -35,7 +35,6 @@ public class Receiver extends BroadcastReceiver {
         if(intent.getAction().equals("android.intent.action.PHONE_STATE")){
             reportPhoneState(context, intent);
         }
-        // should we do it for message as well?
     }
 
     private void reportPhoneState(Context context, Intent intent){
